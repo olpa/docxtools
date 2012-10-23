@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+
+    <rewriteURI uriStartString="http://transpect.le-tex.de/docx2hub" rewritePrefix="../"/>
+
+<!-- Will cause a stack overflow (circular inclusion of catalogs when calabash's catalog has already been used?) -->
+<!--     <nextCatalog catalog="../calabash/resolver/catalog.xml"/> -->
+
+</catalog>

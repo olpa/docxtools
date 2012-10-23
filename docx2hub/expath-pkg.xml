@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="../transpect/schema/expath-pkg.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<package 
+    xmlns="http://expath.org/ns/pkg" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    
+    version="1.0"
+    spec="1.0-alpha1"
+    name="http://www.le-tex.de/namespace/docx2hub" 
+    abbrev="docx2hub">
+    <title>Docx2Hub-Converter</title>
+    
+    <rdf:Description>
+        <dc:Title>Docx2Hub-Converter</dc:Title>
+        <dc:Identifier id="docx2hub"/>
+        <dc:Date>2012-08-07</dc:Date>
+        <dc:Description>Converts DOCX files to HUB xml</dc:Description>
+    </rdf:Description>
+    
+    <dependency processor="saxon" version="he"/>
+    
+    <dependency package="tr-eval" version="0.1"/>
+    <dependency package="tr-install" version="0.1"/>
+    
+    <xproc>
+        <import-uri>http://www.le-tex.de/namespace/docx2hub/wml2hub.xpl</import-uri>
+        <file>wml2hub.xpl</file>
+    </xproc>
+        
+</package>

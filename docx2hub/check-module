@@ -1,0 +1,28 @@
+#! /bin/bash
+
+flag=0
+
+for f in tests/*.docx; do
+    name=`basename $f .docx`
+    echo "Testing `basename $name` ..."
+    { make DATA_DIR=`pwd`/tests/ MS=$name hub >& /dev/null; } \
+	&& echo "  ... converting passed" \
+	|| echo "  ... converting failed";
+    { diff tests/$name/hub/$name.hub.xml tests/$name.hub.xml  > /dev/null; }\
+	&& echo "  ... success!" \
+	|| { echo "  ... failed! Reference document and new document are not the same."; flag=1;}
+    rm -r tests/$name
+done
+
+
+
+if [ $flag == 1 ]; then
+    echo
+    echo "I am sorry. Check failed."
+    echo
+    exit -1
+else
+    echo
+    echo "Success! All documents reproduce!"
+    echo 
+fi
