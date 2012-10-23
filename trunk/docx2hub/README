@@ -1,0 +1,6 @@
+Anlegen eines neuen Projekts:
+
+1. external auf http://svn/svn/ltxbase/WordML_nach_DocBook_Konvertierung/trunk/ im Ordner base anlegen.
+
+2. svn up
+

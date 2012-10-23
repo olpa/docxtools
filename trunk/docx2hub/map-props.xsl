@@ -1,0 +1,654 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xsl:stylesheet version="2.0"
+
+  xmlns:xsl		= "http://www.w3.org/1999/XSL/Transform"
+  xmlns:fn              = "http://www.w3.org/2005/xpath-functions"
+  xmlns:xs		= "http://www.w3.org/2001/XMLSchema"
+  xmlns:w		= "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+  xmlns:word200x	= "http://schemas.microsoft.com/office/word/2003/wordml"
+  xmlns:v		= "urn:schemas-microsoft-com:vml" 
+  xmlns:dbk		= "http://docbook.org/ns/docbook"
+  xmlns:wx		= "http://schemas.microsoft.com/office/word/2003/auxHint"
+  xmlns:o		= "urn:schemas-microsoft-com:office:office"
+  xmlns:pkg		= "http://schemas.microsoft.com/office/2006/xmlPackage"
+  xmlns:r		= "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:rel		= "http://schemas.openxmlformats.org/package/2006/relationships"
+  xmlns:exsl		= 'http://exslt.org/common'
+  xmlns:saxon		= "http://saxon.sf.net/"
+  xmlns:letex		= "http://www.le-tex.de/namespace"
+  xmlns:docx2hub = "http://www.le-tex.de/namespace/docx2hub"
+  xmlns:mml             = "http://www.w3.org/Math/DTD/mathml2/mathml2.dtd"
+  xmlns:css="http://www.w3.org/1996/css"
+  xmlns="http://docbook.org/ns/docbook"
+
+  exclude-result-prefixes = "w o v wx xs dbk pkg r rel word200x exsl saxon fn letex mml docx2hub"
+>
+
+  <xsl:import href="propmap.xsl"/>
+  <xsl:import href="letex-util/colors/colors.xsl"/>
+
+  <xsl:key name="docx2hub:style" match="w:style" use="@w:styleId" />
+  <xsl:key name="docx2hub:style-by-role" match="dbk:style" use="@role" />
+
+  <xsl:template match="/" mode="docx2hub:add-props">
+    <xsl:apply-templates select="w:root/w:document/w:body" mode="#current" />
+  </xsl:template>
+
+  <xsl:template match="@srcpath" mode="docx2hub:add-props">
+    <xsl:attribute name="srcpath" select="substring-after(., /w:root/@xml:base)" />
+  </xsl:template>
+
+  <xsl:template match="w:body" mode="docx2hub:add-props">
+    <Body version="5.1-variant le-tex_Hub-1.0" css:version="3.0-variant le-tex_Hub-1.0">
+      <info>
+        <keywordset role="hub">
+          <keyword role="formatting-deviations-only">true</keyword>
+          <keyword role="source-type">docx</keyword>
+          <xsl:if test="/w:root/@xml:base != ''">
+            <keyword role="source-dir-uri">
+              <xsl:value-of select="/w:root/@xml:base" />
+            </keyword>
+          </xsl:if>
+        </keywordset>
+        <styles>
+          <parastyles>
+            <xsl:apply-templates select="key('docx2hub:style', distinct-values(.//w:pStyle/@w:val))
+                                         union
+                                         (: Resolve linked char styles as their respective para styles :)
+                                         key(
+                                           'docx2hub:style',
+                                           key('docx2hub:style', distinct-values(.//w:rStyle/@w:val))/w:link/@w:val
+                                         )" mode="#current">
+              <xsl:sort select="@w:styleId" />
+            </xsl:apply-templates>
+          </parastyles>
+          <inlinestyles>
+            <xsl:apply-templates select="key('docx2hub:style', distinct-values(.//w:rStyle/@w:val))[not(w:link)]" mode="#current">
+              <xsl:sort select="@w:styleId" />
+            </xsl:apply-templates>
+          </inlinestyles>
+          <tablestyles>
+            <xsl:apply-templates select="key('docx2hub:style', distinct-values(.//w:tblStyle/@w:val))" mode="#current">
+              <xsl:sort select="@w:styleId" />
+            </xsl:apply-templates>
+          </tablestyles>
+          <cellstyles/>
+        </styles>
+      </info>
+      <xsl:copy-of select="../../w:numbering, ../../w:docRels, ../../w:footnoteRels, ../../w:commentRels, ../../w:fonts" />
+      <xsl:apply-templates select="../../w:comments, ../../w:footnotes" mode="#current"/>
+      <xsl:apply-templates mode="#current"/>
+    </Body>
+  </xsl:template>
+
+  <xsl:template match="w:style" mode="docx2hub:add-props">
+    <xsl:param name="wrap-in-style-element" select="true()" as="xs:boolean"/>
+    <xsl:variable name="atts" as="element(*)*"> <!-- docx2hub:attribute, ... -->
+      <xsl:apply-templates select="if (w:basedOn/@w:val) 
+                                   then key('docx2hub:style', w:basedOn/@w:val) 
+                                   else ()" mode="#current">
+        <xsl:with-param name="wrap-in-style-element" select="false()"/>
+      </xsl:apply-templates>
+      <xsl:variable name="mergeable-atts" as="element(*)*"> <!-- docx2hub:attribute, ... -->
+        <xsl:apply-templates select="* except w:basedOn" mode="#current" />
+      </xsl:variable>
+      <xsl:for-each-group select="$mergeable-atts[self::docx2hub:attribute]" group-by="@name">
+        <docx2hub:attribute name="{current-grouping-key()}"><xsl:value-of select="current-group()" /></docx2hub:attribute>
+      </xsl:for-each-group>
+      <xsl:sequence select="$mergeable-atts[not(self::docx2hub:attribute)]"/>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$wrap-in-style-element">
+        <style>
+          <xsl:sequence select="$atts"/>
+        </style>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="$atts"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template match="w:basedOn/@w:val" mode="docx2hub:add-props" />
+
+
+  <xsl:template match="w:rPr | w:pPr" mode="docx2hub:add-props" priority="2">
+    <xsl:apply-templates mode="#current" />
+  </xsl:template>
+
+  <!-- § 17.3.1.29: this is only for the paragraph mark's formatting: -->
+  <xsl:template match="w:pPr/w:rPr" mode="docx2hub:add-props" priority="2.5" />
+
+  <xsl:template match="w:tblPr" mode="docx2hub:add-props" priority="2">
+    <xsl:copy copy-namespaces="no">
+      <xsl:apply-templates mode="#current" />
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="w:tcPr" mode="docx2hub:add-props" priority="2">
+    <xsl:apply-templates mode="#current" />
+    <!-- for cellspan etc. processing as defined in tables.xsl: -->
+    <xsl:copy-of select="." />
+  </xsl:template>
+
+  <xsl:template match="w:ind" mode="docx2hub:add-props" priority="2">
+    <!-- Precedence as per § 17.3.1.12.
+         Ignore the ..Chars variants and start/end for the time being. -->
+    <xsl:apply-templates select="@w:left | @w:right | @w:firstLine, @w:hanging" mode="#current" />
+  </xsl:template>
+
+  <xsl:template match="w:pBdr | w:tcBorders" mode="docx2hub:add-props" priority="2">
+    <xsl:apply-templates select="w:left | w:right | w:top | w:bottom" mode="#current" />
+  </xsl:template>
+
+  <xsl:template match="w:spacing" mode="docx2hub:add-props" priority="2">
+    <!-- Precedence as per § 17.3.1.33.
+         Ignore autosacing and lineRule.
+         Handles both w:pPr/w:spacing and w:rPr/w:spacing in this template rule. -->
+    <xsl:apply-templates select="@w:val | @w:after | @w:before | @w:line, @w:afterLines | @w:beforeLines" mode="#current" />
+  </xsl:template>
+
+  <xsl:template match="w:tcW" mode="docx2hub:add-props" priority="2">
+    <xsl:apply-templates select="@w:w" mode="#current" />
+  </xsl:template>
+
+  <xsl:template match="  w:style/*
+                       | w:rPr/* 
+                       | w:pBdr/* 
+                       | w:pPr/* 
+                       | w:tblPr/*
+                       | w:tcBorders/* 
+                       | w:tcPr/*
+                       | w:ind/@* 
+                       | w:tab/@*
+                       | w:tcW/@* 
+                       | w:spacing/@* 
+                       | v:shape/@* 
+                       " 
+    mode="docx2hub:add-props">
+    <xsl:variable name="prop" select="key('docx2hub:prop', docx2hub:propkey(.), $docx2hub:propmap)" />
+    <xsl:variable name="raw-output" as="element(*)*">
+      <xsl:apply-templates select="$prop" mode="#current">
+        <xsl:with-param name="val" select="." tunnel="yes" />
+      </xsl:apply-templates>
+      <xsl:if test="empty($prop)">
+        <!-- Fallback (no mapping in propmap): -->
+        <docx2hub:attribute name="docx2hub:generated-{local-name()}"><xsl:value-of select="docx2hub:serialize-prop(.)" /></docx2hub:attribute>
+      </xsl:if>
+    </xsl:variable>
+    <xsl:sequence select="$raw-output" />
+  </xsl:template>
+
+  <xsl:template match="@w:rsid 
+                       | @w:rsidR
+                       | @w:rsidRPr
+                       | @w:rsidRDefault
+                       | @w:rsidP"
+    mode="docx2hub:add-props" />
+
+  <xsl:function name="docx2hub:propkey" as="xs:string">
+    <xsl:param name="prop" as="node()" /> <!-- w:sz, ... -->
+    <xsl:choose>
+      <xsl:when test="$prop/self::attribute()">
+        <xsl:sequence select="string-join((name($prop/..), name($prop)), '/@')" />
+      </xsl:when>
+      <xsl:when test="$prop/(parent::w:pBdr, parent::w:tcBorders)">
+        <xsl:sequence select="string-join((name($prop/..), name($prop)), '/')" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="name($prop)" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:function>
+
+  <xsl:function name="docx2hub:serialize-prop" as="xs:string">
+    <xsl:param name="prop" as="item()" /> <!-- w:sz, @fillcolor, ... -->
+    <xsl:sequence select="string-join(
+                            for $a in 
+                              if ($prop instance of element()) 
+                              then $prop/@* 
+                              else $prop (: attribute() :)
+                            return concat(name($a), ':', $a),
+                            '; '
+                          )" />
+  </xsl:function>
+
+  <xsl:template match="prop" mode="docx2hub:add-props" as="node()*">
+    <xsl:param name="val" as="node()" tunnel="yes" />
+    <xsl:variable name="atts" as="element(*)*">
+      <!-- in the following line, val is a potential child of prop (do not cofuse with $val)! -->
+      <xsl:apply-templates select="@type, val" mode="#current" />
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="empty($atts) and @default">
+        <docx2hub:attribute name="{@target-name}"><xsl:value-of select="@default" /></docx2hub:attribute>
+      </xsl:when>
+      <xsl:when test="empty($atts)" />
+      <xsl:otherwise>
+        <xsl:sequence select="$atts" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template match="val" mode="docx2hub:add-props" as="element(*)?">
+    <xsl:apply-templates select="@eq, @match" mode="#current" />
+  </xsl:template>
+
+  <xsl:template match="prop/@type" mode="docx2hub:add-props" as="node()*">
+    <xsl:param name="val" as="node()" tunnel="yes" />
+    <xsl:choose>
+
+      <xsl:when test=". eq 'percentage'">
+        <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="if (xs:integer($val) eq -1) then 1 else xs:double($val) * 0.01" /></docx2hub:attribute>
+      </xsl:when>
+
+      <xsl:when test=". eq 'lang'">
+        <docx2hub:attribute name="{../@target-name}">
+          <!-- provisional -->
+          <xsl:value-of select="if (matches($val, 'German') or matches($val, '\Wde\W'))
+                                then 'de'
+                                else 
+                                  if (matches($val, 'English'))
+                                  then 'en'
+                                  else $val" />
+        </docx2hub:attribute>
+      </xsl:when>
+
+      <xsl:when test=". eq 'docx-boolean-prop'">
+        <xsl:choose>
+          <xsl:when test="$val/@w:val = '0'">
+            <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="../@default" /></docx2hub:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="../@active" /></docx2hub:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+
+      <xsl:when test=". eq 'docx-border'">
+        <!-- According to § 17.3.1.5 and other sections, the top/bottom borders don't apply
+             if a set of paras has identical border settings. The between setting should be used instead.
+             TODO -->
+        <xsl:if test="not($val/@w:val eq 'nil')">
+          <xsl:variable name="orientation" select="replace(../@name, '^.+:', '')" as="xs:string" />
+          <docx2hub:attribute name="css:border-{$orientation}-style"><xsl:value-of select="docx2hub:border-style($val/@w:val)" /></docx2hub:attribute>
+          <docx2hub:attribute name="css:border-{$orientation}-width"><xsl:value-of select="docx2hub:pt-length($val/@w:sz)" /></docx2hub:attribute>
+          <xsl:if test="$val/@w:color ne 'auto'">
+            <docx2hub:attribute name="css:border-{$orientation}-color"><xsl:value-of select="docx2hub:color($val/@w:color)" /></docx2hub:attribute>
+          </xsl:if>
+        </xsl:if>
+      </xsl:when>
+
+      <xsl:when test=". eq 'docx-charstyle'">
+        <xsl:variable name="linked" as=" xs:string?" select="key('docx2hub:style', $val/@w:val, root($val))/w:link/@w:val"/>
+        <docx2hub:attribute name="role"><xsl:value-of select="key(
+                                                                'docx2hub:style',
+                                                                if ($linked)
+                                                                then $linked
+                                                                else $val/@w:val,
+                                                                root($val)
+                                                              )/w:name/@w:val" /></docx2hub:attribute>
+      </xsl:when>
+
+      <xsl:when test=". eq 'docx-color'">
+        <xsl:variable name="colorval" as="xs:string?" select="docx2hub:color( ($val/@w:val, $val)[1] )" />
+        <xsl:if test="$colorval">
+          <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="$colorval" /></docx2hub:attribute>
+        </xsl:if>
+      </xsl:when>
+
+      <xsl:when test=". eq 'docx-font-family'">
+        <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="$val/(@w:ascii, @w:cs)[1]" /></docx2hub:attribute>
+      </xsl:when>
+
+      <xsl:when test=". eq 'docx-font-size'">
+        <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="concat(number($val/@w:val) * 0.5, 'pt')" /></docx2hub:attribute>
+      </xsl:when>
+
+      <xsl:when test=". eq 'docx-font-stretch'">
+        <xsl:variable name="result" as="xs:string">
+          <xsl:choose>
+            <xsl:when test="$val/@w:val &lt; 40">
+              <xsl:sequence select="'ultra-condensed'" />
+            </xsl:when>
+            <xsl:when test="$val/@w:val &lt; 60">
+              <xsl:sequence select="'extra-condensed'" />
+            </xsl:when>
+            <xsl:when test="$val/@w:val &lt; 80">
+              <xsl:sequence select="'condensed'" />
+            </xsl:when>
+            <xsl:when test="$val/@w:val &lt; 96">
+              <xsl:sequence select="'semi-condensed'" />
+            </xsl:when>
+            <xsl:when test="$val/@w:val &lt; 104">
+              <xsl:sequence select="'normal'" />
+            </xsl:when>
+            <xsl:when test="$val/@w:val &lt; 120">
+              <xsl:sequence select="'semi-expanded'" />
+            </xsl:when>
+            <xsl:when test="$val/@w:val &lt; 140">
+              <xsl:sequence select="'expanded'" />
+            </xsl:when>
+            <xsl:when test="$val/@w:val &lt; 160">
+              <xsl:sequence select="'extra-expanded'" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:sequence select="'ultra-expanded'" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="$result" /></docx2hub:attribute>
+      </xsl:when>
+
+      <xsl:when test=". eq 'docx-hierarchy-level'">
+        <xsl:if test="not($val/@w:val eq '9')"><!-- § 17.3.1.20 -->
+          <docx2hub:attribute name="remap"><xsl:value-of select="concat('h', xs:integer($val/@w:val) + 1)" /></docx2hub:attribute>
+        </xsl:if>
+      </xsl:when>
+
+      <xsl:when test=". eq 'docx-length-attr'">
+        <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="docx2hub:pt-length($val)" /></docx2hub:attribute>
+      </xsl:when>
+
+      <xsl:when test=". eq 'docx-length-attr-negated'">
+        <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="docx2hub:pt-length(concat('-', $val))" /></docx2hub:attribute>
+      </xsl:when>
+
+      <xsl:when test=". eq 'docx-parastyle'">
+        <docx2hub:attribute name="role"><xsl:value-of select="key(
+                                                                'docx2hub:style',
+                                                                $val/@w:val,
+                                                                root($val)
+                                                              )/w:name/@w:val" /></docx2hub:attribute>
+      </xsl:when>
+
+      <xsl:when test=". eq 'docx-shd'">
+        <xsl:choose>
+          <xsl:when test="$val/@w:val eq 'clear'">
+            <xsl:if test="$val/@w:fill ne 'auto'">
+              <docx2hub:attribute name="css:background-color"><xsl:value-of select="concat('#', $val/@w:fill)" /></docx2hub:attribute>
+            </xsl:if>
+          </xsl:when>
+          <xsl:when test="$val/@w:val eq 'solid'">
+            <docx2hub:attribute name="css:background-color"><xsl:value-of select="concat('#', $val/@w:color)" /></docx2hub:attribute>
+          </xsl:when>
+          <xsl:when test="matches($val/@w:val, '^pct')">
+            <xsl:choose>
+              <xsl:when test="$val/@w:fill = 'auto' and $val/@w:color = 'auto'">
+                <docx2hub:color-percentage target="css:background-color" use="css:color"><xsl:value-of select="replace($val/@w:val, '^pct', '')" /></docx2hub:color-percentage>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:message>map-props.xsl: w:shd/@w:val='pct*' only implemented for @w:color='auto' and @w:fill='auto'
+                <xsl:copy-of select="$val" />
+              </xsl:message>
+            </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:message>map-props.xsl: w:shd/@w:val other than 'clear', 'pct*', and 'solid' not implemented.
+            <xsl:copy-of select="$val" />
+            </xsl:message>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+
+      <xsl:when test=". eq 'docx-underline'">
+        <!-- §§§ TODO -->
+        <docx2hub:attribute name="css:text-decoration-line"><xsl:value-of select="'underline'" /></docx2hub:attribute>
+      </xsl:when>
+
+      <xsl:when test=". eq 'tablist'">
+        <tabs>
+          <xsl:apply-templates select="$val/*" mode="#current"/>
+        </tabs>
+      </xsl:when>
+
+      <xsl:when test=". eq 'linear'">
+        <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="if ($val/self::attribute())
+                                                                           then $val
+                                                                           else $val/@w:val" /></docx2hub:attribute>
+      </xsl:when>
+
+      <xsl:when test=". eq 'passthru'">
+        <xsl:copy-of select="$val" copy-namespaces="no"/>
+      </xsl:when>
+
+      <xsl:when test=". eq 'position'">
+        <xsl:choose>
+          <xsl:when test="$val eq 'Normal'" />
+          <xsl:otherwise>
+            <docx2hub:wrap element="{lower-case($val)}" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+
+      <xsl:when test=". eq 'style-link'">
+        <docx2hub:style-link type="{../@name}" target="{$val}"/>
+      </xsl:when>
+
+      <xsl:otherwise>
+        <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="$val" /></docx2hub:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:function name="docx2hub:color" as="xs:string?" >
+    <xsl:param name="val" as="xs:string"/>
+    <xsl:choose>
+      <xsl:when test="$val = ('auto', 'none')" />
+      <xsl:when test="matches($val, '^#[0-9a-f]{6}$')">
+        <!-- e.g., v:shape/@fillcolor -->
+        <xsl:sequence select="upper-case($val)" />
+      </xsl:when>
+      <xsl:when test="matches($val, '[0-9A-F]{6}')">
+        <xsl:sequence select="concat('#', $val)" />
+      </xsl:when>
+      <xsl:when test="$val = ('black', 'blue', 'green', 'red', 'white', 'yellow')">
+        <xsl:sequence select="$val" />
+      </xsl:when>
+      <xsl:when test="$val eq 'cyan'">
+        <xsl:sequence select="'#00FFFF'" />
+      </xsl:when>
+      <xsl:when test="$val eq 'darkBlue'">
+        <xsl:sequence select="'#00008B'" />
+      </xsl:when>
+      <xsl:when test="$val eq 'darkCyan'">
+        <xsl:sequence select="'#008B8B'" />
+      </xsl:when>
+      <xsl:when test="$val eq 'darkGray'">
+        <xsl:sequence select="'#A9A9A9'" />
+      </xsl:when>
+      <xsl:when test="$val eq 'darkGreen'">
+        <xsl:sequence select="'#006400'" />
+      </xsl:when>
+      <xsl:when test="$val eq 'darkMagenta'">
+        <xsl:sequence select="'#800080'" />
+      </xsl:when>
+      <xsl:when test="$val eq 'darkRed'">
+        <xsl:sequence select="'#8B0000'" />
+      </xsl:when>
+      <xsl:when test="$val eq 'darkYellow'">
+        <xsl:sequence select="'#808000'" />
+      </xsl:when>
+      <xsl:when test="$val eq 'lightGray'">
+        <xsl:sequence select="'#D3D3D3'" />
+      </xsl:when>
+      <xsl:when test="$val eq 'magenta'">
+        <xsl:sequence select="'#FF00FF'" />
+      </xsl:when>
+      <xsl:otherwise><!-- shouldn't happen -->
+        <xsl:sequence select="''" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:function>
+
+  <xsl:function name="docx2hub:pt-length" as="xs:string" >
+    <xsl:param name="val" as="xs:string"/>
+    <xsl:sequence select="if (matches($val, '%$'))
+                          then $val
+                          else concat(xs:string(xs:integer($val) * 0.05), 'pt')" />
+  </xsl:function>
+
+  <xsl:function name="docx2hub:border-style" as="xs:string" >
+    <xsl:param name="val" as="xs:string"/>
+    <xsl:choose>
+      <xsl:when test="$val eq 'single'">
+        <xsl:sequence select="'solid'" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="$val" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:function>
+
+  <xsl:template match="val/@match" mode="docx2hub:add-props" as="element(*)?">
+    <xsl:param name="val" as="node()" tunnel="yes" />
+    <xsl:if test="matches($val/@w:val, .)">
+      <xsl:call-template name="docx2hub:XML-Hubformat-atts" />
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="val/@eq" mode="docx2hub:add-props" as="element(*)?">
+    <xsl:param name="val" as="node()" tunnel="yes" />
+    <xsl:if test="$val eq .">
+      <xsl:call-template name="docx2hub:XML-Hubformat-atts" />
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="docx2hub:XML-Hubformat-atts" as="element(*)?">
+    <xsl:variable name="target-val" select="(../@target-value, ../../@target-value)[last()]" as="xs:string?" />
+    <xsl:if test="exists($target-val)">
+      <docx2hub:attribute name="{(../@target-name, ../../@target-name)[last()]}"><xsl:value-of select="$target-val" /></docx2hub:attribute>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="Color" mode="docx2hub:add-props" as="xs:string">
+    <xsl:param name="multiplier" as="xs:double" select="1.0" />
+    <xsl:choose>
+      <xsl:when test="@Space eq 'CMYK'">
+        <xsl:sequence select="concat(
+                                'device-cmyk(', 
+                                string-join(
+                                  for $v in tokenize(@ColorValue, '\s') return xs:string(xs:integer(xs:double($v) * 10000 * $multiplier) * 0.000001)
+                                  , ','
+                                ),
+                                ')'
+                              )" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:message>Unknown colorspace <xsl:value-of select="@Space"/>
+        </xsl:message>
+        <xsl:sequence select="@ColorValue" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template match="w:tabs/w:tab" mode="docx2hub:add-props" as="element(dbk:tab)" priority="2">
+    <tab>
+      <xsl:apply-templates select="@*" mode="#current" />
+    </tab>
+  </xsl:template>
+
+
+  <xsl:key name="docx2hub:style" 
+    match="CellStyle | CharacterStyle | ObjectStyle | ParagraphStyle | TableStyle" 
+    use="@Self" />
+
+
+  <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+  <!-- mode: docx2hub:props2atts -->
+  <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+  <xsl:template match="* | @*" mode="docx2hub:props2atts">
+    <xsl:variable name="content" as="node()*">
+      <xsl:apply-templates select="docx2hub:style-link" mode="#current" />
+      <xsl:apply-templates select="docx2hub:attribute[not(@name = following-sibling::docx2hub:remove-attribute/@name)]" mode="#current" />
+      <xsl:apply-templates select="docx2hub:color-percentage[not(@name = following-sibling::docx2hub:remove-attribute/@name)]" mode="#current" />
+      <xsl:apply-templates select="node() except (docx2hub:attribute | docx2hub:wrap | docx2hub:style-link | dbk:tabs)" mode="#current" />
+      <xsl:variable name="remaining-tabs" as="element(dbk:tab)*">
+        <xsl:for-each-group select="dbk:tabs/dbk:tab" group-by="docx2hub:attribute[@name eq 'horizontal-position']">
+          <xsl:if test="not(current-group()[last()]/docx2hub:attribute[@name eq 'clear'])">
+            <xsl:apply-templates select="current-group()[last()]" mode="#current"/>
+          </xsl:if>
+        </xsl:for-each-group>
+      </xsl:variable>
+      <xsl:if test="exists($remaining-tabs)">
+        <tabs>
+          <xsl:sequence select="$remaining-tabs" />
+        </tabs>
+      </xsl:if>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="exists(docx2hub:wrap) and exists(self::dbk:style)">
+        <xsl:copy>
+          <xsl:copy-of select="@*"/>
+          <xsl:attribute name="remap" select="docx2hub:wrap/@element" />
+        </xsl:copy>
+      </xsl:when>
+      <xsl:when test="exists(docx2hub:wrap) and not(self::dbk:style)">
+        <xsl:sequence select="docx2hub:wrap($content, (docx2hub:wrap))" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:copy>
+          <xsl:sequence select="@*, $content" />
+        </xsl:copy>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:function name="docx2hub:wrap" as="node()*">
+    <xsl:param name="content" as="node()*" />
+    <xsl:param name="wrappers" as="element(docx2hub:wrap)*" />
+    <xsl:choose>
+      <xsl:when test="exists($wrappers)">
+        <xsl:element name="{$wrappers[1]/@element}">
+          <xsl:sequence select="docx2hub:wrap($content, $wrappers[position() gt 1])" />
+        </xsl:element>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="$content" mode="docx2hub:props2atts"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:function>
+
+  <xsl:template match="docx2hub:attribute" mode="docx2hub:props2atts">
+    <xsl:attribute name="{@name}" select="." />
+  </xsl:template>
+
+  <xsl:template match="docx2hub:attribute[@name = ('fill-tint')]" mode="docx2hub:props2atts"/>
+
+  <xsl:template match="docx2hub:color-percentage" mode="docx2hub:props2atts">
+    <xsl:variable name="color" select="(../docx2hub:attribute[@name eq 'css:color'][last()], '#000')[1]" as="xs:string" />
+    <xsl:attribute name="{@target}" select="letex:tint-hex-color($color, number(.) * 0.01)" />
+  </xsl:template>
+
+  <!-- Let only the last setting prevail: -->
+  <xsl:template match="w:numPr[following-sibling::w:numPr]" mode="docx2hub:props2atts" />
+  <xsl:template match="w:tblPr[following-sibling::w:tblPr]" mode="docx2hub:props2atts" />
+  <xsl:template match="w:tcPr[following-sibling::w:tcPr]" mode="docx2hub:props2atts" />
+
+
+
+    
+  <xsl:template match="docx2hub:remove-attribute" mode="docx2hub:props2atts" />
+
+  <xsl:template match="docx2hub:style-link" mode="docx2hub:props2atts">
+    <xsl:attribute name="{if (@type eq 'AppliedParagraphStyle')
+                          then 'parastyle'
+                          else @type}" 
+      select="@target" />
+  </xsl:template>
+
+  <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+  <!-- mode: docx2hub:remove-redundant-run-atts -->
+  <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+  <xsl:template match="w:r/@*[some $att in ../ancestor::w:p[1]/@* 
+                       satisfies (
+                         name($att) eq name(current())
+                         and 
+                         xs:string($att) eq xs:string(current())
+                       )]" mode="docx2hub:remove-redundant-run-atts" />
+
+
+</xsl:stylesheet>
