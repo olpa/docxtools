@@ -58,6 +58,7 @@
       select="if (ancestor::w:footnote)
               then 'footnote-rel-by-id'
               else 'doc-rel-by-id'" />
+    <xsl:variable name="styles" select="tokenize(parent::v:shape/@style,';')" as="xs:string*"/>
     <xsl:element name="{if ($inline) then 'inlinemediaobject' else 'mediaobject'}">
       <xsl:attribute name="role" select="'imagedata'"/>
       <imageobject>
@@ -65,7 +66,14 @@
         <xsl:attribute name="style" select="parent::v:shape/@style"/>
         -->
         <xsl:apply-templates select="@* except @r:id" mode="#current"/>
-        <imagedata fileref="{key($key-name, current()/@r:id)/@Target}"/>
+        <imagedata fileref="{key($key-name, current()/@r:id)/@Target}">
+          <xsl:if test="$styles[matches(.,'^width')]">
+            <xsl:attribute name="width" select="tokenize($styles[matches(.,'^width')],':')[2]"/>
+          </xsl:if>
+          <xsl:if test="$styles[matches(.,'^height')]">
+            <xsl:attribute name="depth" select="tokenize($styles[matches(.,'^height')],':')[2]"/>
+          </xsl:if>
+        </imagedata>
       </imageobject>
       <xsl:variable name="img-file-name" select="key($key-name, current()/@r:id)/@Target" as="xs:string" />
       <xsl:if test="matches($img-file-name, '^media/image[0-9]+\.(jpe?g|png|tiff?)$')">
