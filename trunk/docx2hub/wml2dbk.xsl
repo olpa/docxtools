@@ -432,6 +432,7 @@ Entwicklung: le-tex publishing services oHG (2008)
     </xsl:call-template>
   </xsl:template>
 
+  <xsl:template match="w:commentRels" mode="wml-to-dbk"/>
 
 
   <!-- element section -->
