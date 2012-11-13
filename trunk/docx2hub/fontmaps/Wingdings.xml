@@ -2,8 +2,11 @@
 <symbols>
   <symbol number="F049" entity="&#xF049;" char="&#x2709;"/><!-- raised hand -->
   <symbol number="F04A" entity="&#xF04A;" char="&#x263a;"/><!-- happy smiley -->
+  <symbol number="004A" entity="J" char="&#x263A;"/><!-- happy smiley -->
   <symbol number="F04B" entity="&#xF04B;" char="&#x1F610;"/><!-- neutral smiley -->
   <symbol number="F04C" entity="&#xF04C;" char="&#x263b;"/><!-- sad smiley -->
+  <symbol number="004C" entity="L" char="&#x2639;"/><!-- sad smiley -->
+  <symbol number="F05D" entity="&#xF05D;" char="&#x21d2;"/><!-- Rightwards Double Arrow -->
   <symbol number="F0A7" entity="&#xF0A7;" char="&#x25aa;"/><!-- BLACK SMALL SQUARE -->
   <symbol number="F0DF" entity="&#xF0DF;" char="&#x2190;"/><!-- LEFTWARDS ARROW -->
   <symbol number="F0E0" entity="&#xF0E0;" char="&#x2192;"/><!-- RIGHTWARDS ARROW -->
@@ -12,4 +15,8 @@
   <symbol number="F0FE" entity="&#xF0FE;" char="&#x2611;"/><!-- BALLOT BOX WITH CHECK -->
   <symbol number="003F" entity="&#x003F;" char="&#x2794;"/><!-- Heavy wide-headed rightwards arrow -->
   <symbol number="0AEA" entity="&#x0AEA;" char="&#x2794;"/><!-- Heavy wide-headed rightwards arrow -->
+  <symbol number="F06F" entity="" char="&#x25A1;"/><!-- WHITE SQUARE -->
+  <symbol number="006F" entity="o" char="&#x25A1;"/><!-- WHITE SQUARE -->
+  <symbol number="F0A8" entity="" char="&#x25FB;"/><!-- WHITE MEDIUM SQUARE -->
+  <symbol number="F0FC" entity="&#252;" char="&#x2713;"/><!-- CHECK MARK -->
 </symbols>
