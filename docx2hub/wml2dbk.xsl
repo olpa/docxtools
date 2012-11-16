@@ -62,6 +62,15 @@ Entwicklung: le-tex publishing services oHG (2008)
             then document(concat($base-dir, '/footnotes.xml'))/w:footnotes
             else ()" 
     as="element(w:footnotes)?" />
+  <xsl:variable name="docRels" select="if (doc-available(concat($base-dir, '/_rels/document.xml.rels'))) 
+                                            then document(concat($base-dir, '/_rels/document.xml.rels'))/rel:Relationships
+                                            else ()" />
+  <xsl:variable name="footnoteRels" select="if (doc-available(concat($base-dir, '/_rels/footnotes.xml.rels'))) 
+                                            then document(concat($base-dir, '/_rels/footnotes.xml.rels'))/rel:Relationships
+                                            else ()" />
+  <xsl:variable name="commentRels" select="if (doc-available(concat($base-dir, '/_rels/comments.xml.rels'))) 
+                                            then document(concat($base-dir, '/_rels/comments.xml.rels'))/rel:Relationships
+                                            else ()" />
 
   <xsl:key name="style-by-id" match="w:style" use="@w:styleId" />
   <xsl:key name="numbering-by-id" match="w:num" use="@w:numId" />
@@ -460,7 +469,7 @@ Entwicklung: le-tex publishing services oHG (2008)
 
   <xsl:template match="w:p" mode="wml-to-dbk">
     <xsl:element name="para">
-      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:apply-templates select="@* except @*[matches(name(),'^w:rsid')]" mode="#current"/>
       <xsl:if test="false() (: §§§ :)
                     and
                     (some $x in * satisfies not($x/name() = $docx2hub:allowed-para-element-names))">
@@ -599,13 +608,14 @@ Entwicklung: le-tex publishing services oHG (2008)
   </xsl:template>
 
   <xsl:template match="@r:id[parent::w:hyperlink]" mode="wml-to-dbk" priority="1.5">
-    <xsl:variable name="key-name" as="xs:string"
+    <xsl:variable name="key-name" as="node()*"
       select="if (ancestor::w:footnote)
-              then 'footnote-rel-by-id'
+              then $footnoteRels
               else if (ancestor::w:comment) 
-                then 'comment-rel-by-id'
-                else 'doc-rel-by-id'" />
-    <xsl:variable name="rel-item" select="key($key-name, current())" as="element(rel:Relationship)?" />
+                then $commentRels
+                else $docRels" />
+    <xsl:variable name="value" select="."/>
+    <xsl:variable name="rel-item" select="$key-name/rel:Relationship[@Id=$value]"/>
     <xsl:choose>
       <xsl:when test="exists(parent::w:hyperlink/@w:anchor)">
         <xsl:attribute name="linkend" select="concat(
