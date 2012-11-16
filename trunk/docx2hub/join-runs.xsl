@@ -62,7 +62,10 @@
 
   <xsl:function name="letex:signature" as="xs:string?">
     <xsl:param name="node" as="node()?" />
-    <xsl:apply-templates select="$node" mode="docx2hub:join-runs-signature" />
+    <xsl:variable name="result-strings" as="xs:string*">
+      <xsl:apply-templates select="$node" mode="docx2hub:join-runs-signature" />
+    </xsl:variable>
+    <xsl:value-of select="string-join($result-strings,'')"/>
   </xsl:function>
 
   <xsl:template match="dbk:phrase" mode="docx2hub:join-runs-signature">
