@@ -99,8 +99,7 @@
       </xsl:when>
       <xsl:otherwise>
         <xsl:message>
-          
-        <xsl:copy-of select="$text" />
+          <xsl:copy-of select="$text"/>
         </xsl:message>
         <xsl:call-template name="signal-error">
           <xsl:with-param name="error-code" select="'W2D_601'"/>
@@ -108,7 +107,7 @@
           <xsl:with-param name="hash">
             <value key="xpath"><xsl:value-of select="@xpath"/></value>
             <value key="level">WRN</value>
-            <value key="info-text"><xsl:value-of select="$font"/> (0x<xsl:value-of select="letex:dec-to-hex(string-to-codepoints($text))"/>)</value>
+            <value key="info-text"><xsl:value-of select="$font"/> (0x<xsl:value-of select="$text"/>)</value>
             <value key="pi">Zeichen <xsl:value-of select="string-to-codepoints($text)"/> aus Font <xsl:value-of select="$font"/> konnte nicht gemappt werden</value>
             <value key="comment"/>
           </xsl:with-param>
