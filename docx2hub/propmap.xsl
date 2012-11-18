@@ -104,6 +104,7 @@
         <prop name="w:u" type="docx-underline" />
         <prop name="w:uiPriority" />
         <prop name="w:unhideWhenUsed" />
+        <prop name="w:vanish" type="docx-boolean-prop" target-name="css:display" default="inherit" active="none"/>
         <prop name="w:w" type="docx-font-stretch" target-name="css:font-stretch"/>
         <prop name="w:widowControl" type="docx-boolean-prop" target-name="css:orphans" default="1" active="2"/>
         <prop name="w:widowControl" type="docx-boolean-prop" target-name="css:widows" default="1" active="2"/>
