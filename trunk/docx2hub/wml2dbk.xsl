@@ -45,7 +45,7 @@ Entwicklung: le-tex publishing services oHG (2008)
   <!-- To avoid conflicts sort in alphabetical order. -->
   <xsl:import href="modules/error-handler/error-handler.xsl"/>
 
-  <xsl:import href="letex-util/resolve-uri.xsl"/>
+  <xsl:import href="letex-util/resolve-uri/resolve-uri.xsl"/>
 
 
   <xsl:param name="debug" select="'yes'" as="xs:string?"/>
