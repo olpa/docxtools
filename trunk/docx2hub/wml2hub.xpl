@@ -25,13 +25,14 @@
   <p:input port="source">
     <p:empty/>
   </p:input>
-  <p:output port="result"/>
+  <p:output port="result" primary="true"/>
     
   <p:option name="docx" required="true"/>
   <p:option name="debug" required="false" select="'no'"/>
   <p:option name="debug-dir-uri" required="false" select="''"/>
   <p:option name="unwrap-tooltip-links" required="false" select="'no'"/>
-
+  <p:option name="hub-version" required="false" select="'1.1'"/>
+  
   <!-- import libs with extension steps -->
   
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl" />
