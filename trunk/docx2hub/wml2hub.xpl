@@ -37,7 +37,11 @@
   
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl" />
   <p:import href="http://transpect.le-tex.de/calabash-extensions/ltx-unzip/ltx-lib.xpl" />
+  <p:import href="http://transpect.le-tex.de/xproc-util/xml-model/prepend-hub-xml-model.xpl" />
+  <p:import href="http://transpect.le-tex.de/xproc-util/xslt-mode/xslt-mode.xpl"/>
   <p:import href="wml2hub.lib.xpl" />
+
+  <p:variable name="basename" select="replace($docx, '^(.+?)([^/\\]+)\.docx$', '$2')"/>
 
   <!-- unzip or print out error message -->
     
@@ -49,128 +53,104 @@
     <p:with-option name="overwrite" select="'yes'" />
   </letex:unzip>
 
-  <p:load name="designmap">
+  <p:load name="document">
     <p:with-option name="href" select="concat(/c:files/@xml:base, 'word/document.xml')" />
   </p:load>
-
-  <p:xslt initial-mode="insert-xpath" name="insert-xpath">
-    <p:input port="stylesheet">
-      <p:document href="main.xsl"/>
-    </p:input>
-    <p:input port="parameters"><p:empty/></p:input>
-  </p:xslt>
-
-  <docx2hub:store-debug pipeline-step="01.insert-xpath">
-    <p:with-option name="active" select="$debug" />
-    <p:with-option name="specified-uri" select="$debug-dir-uri"/>
-    <p:with-option name="default-uri" select="concat(/c:files/@xml:base, '/debug')"><p:pipe step="unzip" port="result" /></p:with-option>
-  </docx2hub:store-debug>
   
-  <p:xslt initial-mode="docx2hub:add-props" name="add-props">
+  <p:sink/>
+  
+  <p:load name="stylesheet" href="main.xsl"/>
+
+  <p:sink/>
+
+  <p:add-attribute attribute-name="value" match="/c:param-set/c:param[@name = 'error-msg-file-path']">
+    <p:with-option name="attribute-value" select="replace( static-base-uri(), '/wml2hub.xpl', '' )"/>
     <p:input port="source">
-      <p:pipe port="result" step="insert-xpath"/>
+      <p:inline>
+        <c:param-set>
+          <c:param name="error-msg-file-path"/>
+          <c:param name="hub-version"/>
+          <c:param name="unwrap-tooltip-links"/>
+        </c:param-set>
+      </p:inline>
     </p:input>
-    <p:input port="stylesheet">
-      <p:document href="main.xsl"/>
-    </p:input>
-    <p:input port="parameters"><p:empty/></p:input>
-  </p:xslt>
-
-  <docx2hub:store-debug pipeline-step="03.add-props">
-    <p:with-option name="active" select="$debug" />
-    <p:with-option name="specified-uri" select="$debug-dir-uri"/>
-    <p:with-option name="default-uri" select="concat(/c:files/@xml:base, '/debug')"><p:pipe step="unzip" port="result" /></p:with-option>
-  </docx2hub:store-debug>
+  </p:add-attribute>
   
-  <p:xslt initial-mode="docx2hub:props2atts" name="props2atts">
-    <p:input port="stylesheet">
-      <p:document href="main.xsl"/>
-    </p:input>
-    <p:input port="source">
-      <p:pipe port="result" step="add-props"/>
-    </p:input>
-    <p:input port="parameters"><p:empty/></p:input>
-  </p:xslt>
+  <p:add-attribute attribute-name="value" match="/c:param-set/c:param[@name = 'hub-version']">
+    <p:with-option name="attribute-value" select="$hub-version"/>
+  </p:add-attribute>
 
-  <docx2hub:store-debug pipeline-step="04.props2atts">
-    <p:with-option name="active" select="$debug" />
-    <p:with-option name="specified-uri" select="$debug-dir-uri"/>
-    <p:with-option name="default-uri" select="concat(/c:files/@xml:base, '/debug')"><p:pipe step="unzip" port="result" /></p:with-option>
-  </docx2hub:store-debug>
-  
-  <p:xslt initial-mode="docx2hub:remove-redundant-run-atts" name="remove-redundant-run-atts">
-    <p:input port="stylesheet">
-      <p:document href="main.xsl"/>
-    </p:input>
-    <p:input port="source">
-      <p:pipe port="result" step="props2atts"/>
-    </p:input>
-    <p:input port="parameters"><p:empty/></p:input>
-  </p:xslt>
+  <p:add-attribute name="params" attribute-name="value" match="/c:param-set/c:param[@name = 'unwrap-tooltip-links']">
+    <p:with-option name="attribute-value" select="$unwrap-tooltip-links"/>
+  </p:add-attribute>
 
-  <docx2hub:store-debug pipeline-step="05.remove-redundant-run-atts">
-    <p:with-option name="active" select="$debug" />
-    <p:with-option name="specified-uri" select="$debug-dir-uri"/>
-    <p:with-option name="default-uri" select="concat(/c:files/@xml:base, '/debug')"><p:pipe step="unzip" port="result" /></p:with-option>
-  </docx2hub:store-debug>
+  <letex:xslt-mode mode="insert-xpath">
+    <p:input port="source"><p:pipe step="document" port="result" /></p:input>
+    <p:input port="parameters"><p:pipe step="params" port="result" /></p:input>
+    <p:input port="stylesheet"><p:pipe step="stylesheet" port="result" /></p:input>
+    <p:with-option name="prefix" select="concat('docx2hub/', $basename, '/01')"/>
+    <p:with-option name="debug" select="$debug"/>
+    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+  </letex:xslt-mode>
   
-  <p:xslt initial-mode="docx2hub:separate-field-functions" name="separate-field-functions">
-    <p:input port="stylesheet">
-      <p:document href="main.xsl"/>
-    </p:input>
-    <p:input port="source">
-      <p:pipe port="result" step="remove-redundant-run-atts"/>
-    </p:input>
-    <p:input port="parameters"><p:empty/></p:input>
-  </p:xslt>
+  <letex:xslt-mode mode="docx2hub:add-props">
+    <p:input port="parameters"><p:pipe step="params" port="result" /></p:input>
+    <p:input port="stylesheet"><p:pipe step="stylesheet" port="result" /></p:input>
+    <p:with-option name="prefix" select="concat('docx2hub/', $basename, '/03')"/>
+    <p:with-option name="debug" select="$debug"/>
+    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+  </letex:xslt-mode>
+  
+  <letex:xslt-mode mode="docx2hub:props2atts">
+    <p:input port="parameters"><p:pipe step="params" port="result" /></p:input>
+    <p:input port="stylesheet"><p:pipe step="stylesheet" port="result" /></p:input>
+    <p:with-option name="prefix" select="concat('docx2hub/', $basename, '/04')"/>
+    <p:with-option name="debug" select="$debug"/>
+    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+  </letex:xslt-mode>
+  
+  <letex:xslt-mode mode="docx2hub:remove-redundant-run-atts">
+    <p:input port="parameters"><p:pipe step="params" port="result" /></p:input>
+    <p:input port="stylesheet"><p:pipe step="stylesheet" port="result" /></p:input>
+    <p:with-option name="prefix" select="concat('docx2hub/', $basename, '/05')"/>
+    <p:with-option name="debug" select="$debug"/>
+    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+  </letex:xslt-mode>
+  
+  <letex:xslt-mode mode="docx2hub:separate-field-functions">
+    <p:input port="parameters"><p:pipe step="params" port="result" /></p:input>
+    <p:input port="stylesheet"><p:pipe step="stylesheet" port="result" /></p:input>
+    <p:with-option name="prefix" select="concat('docx2hub/', $basename, '/11')"/>
+    <p:with-option name="debug" select="$debug"/>
+    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+  </letex:xslt-mode>
+  
+  <letex:xslt-mode mode="wml-to-dbk">
+    <p:input port="parameters"><p:pipe step="params" port="result" /></p:input>
+    <p:input port="stylesheet"><p:pipe step="stylesheet" port="result" /></p:input>
+    <p:with-option name="prefix" select="concat('docx2hub/', $basename, '/20')"/>
+    <p:with-option name="debug" select="$debug"/>
+    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+    <p:with-option name="hub-version" select="$hub-version"/>
+  </letex:xslt-mode>
+  
+  <letex:xslt-mode mode="docx2hub:join-runs">
+    <p:input port="parameters"><p:pipe step="params" port="result" /></p:input>
+    <p:input port="stylesheet"><p:pipe step="stylesheet" port="result" /></p:input>
+    <p:with-option name="prefix" select="concat('docx2hub/', $basename, '/24')"/>
+    <p:with-option name="debug" select="$debug"/>
+    <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+    <p:with-option name="hub-version" select="$hub-version"/>
+  </letex:xslt-mode>
 
-  <docx2hub:store-debug pipeline-step="11.separate-field-functions">
-    <p:with-option name="active" select="$debug" />
-    <p:with-option name="specified-uri" select="$debug-dir-uri"/>
-    <p:with-option name="default-uri" select="concat(/c:files/@xml:base, '/debug')"><p:pipe step="unzip" port="result" /></p:with-option>
-  </docx2hub:store-debug>
-  
-  <p:xslt initial-mode="wml-to-dbk" name="wml-to-dbk">
-    <p:with-param name="error-msg-file-path" select="replace( static-base-uri(), '/wml2hub.xpl', '' )"/>
-    <p:with-param name="unwrap-tooltip-links" select="$unwrap-tooltip-links"/>
-    <p:input port="stylesheet">
-      <p:document href="main.xsl"/>
-    </p:input>
-    <p:input port="source">
-      <p:pipe port="result" step="separate-field-functions"/>
-    </p:input>
-    <p:input port="parameters"><p:empty/></p:input>
-  </p:xslt>
-
-  <docx2hub:store-debug pipeline-step="20.wml-to-dbk">
-    <p:with-option name="active" select="$debug" />
-    <p:with-option name="specified-uri" select="$debug-dir-uri"/>
-    <p:with-option name="default-uri" select="concat(/c:files/@xml:base, '/debug')"><p:pipe step="unzip" port="result" /></p:with-option>
-  </docx2hub:store-debug>
-  
-  <p:xslt initial-mode="docx2hub:join-runs" name="join-runs">
-    <p:input port="stylesheet">
-      <p:document href="main.xsl"/>
-    </p:input>
-    <p:input port="source">
-      <p:pipe port="result" step="wml-to-dbk"/>
-    </p:input>
-    <p:input port="parameters"><p:empty/></p:input>
-  </p:xslt>
-
-  <docx2hub:store-debug pipeline-step="24.join-runs">
-    <p:with-option name="active" select="$debug" />
-    <p:with-option name="specified-uri" select="$debug-dir-uri"/>
-    <p:with-option name="default-uri" select="concat(/c:files/@xml:base, '/debug')"><p:pipe step="unzip" port="result" /></p:with-option>
-  </docx2hub:store-debug>
-  
   <p:add-attribute match="/*" attribute-name="xml:base" name="rebase">
-    <p:input port="source">
-      <p:pipe port="result" step="join-runs"/>
-    </p:input>
     <p:with-option name="attribute-value" select="replace(/c:files/@xml:base, '\.\w+\.tmp/?$', '.hub.xml')" >
       <p:pipe step="unzip" port="result"/>
     </p:with-option>
   </p:add-attribute>
 
+  <letex:prepend-hub-xml-model name="pi">
+    <p:with-option name="hub-version" select="$hub-version"/>
+  </letex:prepend-hub-xml-model>
+  
 </p:declare-step>
