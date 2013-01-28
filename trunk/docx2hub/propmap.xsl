@@ -6,7 +6,27 @@
     exclude-result-prefixes = "xs"
 >
 
-  <xsl:key name="docx2hub:prop" match="prop" use="@name" />
+  <!-- The predicate prop[…] is needed when there are multiple entries with different @hubversion
+    attributes. The key picks, of all prop declarations that are compatible with the requested $hub-version, 
+    the prop declaration for the most recent version. Versions numbers are expected to be dot-separated integers.
+    -->  
+  <xsl:key 
+    name="docx2hub:prop" 
+    match="prop[
+      if(@hubversion)
+      then (
+        compare($hub-version, @hubversion, 'http://saxon.sf.net/collation?alphanumeric=yes') ge 0
+        and @hubversion = max(
+          ../prop
+            [@name = current()/@name]
+            [compare($hub-version, @hubversion, 'http://saxon.sf.net/collation?alphanumeric=yes') ge 0]
+              /@hubversion, 
+          'http://saxon.sf.net/collation?alphanumeric=yes'
+        )
+      )
+      else true()
+    ]"
+    use="@name" />
 
   <xsl:variable name="docx2hub:propmap" as="document-node(element(propmap))">
     <xsl:document xmlns="">
@@ -46,7 +66,8 @@
         <prop name="w:lang" type="linear" target-name="xml:lang" />
         <prop name="w:link" />
         <prop name="w:locked" />
-        <prop name="w:name" type="linear" target-name="role"/>
+        <prop name="w:name" type="linear" target-name="role" hubversion="1.0"/>
+        <prop name="w:name" type="linear" target-name="name" hubversion="1.1"/>
         <prop name="w:next" />
         <prop name="w:noProof" />
         <prop name="w:numPr" type="passthru" />
@@ -60,11 +81,14 @@
         <prop name="w:qFormat" />
         <prop name="w:rFonts" type="docx-font-family" target-name="css:font-family" />
         <prop name="w:rsid" />
+        <prop name="w:rsidDel" /><!-- 17.3.2.25 suggests that it identifies deleted runs. But see for example
+            DIN_EN_1673_A1_nf_11758779.doc for two rsidDel runs that are part of the final document. -->
         <prop name="w:rsidR" />
         <prop name="w:rsidRDefault" />
         <prop name="w:rsidP" />
         <prop name="w:rsidRPr" />
         <prop name="w:rStyle" type="docx-charstyle" />
+        <prop name="w:sectPr" /><!-- provisional -->
         <prop name="w:semiHidden" />
         <prop name="w:shadow" type="docx-boolean-prop" target-name="css:text-shadow" default="none" active="1pt 1pt"/>
         <prop name="w:shd" type="docx-shd" />

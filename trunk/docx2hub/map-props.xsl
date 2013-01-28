@@ -28,7 +28,7 @@
   <xsl:import href="letex-util/colors/colors.xsl"/>
 
   <xsl:key name="docx2hub:style" match="w:style" use="@w:styleId" />
-  <xsl:key name="docx2hub:style-by-role" match="dbk:style" use="@role" />
+  <xsl:key name="docx2hub:style-by-role" match="css:rule" use="@role" />
 
   <xsl:template match="/" mode="docx2hub:add-props">
     <xsl:apply-templates select="w:root/w:document/w:body" mode="#current" />
@@ -39,7 +39,12 @@
   </xsl:template>
 
   <xsl:template match="w:body" mode="docx2hub:add-props">
-    <Body version="5.1-variant le-tex_Hub-1.0" css:version="3.0-variant le-tex_Hub-1.0">
+    <xsl:element name="{if ($hub-version eq '1.0') then 'Body' else 'hub'}">
+      <xsl:attribute name="version" select="concat('5.1-variant le-tex_Hub-', $hub-version)"/>
+      <xsl:attribute name="css:version" select="concat('3.0-variant le-tex_Hub-', $hub-version)" />
+      <xsl:if test="not($hub-version eq '1.0')">
+        <xsl:attribute name="css:rule-selection-attribute" select="'role'" />
+      </xsl:if>
       <info>
         <keywordset role="hub">
           <keyword role="formatting-deviations-only">true</keyword>
@@ -50,39 +55,72 @@
             </keyword>
           </xsl:if>
         </keywordset>
-        <styles>
-          <parastyles>
-            <xsl:apply-templates select="key('docx2hub:style', distinct-values(.//w:pStyle/@w:val))
-                                         union
-                                         (: Resolve linked char styles as their respective para styles :)
-                                         key(
-                                           'docx2hub:style',
-                                           key('docx2hub:style', distinct-values(.//w:rStyle/@w:val))/w:link/@w:val
-                                         )" mode="#current">
-              <xsl:sort select="@w:styleId" />
-            </xsl:apply-templates>
-          </parastyles>
-          <inlinestyles>
-            <xsl:apply-templates select="key('docx2hub:style', distinct-values(.//w:rStyle/@w:val))[not(w:link)]" mode="#current">
-              <xsl:sort select="@w:styleId" />
-            </xsl:apply-templates>
-          </inlinestyles>
-          <tablestyles>
-            <xsl:apply-templates select="key('docx2hub:style', distinct-values(.//w:tblStyle/@w:val))" mode="#current">
-              <xsl:sort select="@w:styleId" />
-            </xsl:apply-templates>
-          </tablestyles>
-          <cellstyles/>
-        </styles>
+        <xsl:choose>
+          <xsl:when test="$hub-version eq '1.0'">
+            <xsl:call-template name="docx2hub:hub-1.0-styles">
+              <xsl:with-param name="version" select="$hub-version" tunnel="yes"/>
+            </xsl:call-template>
+          </xsl:when>
+          <xsl:when test="$hub-version eq '1.1'">
+            <xsl:call-template name="docx2hub:hub-1.1-styles">
+              <xsl:with-param name="version" select="$hub-version" tunnel="yes"/>
+            </xsl:call-template>
+          </xsl:when>
+        </xsl:choose>
       </info>
       <xsl:copy-of select="../../w:numbering, ../../w:docRels, ../../w:footnoteRels, ../../w:commentRels, ../../w:fonts" />
       <xsl:apply-templates select="../../w:comments, ../../w:footnotes" mode="#current"/>
       <xsl:apply-templates mode="#current"/>
-    </Body>
+    </xsl:element>
   </xsl:template>
 
+  <xsl:template name="docx2hub:hub-1.0-styles">
+    <styles>
+      <parastyles>
+        <xsl:apply-templates select="key('docx2hub:style', distinct-values(.//w:pStyle/@w:val))
+          union
+          (: Resolve linked char styles as their respective para styles :)
+          key(
+           'docx2hub:style',
+            key('docx2hub:style', distinct-values(.//w:rStyle/@w:val))/w:link/@w:val
+          )" mode="#current">
+          <xsl:sort select="@w:styleId" />
+        </xsl:apply-templates>
+      </parastyles>
+      <inlinestyles>
+        <xsl:apply-templates select="key('docx2hub:style', distinct-values(.//w:rStyle/@w:val))[not(w:link)]" mode="#current">
+          <xsl:sort select="@w:styleId" />
+        </xsl:apply-templates>
+      </inlinestyles>
+      <tablestyles>
+        <xsl:apply-templates select="key('docx2hub:style', distinct-values(.//w:tblStyle/@w:val))" mode="#current">
+          <xsl:sort select="@w:styleId" />
+        </xsl:apply-templates>
+      </tablestyles>
+      <cellstyles/>
+    </styles>
+  </xsl:template>    
+
+  <xsl:template name="docx2hub:hub-1.1-styles">
+    <css:rules>
+      <xsl:apply-templates select="key('docx2hub:style', distinct-values(.//w:pStyle/@w:val))
+        union
+        key('docx2hub:style', key('docx2hub:style', distinct-values(.//w:rStyle/@w:val))/w:link/@w:val)" 
+        mode="#current">
+        <xsl:sort select="@w:styleId" />
+      </xsl:apply-templates>
+      <xsl:apply-templates select="key('docx2hub:style', distinct-values(.//w:rStyle/@w:val))[not(w:link)]" mode="#current">
+        <xsl:sort select="@w:styleId" />
+      </xsl:apply-templates>
+      <xsl:apply-templates select="key('docx2hub:style', distinct-values(.//w:tblStyle/@w:val))" mode="#current">
+        <xsl:sort select="@w:styleId" />
+      </xsl:apply-templates>
+    </css:rules>
+  </xsl:template>
+  
   <xsl:template match="w:style" mode="docx2hub:add-props">
     <xsl:param name="wrap-in-style-element" select="true()" as="xs:boolean"/>
+    <xsl:param name="version" as="xs:string" tunnel="yes"/>
     <xsl:variable name="atts" as="element(*)*"> <!-- docx2hub:attribute, ... -->
       <xsl:apply-templates select="if (w:basedOn/@w:val) 
                                    then key('docx2hub:style', w:basedOn/@w:val) 
@@ -99,9 +137,10 @@
     </xsl:variable>
     <xsl:choose>
       <xsl:when test="$wrap-in-style-element">
-        <style>
+        <xsl:element name="{if ($hub-version = '1.0') then 'style' else 'css:rule'}">
+          <xsl:apply-templates select="." mode="docx2hub:XML-Hubformat-add-properties_layout-type"/>
           <xsl:sequence select="$atts"/>
-        </style>
+        </xsl:element>
       </xsl:when>
       <xsl:otherwise>
         <xsl:sequence select="$atts"/>
@@ -111,7 +150,20 @@
 
   <xsl:template match="w:basedOn/@w:val" mode="docx2hub:add-props" />
 
-
+  <xsl:template match="w:style"
+    mode="docx2hub:XML-Hubformat-add-properties_layout-type">
+    <xsl:param name="version" tunnel="yes" as="xs:string"/>
+    <xsl:if test="not($version eq '1.0')">
+      <xsl:attribute name="layout-type" select="if (@w:type = 'paragraph')
+        then 'para'
+        else if (@w:type = 'character')
+        then 'inline'
+        else if (@w:type = 'table')
+        then 'table'        
+        else 'undefined'"/>
+    </xsl:if>
+  </xsl:template>
+  
   <xsl:template match="w:rPr | w:pPr" mode="docx2hub:add-props" priority="2">
     <xsl:apply-templates mode="#current" />
   </xsl:template>
@@ -179,7 +231,8 @@
     <xsl:sequence select="$raw-output" />
   </xsl:template>
 
-  <xsl:template match="@w:rsid 
+  <xsl:template match="@w:rsid
+                       | @w:rsidDel
                        | @w:rsidR
                        | @w:rsidRPr
                        | @w:rsidRDefault
@@ -579,13 +632,13 @@
       </xsl:if>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="exists(docx2hub:wrap) and exists(self::dbk:style)">
+      <xsl:when test="exists(docx2hub:wrap) and exists(self::css:rule)">
         <xsl:copy>
           <xsl:copy-of select="@*"/>
           <xsl:attribute name="remap" select="docx2hub:wrap/@element" />
         </xsl:copy>
       </xsl:when>
-      <xsl:when test="exists(docx2hub:wrap) and not(self::dbk:style)">
+      <xsl:when test="exists(docx2hub:wrap) and not(self::css:rule)">
         <xsl:sequence select="docx2hub:wrap($content, (docx2hub:wrap))" />
       </xsl:when>
       <xsl:otherwise>

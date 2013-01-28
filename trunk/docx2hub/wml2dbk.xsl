@@ -54,7 +54,8 @@ Entwicklung: le-tex publishing services oHG (2008)
   <xsl:variable name="debug-dir" select="concat(replace($base-dir, '^(.+/)(.+?/)$', '$1'), 'debug')"/>
   <!-- Links that probably have been inserted by Word without user consent: -->
   <xsl:param name="unwrap-tooltip-links" select="'no'" as="xs:string?"/>
-
+  <xsl:param name="hub-version" select="'1.0'" as="xs:string"/>
+  
   <xsl:variable name="symbol-font-map" select="document('Symbol.xml')" as="document-node(element(symbols))" />
   <xsl:variable 
     name="footnotes" 
@@ -334,8 +335,6 @@ Entwicklung: le-tex publishing services oHG (2008)
                        ][
                          count(w:r[w:fldChar[@w:fldCharType='end']]) gt 1
                        ]" mode="docx2hub:separate-field-functions">
-    <xsl:message>HURZ
-    </xsl:message>
     <xsl:variable name="attribute-names" as="xs:string *">
       <xsl:for-each select="@*">
         <xsl:sequence select="name(.)"/>
@@ -382,10 +381,10 @@ Entwicklung: le-tex publishing services oHG (2008)
   <!-- GI 2012-10-08 §§§
        Want to get rid of the warnings. Does that hurt? Not tested.
        -->
-  <xsl:template match="w:p/w:numPr | dbk:style/w:numPr |
+  <xsl:template match="w:p/w:numPr | css:rule/w:numPr | style/w:numPr |
                        /*/w:numbering | /*/w:docRels | /*/w:fonts | /*/w:comments" mode="wml-to-dbk" priority="-0.25"/>
 
-  <xsl:template match="dbk:*" mode="wml-to-dbk">
+  <xsl:template match="dbk:* | css:*" mode="wml-to-dbk">
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*" mode="#current" />
       <xsl:apply-templates select="node()" mode="#current" />
@@ -453,7 +452,7 @@ Entwicklung: le-tex publishing services oHG (2008)
 
   <xsl:template match="@mc:Ignorable" mode="wml-to-dbk"/>
 
-  <xsl:template match="dbk:Body" mode="wml-to-dbk">
+  <xsl:template match="/dbk:*" mode="wml-to-dbk">
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*" mode="wml-to-dbk"/>
       <xsl:call-template name="check-field-functions">
@@ -653,7 +652,7 @@ Entwicklung: le-tex publishing services oHG (2008)
   <!-- runs (w:r) -->
   <xsl:template match="w:r[@*]" mode="wml-to-dbk">
     <xsl:element name="phrase">
-      <xsl:apply-templates select="@* except @xpath" mode="#current"/>
+      <xsl:apply-templates select="@* except @*[matches(name(),'^w:rsid')]" mode="#current"/>
       <xsl:apply-templates mode="#current"/>
     </xsl:element>
   </xsl:template>

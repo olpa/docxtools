@@ -79,38 +79,38 @@
     <xsl:apply-templates select="/" mode="insert-xpath"/>    
   </xsl:variable>
 
-  <xsl:variable name="docx2hub:add-props" as="document-node(element(dbk:Body))">
+  <xsl:variable name="docx2hub:add-props" as="document-node(element(*))">
     <xsl:document>
       <xsl:apply-templates select="$insert-xpath" mode="docx2hub:add-props"/>
     </xsl:document>
   </xsl:variable>
 
   <!-- make proper attributes out of intermediate ones -->
-  <xsl:variable name="docx2hub:props2atts" as="document-node(element(dbk:Body))">
+  <xsl:variable name="docx2hub:props2atts" as="document-node(element(*))">
     <xsl:document>
       <xsl:apply-templates select="$docx2hub:add-props" mode="docx2hub:props2atts"/>
     </xsl:document>
   </xsl:variable>
 
-  <xsl:variable name="docx2hub:remove-redundant-run-atts" as="document-node(element(dbk:Body))">
+  <xsl:variable name="docx2hub:remove-redundant-run-atts" as="document-node(element(*))">
     <xsl:document>
       <xsl:apply-templates select="$docx2hub:props2atts" mode="docx2hub:remove-redundant-run-atts"/>
     </xsl:document>
   </xsl:variable>
 
-  <xsl:variable name="docx2hub:separate-field-functions" as="document-node(element(dbk:Body))">
+  <xsl:variable name="docx2hub:separate-field-functions" as="document-node(element(*))">
     <xsl:document>
       <xsl:apply-templates select="$docx2hub:remove-redundant-run-atts" mode="docx2hub:separate-field-functions"/>
     </xsl:document>
   </xsl:variable>
 
-  <xsl:variable name="wml-to-dbk" as="document-node(element(dbk:Body))">
+  <xsl:variable name="wml-to-dbk" as="document-node(element(*))">
     <xsl:document>
       <xsl:apply-templates  select="$docx2hub:separate-field-functions" mode="wml-to-dbk"/>
     </xsl:document>
   </xsl:variable>
 
-  <xsl:variable name="docx2hub:join-runs" as="document-node(element(dbk:Body))">
+  <xsl:variable name="docx2hub:join-runs" as="document-node(element(*))">
     <xsl:document>
       <xsl:apply-templates select="$wml-to-dbk" mode="docx2hub:join-runs"/>
     </xsl:document>
