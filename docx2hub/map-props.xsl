@@ -28,7 +28,7 @@
   <xsl:import href="letex-util/colors/colors.xsl"/>
 
   <xsl:key name="docx2hub:style" match="w:style" use="@w:styleId" />
-  <xsl:key name="docx2hub:style-by-role" match="css:rule" use="@role" />
+  <xsl:key name="docx2hub:style-by-role" match="css:rule | dbk:style" use="if ($hub-version eq '1.0') then @role else @name" />
 
   <xsl:template match="/" mode="docx2hub:add-props">
     <xsl:apply-templates select="w:root/w:document/w:body" mode="#current" />
@@ -334,13 +334,10 @@
 
       <xsl:when test=". eq 'docx-charstyle'">
         <xsl:variable name="linked" as=" xs:string?" select="key('docx2hub:style', $val/@w:val, root($val))/w:link/@w:val"/>
-        <docx2hub:attribute name="role"><xsl:value-of select="key(
-                                                                'docx2hub:style',
-                                                                if ($linked)
-                                                                then $linked
-                                                                else $val/@w:val,
-                                                                root($val)
-                                                              )/w:name/@w:val" /></docx2hub:attribute>
+        <xsl:call-template name="docx2hub:style-name">
+          <xsl:with-param name="val" select="$val"/>
+          <xsl:with-param name="linked" select="$linked"/>
+        </xsl:call-template>
       </xsl:when>
 
       <xsl:when test=". eq 'docx-color'">
@@ -408,11 +405,9 @@
       </xsl:when>
 
       <xsl:when test=". eq 'docx-parastyle'">
-        <docx2hub:attribute name="role"><xsl:value-of select="key(
-                                                                'docx2hub:style',
-                                                                $val/@w:val,
-                                                                root($val)
-                                                              )/w:name/@w:val" /></docx2hub:attribute>
+        <xsl:call-template name="docx2hub:style-name">
+          <xsl:with-param name="val" select="$val"/>
+        </xsl:call-template>
       </xsl:when>
 
       <xsl:when test=". eq 'docx-shd'">
@@ -479,6 +474,12 @@
         <docx2hub:style-link type="{../@name}" target="{$val}"/>
       </xsl:when>
 
+      <xsl:when test=". eq 'style-name'">
+        <docx2hub:attribute name="{../@target-name}">
+          <xsl:value-of select="docx2hub:css-compatible-name($val/@w:val)"/>
+        </docx2hub:attribute>
+      </xsl:when>
+
       <xsl:otherwise>
         <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="$val" /></docx2hub:attribute>
       </xsl:otherwise>
@@ -534,6 +535,23 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:function>
+
+  <xsl:template name="docx2hub:style-name" as="element(docx2hub:attribute)">
+    <xsl:param name="val" as="element(*)"/><!-- w:pStyle, w:cStyle -->
+    <xsl:param name="linked" as="xs:string?"/>
+    <xsl:variable name="looked-up" as="xs:string" select="key(
+        'docx2hub:style',
+        if ($linked)
+          then $linked
+          else $val/@w:val,
+        root($val)
+      )/w:name/@w:val" />
+    <docx2hub:attribute name="role">
+      <xsl:value-of select="if ($hub-version eq '1.0')
+                              then $looked-up
+                              else docx2hub:css-compatible-name($looked-up)" />
+    </docx2hub:attribute>    
+  </xsl:template>
 
   <xsl:function name="docx2hub:pt-length" as="xs:string" >
     <xsl:param name="val" as="xs:string"/>
@@ -607,6 +625,10 @@
     match="CellStyle | CharacterStyle | ObjectStyle | ParagraphStyle | TableStyle" 
     use="@Self" />
 
+  <xsl:function name="docx2hub:css-compatible-name" as="xs:string">
+    <xsl:param name="input" as="xs:string"/>
+    <xsl:sequence select="replace(replace(normalize-unicode($input, 'NFKD'), '\p{Mn}', ''), '\C', '_')"/>
+  </xsl:function>
 
   <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
   <!-- mode: docx2hub:props2atts -->

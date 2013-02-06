@@ -67,7 +67,8 @@
         <prop name="w:link" />
         <prop name="w:locked" />
         <prop name="w:name" type="linear" target-name="role" hubversion="1.0"/>
-        <prop name="w:name" type="linear" target-name="name" hubversion="1.1"/>
+        <prop name="w:name" type="linear" target-name="native-name" hubversion="1.1"/>
+        <prop name="w:name" type="style-name" target-name="name" hubversion="1.1"/>
         <prop name="w:next" />
         <prop name="w:noProof" />
         <prop name="w:numPr" type="passthru" />
