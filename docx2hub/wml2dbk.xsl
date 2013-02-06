@@ -115,7 +115,7 @@ Entwicklung: le-tex publishing services oHG (2008)
                 <xsl:with-param name="error-code" select="'W2D_010'"/>
                 <xsl:with-param name="exit" select="'yes'"/>
                 <xsl:with-param name="hash">
-                  <value key="xpath"><xsl:value-of select="$nodes[last()]/@xpath"/></value>
+                  <value key="xpath"><xsl:value-of select="$nodes[last()]/@srcpath"/></value>
                   <value key="level">INT</value>
                 </xsl:with-param>
               </xsl:call-template>
@@ -163,7 +163,7 @@ Entwicklung: le-tex publishing services oHG (2008)
             <xsl:with-param name="error-code" select="'W2D_011'"/>
             <xsl:with-param name="exit" select="'yes'"/>
             <xsl:with-param name="hash">
-              <value key="xpath"><xsl:value-of select="$nodes[1]/@xpath"/></value>
+              <value key="xpath"><xsl:value-of select="$nodes[1]/@srcpath"/></value>
               <value key="level">INT</value>
               <value key="info-text"><xsl:value-of select="$nodes//text()"/></value>
             </xsl:with-param>
@@ -198,7 +198,7 @@ Entwicklung: le-tex publishing services oHG (2008)
                   <xsl:with-param name="error-code" select="'W2D_012'"/>
                   <xsl:with-param name="exit" select="'yes'"/>
                   <xsl:with-param name="hash">
-                    <value key="xpath"><xsl:value-of select="$nodes[1]/@xpath"/></value>
+                    <value key="xpath"><xsl:value-of select="$nodes[1]/@srcpath"/></value>
                     <value key="level">INT</value>
                   </xsl:with-param>
                 </xsl:call-template>
@@ -223,7 +223,7 @@ Entwicklung: le-tex publishing services oHG (2008)
                   <xsl:with-param name="error-code" select="'W2D_012'"/>
                   <xsl:with-param name="exit" select="'yes'"/>
                   <xsl:with-param name="hash">
-                    <value key="xpath"><xsl:value-of select="$nodes[1]/@xpath"/></value>
+                    <value key="xpath"><xsl:value-of select="$nodes[1]/@srcpath"/></value>
                     <value key="level">INT</value>
                   </xsl:with-param>
                 </xsl:call-template>
@@ -235,7 +235,7 @@ Entwicklung: le-tex publishing services oHG (2008)
               <xsl:with-param name="error-code" select="'W2D_013'"/>
               <xsl:with-param name="exit" select="'yes'"/>
               <xsl:with-param name="hash">
-                <value key="xpath"><xsl:value-of select="$nodes[1]/@xpath"/></value>
+                <value key="xpath"><xsl:value-of select="$nodes[1]/@srcpath"/></value>
                 <value key="level">INT</value>
                 <value key="info-text"><xsl:value-of select="count($nodes/w:fldChar[@w:fldCharType = 'begin'])"/></value>
               </xsl:with-param>
@@ -370,7 +370,7 @@ Entwicklung: le-tex publishing services oHG (2008)
       <xsl:with-param name="error-code" select="'W2D_020'"/>
       <xsl:with-param name="exit" select="'no'"/>
       <xsl:with-param name="hash">
-        <value key="xpath"><xsl:value-of select="@xpath"/></value>
+        <value key="xpath"><xsl:value-of select="@srcpath"/></value>
         <value key="level">INT</value>
         <value key="mode">wml-to-dbk</value>
         <value key="info-text"><xsl:value-of select="concat('Element: ', name(), '     Parent: ', ../name())"/></value>
@@ -401,7 +401,7 @@ Entwicklung: le-tex publishing services oHG (2008)
       <xsl:with-param name="error-code" select="'W2D_021'"/>
       <xsl:with-param name="exit" select="'no'"/>
       <xsl:with-param name="hash">
-        <value key="xpath"><xsl:value-of select="../@xpath"/></value>
+        <value key="xpath"><xsl:value-of select="../@srcpath"/></value>
         <value key="level">INT</value>
         <value key="mode">wml-to-dbk</value>
         <value key="info-text"><xsl:value-of select="concat('Attribut: ', name(), '     Parent: ', ../name())"/></value>
@@ -415,7 +415,7 @@ Entwicklung: le-tex publishing services oHG (2008)
       <xsl:with-param name="error-code" select="'W2D_022'"/>
       <xsl:with-param name="exit" select="'no'"/>
       <xsl:with-param name="hash">
-        <value key="xpath"><xsl:value-of select="preceding::*[1]/@xpath"/></value>
+        <value key="xpath"><xsl:value-of select="preceding::*[1]/@srcpath"/></value>
         <value key="level">INT</value>
         <value key="mode">wml-to-dbk</value>
         <value key="info-text"><xsl:value-of select="."/></value>
@@ -432,7 +432,7 @@ Entwicklung: le-tex publishing services oHG (2008)
       <xsl:with-param name="error-code" select="'W2D_023'"/>
       <xsl:with-param name="exit" select="'no'"/>
       <xsl:with-param name="hash">
-        <value key="xpath"><xsl:value-of select="preceding::*[1]/@xpath"/></value>
+        <value key="xpath"><xsl:value-of select="preceding::*[1]/@srcpath"/></value>
         <value key="level">INT</value>
         <value key="mode">wml-to-dbk</value>
         <value key="info-text"><xsl:value-of select="."/></value>
@@ -447,7 +447,7 @@ Entwicklung: le-tex publishing services oHG (2008)
 
 
   <xsl:template match="w:document" mode="wml-to-dbk">
-    <xsl:apply-templates select="@* except @xpath | node()" mode="wml-to-dbk"/>
+    <xsl:apply-templates select="@* except @srcpath | node()" mode="wml-to-dbk"/>
   </xsl:template>
 
   <xsl:template match="@mc:Ignorable" mode="wml-to-dbk"/>
@@ -476,7 +476,7 @@ Entwicklung: le-tex publishing services oHG (2008)
           <xsl:with-param name="error-code" select="'W2D_030'"/>
           <xsl:with-param name="exit" select="'yes'"/>
           <xsl:with-param name="hash">
-            <value key="xpath"><xsl:value-of select="@xpath"/></value>
+            <value key="xpath"><xsl:value-of select="@srcpath"/></value>
             <value key="level">INT</value>
             <value key="mode">wml-to-dbk</value>
             <value key="info-text"><xsl:value-of select="string-join(*[not(name() = $docx2hub:allowed-para-element-names)]/name(), ' ')"/></value>
@@ -506,7 +506,7 @@ Entwicklung: le-tex publishing services oHG (2008)
         <xsl:with-param name="error-code" select="'W2D_014'"/>
         <xsl:with-param name="exit" select="'yes'"/>
         <xsl:with-param name="hash">
-          <value key="xpath"><xsl:value-of select="@xpath"/></value>
+          <value key="xpath"><xsl:value-of select="@srcpath"/></value>
           <value key="level">INT</value>
           <value key="info-text"><xsl:value-of select="."/></value>
         </xsl:with-param>
@@ -644,7 +644,7 @@ Entwicklung: le-tex publishing services oHG (2008)
 
   <!-- textbox -->
   <xsl:template match="w:txbxContent" mode="wml-to-dbk">
-    <xsl:apply-templates select="@* except @xpath" mode="#current"/>
+    <xsl:apply-templates select="@* except @srcpath" mode="#current"/>
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
@@ -695,7 +695,7 @@ Entwicklung: le-tex publishing services oHG (2008)
               <xsl:with-param name="error-code" select="'W2D_045'"/>
               <xsl:with-param name="exit"/>
               <xsl:with-param name="hash">
-                <value key="xpath"><xsl:value-of select="@xpath"/></value>
+                <value key="xpath"><xsl:value-of select="@srcpath"/></value>
                 <value key="level">WRN</value>
                 <value key="info-text"><xsl:value-of select="$instrText"/></value>
               </xsl:with-param>
@@ -714,7 +714,7 @@ Entwicklung: le-tex publishing services oHG (2008)
               <xsl:with-param name="error-code" select="'W2D_040'"/>
               <xsl:with-param name="exit" select="'yes'"/>
               <xsl:with-param name="hash">
-                <value key="xpath"><xsl:value-of select="@xpath"/></value>
+                <value key="xpath"><xsl:value-of select="@srcpath"/></value>
                 <value key="level">INT</value>
                 <value key="info-text"><xsl:value-of select="$instrText"/></value>
               </xsl:with-param>
@@ -831,14 +831,14 @@ Entwicklung: le-tex publishing services oHG (2008)
   <!-- math section -->
   <xsl:template match="m:oMathPara" mode="wml-to-dbk">
     <equation role="omml">
-      <xsl:apply-templates select="@* except @xpath" mode="#current"/>
+      <xsl:apply-templates select="@* except @srcpath" mode="#current"/>
       <xsl:apply-templates select="node()" mode="omml2mml"/>
     </equation>
   </xsl:template>
 
   <xsl:template match="m:oMath" mode="wml-to-dbk">
     <inlineequation role="omml">
-      <xsl:apply-templates select="@* except @xpath" mode="#current"/>
+      <xsl:apply-templates select="@* except @srcpath" mode="#current"/>
       <xsl:apply-templates select="." mode="omml2mml"/>
     </inlineequation>
   </xsl:template>

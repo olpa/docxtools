@@ -30,6 +30,7 @@
   <p:option name="docx" required="true"/>
   <p:option name="debug" required="false" select="'no'"/>
   <p:option name="debug-dir-uri" required="false" select="''"/>
+  <p:option name="srcpath" required="false" select="'no'"/>
   <p:option name="unwrap-tooltip-links" required="false" select="'no'"/>
   <p:option name="hub-version" required="false" select="'1.1'"/>
   
@@ -91,6 +92,7 @@
     <p:with-option name="prefix" select="concat('docx2hub/', $basename, '/01')"/>
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+    <p:with-param name="srcpath" select="$srcpath"/>
   </letex:xslt-mode>
   
   <letex:xslt-mode mode="docx2hub:add-props">

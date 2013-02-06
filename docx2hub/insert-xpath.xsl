@@ -27,7 +27,7 @@
   >
   
   <xsl:function name="docx2hub:srcpath" as="xs:string">
-    <xsl:param name="elt" as="element(*)?" />
+    <xsl:param name="elt" as="element(*)?"/>
     <xsl:sequence select="string-join(
                             (
                               if ($elt/.. instance of element(*)) then docx2hub:srcpath($elt/..) else concat(base-uri($elt), '?xpath='),
@@ -41,7 +41,7 @@
                           )"/>
   </xsl:function>
 
-  <xsl:template match="*[ self::w:p or self::w:t or self::w:tbl or self::w:tc or self::w:hyperlink ]
+  <xsl:template match="*[ self::w:p or self::w:t or self::w:tbl or self::w:tc or self::w:hyperlink or self::w:r ]
                         [ /*/name() = ('w:document', 'w:footnotes', 'w:endnotes', 'w:comments')]" mode="insert-xpath">
     <xsl:copy copy-namespaces="no">
       <xsl:if test="$srcpath eq 'yes'">
@@ -108,23 +108,4 @@
     </xsl:copy>
   </xsl:template>
   
-  <!-- letex:xpath-for-node() replaces saxon:path() -->
-  <xsl:function name="letex:xpath-for-node" as="xs:string">
-    <xsl:param name="current-node" as="node()"/>
-    <xsl:variable name="names" as="xs:string*">
-      <xsl:for-each select="$current-node/ancestor-or-self::*">
-        <xsl:variable name="ancestor-of-current-node" select="."/>
-        <xsl:variable name="siblings-with-equal-names" select="$ancestor-of-current-node/../*[name() = name($ancestor-of-current-node)]"/>
-        <xsl:sequence select="concat( name( $ancestor-of-current-node ), concat( '[',letex:node-position($siblings-with-equal-names,$ancestor-of-current-node),']' ) )"/>
-      </xsl:for-each>
-    </xsl:variable>
-    <xsl:sequence select="concat( '/', string-join($names,'/') )"/>
-  </xsl:function>
-  
-  <xsl:function name="letex:node-position" as="xs:integer*">
-    <xsl:param name="sequence" as="node()*"/> 
-    <xsl:param name="node" as="node()"/> 
-    <xsl:sequence select=" for $i in (1 to count($sequence)) return $i[$sequence[$i] is $node]"/>
-  </xsl:function>
-
 </xsl:stylesheet>
