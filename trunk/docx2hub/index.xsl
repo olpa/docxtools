@@ -30,7 +30,9 @@
 
     <!-- §§§ switch to xsl:analyze-string eventually -->
     
-    <xsl:variable name="instru" select="replace(replace(replace($instr,'\\&quot;','_quot_'),'\\([&#8222;&#8220;])','$1'), '\\:', '#_-semi-_-colon-_#')"/>
+    <!-- replaced with variable below. transformation failed with german quotation marks -->
+    <!--<xsl:variable name="instru" select="replace(replace(replace($instr,'\\&quot;','_quot_'),'\\([&#8222;&#8220;])','$1'),'\\:', '#_-semi-_-colon-_#')"/>-->
+    <xsl:variable name="instru" select="replace(replace(replace($instr,'\\&quot;','_quot_'),'&#8222;|&#8220;','&quot;'),'\\:', '#_-semi-_-colon-_#')"/>
     <xsl:choose>
       <xsl:when test="matches($instru,'&quot;(\s+\\[bi])?\s*$')">
         <xsl:variable name="split-instru" select="tokenize($instru,'(^|&quot;)[\s&#160;]*[Xx][eE]($|[\s&#160;])')[string-length(.) gt 0]" as="xs:string*"/>
@@ -41,7 +43,7 @@
               <xsl:with-param name="error-code" select="'W2D_001'"/>
               <xsl:with-param name="exit" select="'yes'"/>
               <xsl:with-param name="hash">
-                <value key="xpath"><xsl:value-of select="$nodes[1]/@xpath"/></value>
+                <value key="xpath"><xsl:value-of select="$nodes[1]/@srcpath"/></value>
                 <value key="level">INT</value>
                 <value key="info-text"><xsl:value-of select="$instr"/></value>
               </xsl:with-param>
@@ -94,11 +96,12 @@
         </xsl:for-each>
       </xsl:when>
       <xsl:otherwise>
+        <xsl:message select="$nodes[1]"></xsl:message>
         <xsl:call-template name="signal-error">
           <xsl:with-param name="error-code" select="'W2D_002'"/>
           <xsl:with-param name="exit" select="'yes'"/>
           <xsl:with-param name="hash">
-            <value key="xpath"><xsl:value-of select="$nodes[1]/@xpath"/></value>
+            <value key="xpath"><xsl:value-of select="$nodes[1]/@srcpath"/></value>
             <value key="level">INT</value>
             <value key="info-text"><xsl:value-of select="$instru"/></value>
           </xsl:with-param>

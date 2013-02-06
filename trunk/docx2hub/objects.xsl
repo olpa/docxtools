@@ -41,7 +41,7 @@
     </xsl:apply-templates>
   </xsl:template>
 
-  <xsl:template match="@xpath" mode="vml"/>
+  <xsl:template match="@srcpath" mode="vml"/>
 
   <xsl:template match="v:fill" mode="vml">
     <xsl:apply-templates select="@* except (@o:detectmouseclick)" mode="#current"/>
@@ -81,7 +81,7 @@
           <xsl:with-param name="error-code" select="'W2D_502'"/>
           <xsl:with-param name="exit" select="'no'"/>
           <xsl:with-param name="hash">
-            <value key="xpath"><xsl:value-of select="@xpath"/></value>
+            <value key="xpath"><xsl:value-of select="@srcpath"/></value>
             <value key="level">WRN</value>
             <value key="comment"/>
             <value key="info-text"><xsl:value-of select="$img-file-name"/></value>
@@ -277,7 +277,7 @@
       <xsl:with-param name="error-code" select="'W2D_501'"/>
       <xsl:with-param name="exit" select="'no'"/>
       <xsl:with-param name="hash">
-        <value key="xpath"><xsl:value-of select="@xpath"/></value>
+        <value key="xpath"><xsl:value-of select="@srcpath"/></value>
         <value key="level">WRN</value>
         <value key="comment"/>
       </xsl:with-param>
@@ -289,7 +289,7 @@
       <xsl:with-param name="error-code" select="'W2D_501'"/>
       <xsl:with-param name="exit" select="'no'"/>
       <xsl:with-param name="hash">
-        <value key="xpath"><xsl:value-of select="@xpath"/></value>
+        <value key="xpath"><xsl:value-of select="@srcpath"/></value>
         <value key="level">WRN</value>
         <value key="comment"/>
       </xsl:with-param>
@@ -306,7 +306,7 @@
       <xsl:with-param name="error-code" select="'W2D_020'"/>
       <xsl:with-param name="exit" select="'no'"/>
       <xsl:with-param name="hash">
-        <value key="xpath"><xsl:value-of select="@xpath"/></value>
+        <value key="xpath"><xsl:value-of select="@srcpath"/></value>
         <value key="level">INT</value>
         <value key="mode">vml</value>
         <value key="info-text"><xsl:value-of select="concat('Element: ', name(), '     Parent: ', ../name())"/></value>
@@ -319,7 +319,7 @@
       <xsl:with-param name="error-code" select="'W2D_021'"/>
       <xsl:with-param name="exit" select="'no'"/>
       <xsl:with-param name="hash">
-        <value key="xpath"><xsl:value-of select="../@xpath"/></value>
+        <value key="xpath"><xsl:value-of select="../@srcpath"/></value>
         <value key="level">INT</value>
         <value key="mode">vml</value>
         <value key="info-text"><xsl:value-of select="concat('Attribut: ', name(), '     Parent: ', ../name())"/></value>
@@ -332,7 +332,7 @@
       <xsl:with-param name="error-code" select="'W2D_023'"/>
       <xsl:with-param name="exit" select="'no'"/>
       <xsl:with-param name="hash">
-        <value key="xpath"><xsl:value-of select="preceding::*[1]/@xpath"/></value>
+        <value key="xpath"><xsl:value-of select="preceding::*[1]/@srcpath"/></value>
         <value key="level">INT</value>
         <value key="mode">vml</value>
         <value key="info-text"><xsl:value-of select="."/></value>
@@ -345,7 +345,7 @@
       <xsl:with-param name="error-code" select="'W2D_022'"/>
       <xsl:with-param name="exit" select="'no'"/>
       <xsl:with-param name="hash">
-        <value key="xpath"><xsl:value-of select="preceding::*[1]/@xpath"/></value>
+        <value key="xpath"><xsl:value-of select="preceding::*[1]/@srcpath"/></value>
         <value key="level">INT</value>
         <value key="mode">vml</value>
         <value key="info-text"><xsl:value-of select="."/></value>

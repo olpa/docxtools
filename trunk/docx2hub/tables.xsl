@@ -66,7 +66,7 @@
         <xsl:with-param name="error-code" select="'W2D_052'"/>
         <xsl:with-param name="exit" select="'no'"/>
         <xsl:with-param name="hash">
-          <value key="xpath"><xsl:value-of select="@xpath"/></value>
+          <value key="xpath"><xsl:value-of select="@srcpath"/></value>
           <value key="level">WRN</value>
           <value key="comment"/>
           <value key="info-text"><xsl:value-of select="concat('Table-width: ', $width, '    Sum of col-widths: ', sum(w:gridCol/@w:w))"/></value>
@@ -103,7 +103,7 @@
       <xsl:with-param name="error-code" select="'W2D_020'"/>
       <xsl:with-param name="exit" select="'no'"/>
       <xsl:with-param name="hash">
-        <value key="xpath"><xsl:value-of select="@xpath"/></value>
+        <value key="xpath"><xsl:value-of select="@srcpath"/></value>
         <value key="level">INT</value>
         <value key="mode">tables</value>
         <value key="info-text"><xsl:value-of select="concat('Element: ', name(), '     Parent: ', ../name())"/></value>
@@ -116,7 +116,7 @@
       <xsl:with-param name="error-code" select="'W2D_021'"/>
       <xsl:with-param name="exit" select="'no'"/>
       <xsl:with-param name="hash">
-        <value key="xpath"><xsl:value-of select="../@xpath"/></value>
+        <value key="xpath"><xsl:value-of select="../@srcpath"/></value>
         <value key="level">INT</value>
         <value key="mode">tables</value>
         <value key="info-text"><xsl:value-of select="concat('Element: ', name(), '     Parent: ', ../name())"/></value>
@@ -129,7 +129,7 @@
       <xsl:with-param name="error-code" select="'W2D_023'"/>
       <xsl:with-param name="exit" select="'no'"/>
       <xsl:with-param name="hash">
-        <value key="xpath"><xsl:value-of select="preceding::*[1]/@xpath"/></value>
+        <value key="xpath"><xsl:value-of select="preceding::*[1]/@srcpath"/></value>
         <value key="level">INT</value>
         <value key="mode">tables</value>
         <value key="info-text"><xsl:value-of select="."/></value>
@@ -142,7 +142,7 @@
       <xsl:with-param name="error-code" select="'W2D_022'"/>
       <xsl:with-param name="exit" select="'no'"/>
       <xsl:with-param name="hash">
-        <value key="xpath"><xsl:value-of select="preceding::*[1]/@xpath"/></value>
+        <value key="xpath"><xsl:value-of select="preceding::*[1]/@srcpath"/></value>
         <value key="level">INT</value>
         <value key="mode">tables</value>
         <value key="info-text"><xsl:value-of select="."/></value>
@@ -169,7 +169,7 @@
   </xsl:template>
 
   <!-- w:vMerge ohne Attribute bedeutet: Zelle, die von einem morerows-entry der vorigen Zeile okkupiert wird und die nicht in CALS erscheinen soll -->
-  <xsl:template match="w:tc[not(w:tcPr/w:vMerge[count(@* except @xpath) = 0])]" mode="tables">
+  <xsl:template match="w:tc[not(w:tcPr/w:vMerge[count(@* except @srcpath) = 0])]" mode="tables">
     <xsl:param name="col-widths" tunnel="yes" as="xs:integer*"/>
     <xsl:element name="entry">
       <xsl:copy-of select="@*"  />
@@ -251,7 +251,7 @@
         <xsl:with-param name="error-code" select="'W2D_050'"/>
         <xsl:with-param name="exit" select="'no'"/>
         <xsl:with-param name="hash">
-          <value key="xpath"><xsl:value-of select="$cell-borders[w:insideH or w:insideV][1]/@xpath"/></value>
+          <value key="xpath"><xsl:value-of select="$cell-borders[w:insideH or w:insideV][1]/@srcpath"/></value>
           <value key="level">INT</value>
         </xsl:with-param>
       </xsl:call-template>
@@ -283,7 +283,7 @@
                 <xsl:with-param name="error-code" select="'W2D_051'"/>
                 <xsl:with-param name="exit" select="'no'"/>
                 <xsl:with-param name="hash">
-                  <value key="xpath"><xsl:value-of select="$cell-borders[w:insideH or w:insideV][1]/@xpath"/></value>
+                  <value key="xpath"><xsl:value-of select="$cell-borders[w:insideH or w:insideV][1]/@srcpath"/></value>
                   <value key="level">INT</value>
                   <value key="info-text"><xsl:value-of select="."/></value>
                 </xsl:with-param>
@@ -366,7 +366,7 @@
   </xsl:function>
 
 
-  <xsl:template match="w:tc[w:tcPr/w:vMerge[count(@* except @xpath) = 0]]" mode="tables"/>
+  <xsl:template match="w:tc[w:tcPr/w:vMerge[count(@* except @srcpath) = 0]]" mode="tables"/>
 
   <xsl:template name="cell.span">
     <xsl:variable name="span" select="0 + w:tcPr/w:gridSpan/@w:val
@@ -395,8 +395,8 @@
     <xsl:if test="w:tcPr/w:vMerge/@w:val = 'restart'">
       <xsl:variable name="counts" as="xs:integer*">
         <xsl:choose>
-          <xsl:when test="../following-sibling::w:tr[1]/w:tc[letex:colcount(1, .) = letex:colcount(1, current())]/w:tcPr/w:vMerge[count(@* except @xpath) = 0]">
-            <xsl:for-each-group select="../following-sibling::w:tr/w:tc[letex:colcount(1, .) = letex:colcount(1, current())]" group-adjacent="if (w:tcPr/w:vMerge[count(@* except @xpath) = 0]) then true() else false()">
+          <xsl:when test="../following-sibling::w:tr[1]/w:tc[letex:colcount(1, .) = letex:colcount(1, current())]/w:tcPr/w:vMerge[count(@* except @srcpath) = 0]">
+            <xsl:for-each-group select="../following-sibling::w:tr/w:tc[letex:colcount(1, .) = letex:colcount(1, current())]" group-adjacent="if (w:tcPr/w:vMerge[count(@* except @srcpath) = 0]) then true() else false()">
               <xsl:sequence select="count(current-group())"/>
             </xsl:for-each-group>
           </xsl:when>

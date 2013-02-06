@@ -65,12 +65,9 @@
             </xsl:non-matching-substring>
           </xsl:analyze-string>
         </xsl:variable>
-        <xsl:message>
-          <xsl:text>##</xsl:text><xsl:value-of select="$msg-text"/>
-        </xsl:message>
-        <xsl:message>
-          <xsl:text>##  </xsl:text><xsl:value-of select="$error-code"/>
-        </xsl:message>
+        <xsl:message select="concat('##  Error Code: ', $error-code)"/>
+        <xsl:message select="concat('##  Error Msg: ', $msg-text)"/>
+        <xsl:message select="$hash"></xsl:message>
         <xsl:if test="$hash/*:value[@key = 'mode']">
           <xsl:message select="concat('##  Mode: ', $hash/*:value[@key = 'mode'])"/>
         </xsl:if>
@@ -82,10 +79,13 @@
             <xsl:value-of select="$msg-text"/>
           </letex:comment>
         </xsl:if>
-        <xsl:if test="$hash/value[@key = 'xpath']">
-          <xsl:message select="concat('##  ', $hash/*:value[@key = 'xpath'])"/>
+        <xsl:if test="$hash/*:value[@key = 'xpath']">
+          <xsl:message select="concat('##  XPath: ', $hash/*:value[@key = 'xpath'])"/>
         </xsl:if>
-        <xsl:if test="$hash/value[@key = 'pi'] and $create-pis = 'yes'">
+        <xsl:if test="$hash/*:value[@key = 'info-text']">
+          <xsl:message select="concat('##  Info: ', $hash/*:value[@key = 'info-text'])"/>
+        </xsl:if>
+        <xsl:if test="$hash/*:value[@key = 'pi'] and $create-pis = 'yes'">
           <xsl:processing-instruction name="letex">
             <xsl:value-of select="$hash/*:value[@key = 'pi']"/>
           </xsl:processing-instruction>

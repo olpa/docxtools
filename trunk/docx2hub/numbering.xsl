@@ -31,7 +31,7 @@
         <xsl:with-param name="error-code" select="'W2D_060'"/>
         <xsl:with-param name="exit" select="'yes'"/>
         <xsl:with-param name="hash">
-          <value key="xpath"><xsl:value-of select="$context/@xpath"/></value>
+          <value key="xpath"><xsl:value-of select="$context/@srcpath"/></value>
           <value key="level">INT</value>
           <value key="info-text"><xsl:value-of select="$context/name()"/></value>
         </xsl:with-param>
@@ -110,7 +110,7 @@
       <xsl:with-param name="error-code" select="'W2D_020'"/>
       <xsl:with-param name="exit" select="'no'"/>
       <xsl:with-param name="hash">
-        <value key="xpath"><xsl:value-of select="@xpath"/></value>
+        <value key="xpath"><xsl:value-of select="@srcpath"/></value>
         <value key="level">INT</value>
         <value key="mode">numbering</value>
         <value key="info-text"><xsl:value-of select="concat('Element: ', name(), '     Parent: ', ../name())"/></value>
@@ -124,7 +124,7 @@
         <xsl:with-param name="error-code" select="'W2D_061'"/>
         <xsl:with-param name="exit" select="'yes'"/>
         <xsl:with-param name="hash">
-          <value key="xpath"><xsl:value-of select="@xpath"/></value>
+          <value key="xpath"><xsl:value-of select="@srcpath"/></value>
           <value key="level">INT</value>
         </xsl:with-param>
       </xsl:call-template>
