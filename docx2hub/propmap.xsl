@@ -80,11 +80,7 @@
         <prop name="w:pBdr/w:left" type="docx-border" />
         <prop name="w:pBdr/w:right" type="docx-border" />
         <prop name="w:pBdr/w:top" type="docx-border"  />
-      	<prop name="w:position">
-      		<val match="^[-]" target-name="css:vertical-align" target-value="sub"/>
-      		<val match="0"/>
-      		<val match="^[^-]" target-name="css:vertical-align" target-value="super"/>
-      	</prop>
+      	<prop name="w:position" target-name="css:vertical-align" type="docx-length-attr"/>
         <prop name="w:pStyle" type="docx-parastyle" />
         <prop name="w:qFormat" />
         <prop name="w:rFonts" type="docx-font-family" target-name="css:font-family" />
@@ -138,10 +134,7 @@
         <prop name="w:uiPriority" />
         <prop name="w:unhideWhenUsed" />
         <prop name="w:vanish" type="docx-boolean-prop" target-name="css:display" default="inherit" active="none"/>
-      	<prop name="w:vertAlign">
-      		<val match="subscript" target-name="css:vertical-align" target-value="sub" />
-      		<val match="superscript" target-name="css:vertical-align" target-value="super" />
-      	</prop>
+      	<prop name="w:vertAlign" type="docx-position" />
       	<prop name="w:w" type="docx-font-stretch" target-name="css:font-stretch"/>
         <prop name="w:widowControl" type="docx-boolean-prop" target-name="css:orphans" default="1" active="2"/>
         <prop name="w:widowControl" type="docx-boolean-prop" target-name="css:widows" default="1" active="2"/>

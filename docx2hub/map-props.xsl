@@ -397,7 +397,7 @@
       </xsl:when>
 
       <xsl:when test=". eq 'docx-length-attr'">
-        <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="docx2hub:pt-length($val)" /></docx2hub:attribute>
+        <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="docx2hub:pt-length(($val, $val/@w:val)[normalize-space()][1])" /></docx2hub:attribute>
       </xsl:when>
 
       <xsl:when test=". eq 'docx-length-attr-negated'">
@@ -461,11 +461,11 @@
         <xsl:copy-of select="$val" copy-namespaces="no"/>
       </xsl:when>
 
-      <xsl:when test=". eq 'position'">
+      <xsl:when test=". eq 'docx-position'">
         <xsl:choose>
-          <xsl:when test="$val eq 'Normal'" />
+          <xsl:when test="$val/@w:val eq 'baseline'" />
           <xsl:otherwise>
-            <docx2hub:wrap element="{lower-case($val)}" />
+            <docx2hub:wrap element="{$val/@w:val}" />
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
@@ -554,7 +554,13 @@
   </xsl:template>
 
   <xsl:function name="docx2hub:pt-length" as="xs:string" >
-    <xsl:param name="val" as="xs:string"/>
+    <xsl:param name="val" as="xs:string?"/>
+    <xsl:choose>
+      <xsl:when test="not($val)">
+        <xsl:message>empty argument for docx2hub:pt-length, defaulting to zero. </xsl:message>
+        <xsl:sequence select="'0'"/>
+      </xsl:when>
+    </xsl:choose>
     <xsl:sequence select="if (matches($val, '%$'))
                           then $val
                           else concat(xs:string(xs:integer($val) * 0.05), 'pt')" />
