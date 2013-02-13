@@ -546,10 +546,17 @@ Entwicklung: le-tex publishing services oHG (2008)
     <anchor role="start" xml:id="{@w:name}" xreflabel="{@w:id}"/>
   </xsl:template>
 
+  <xsl:key name="docx2hub:bookmarkStart" match="w:bookmarkStart" use="@w:id"/>
+
   <xsl:template match="w:bookmarkEnd" mode="wml-to-dbk">
-    <anchor role="end" xml:id="{concat(preceding::w:bookmarkStart[@w:id = current()/@w:id]/@w:name, '_end')}"/>
+    <!--<anchor role="end" xml:id="{concat(preceding::w:bookmarkStart[@w:id = current()/@w:id]/@w:name, '_end')}"/>-->
+    <anchor role="end" xml:id="{concat(key('docx2hub:bookmarkStart', @w:id)/@w:name, '_end')}"/>
   </xsl:template>
 
+  <xsl:template match="w:bookmarkStart[@w:name eq '_GoBack']" mode="wml-to-dbk"/>
+  
+  <xsl:template match="w:bookmarkEnd[key('docx2hub:bookmarkStart', @w:id)/@w:name eq '_GoBack']" mode="wml-to-dbk"/>
+  
   <!-- comments -->
   <xsl:template match="w:commentRangeStart" mode="wml-to-dbk"/>
   <xsl:template match="w:commentRangeEnd" mode="wml-to-dbk"/>
