@@ -60,7 +60,7 @@
     <!-- for-each: just to avoid an XTDE1270 which shouldn't happen when the 3-arg form of key() is invoked: -->
     <xsl:for-each select="$context">
     <xsl:variable name="numPr" select="if ($just-count) then
-                                       if ($context/w:numPr[w:numId/@w:val &gt; 0]) then $context/w:numPr else ()
+                                       if ($context/w:numPr[w:numId/@w:val]) then $context/w:numPr else ()
                                        else if ($context/w:numPr) then $context/w:numPr else ()"/>
     <xsl:variable name="style" select="key('docx2hub:style-by-role', @role, root($context))/w:numPr" as="element(w:numPr)?"/>
     <xsl:sequence select="if ($numPr)
@@ -213,22 +213,25 @@
                   select="$context/preceding-sibling::w:p[letex:get-lvl-override(.)
                           and matches(letex:get-lvl-of-numbering(., true())/w:lvlText/@w:val, '%')
                           and (not(letex:get-lvl-of-numbering(., true())/../generate-id() = $current/../../generate-id())
-                          or not(w:pPr/w:numPr/w:numId/@w:val = $context/w:numPr/w:numId/@w:val
-                              and w:pPr/w:numPr/w:ilvl/@w:val = $context/w:numPr/w:ilvl/@w:val))
+                          or not(w:numPr/w:numId/@w:val = $context/w:numPr/w:numId/@w:val
+                              and w:numPr/w:ilvl/@w:val = $context/w:numPr/w:ilvl/@w:val))
                           and not(letex:get-lvl-of-numbering(., true())/@w:ilvl &gt; $ilvl)][1]"/>
 
                 <xsl:variable name="last-override-stop"
                   select="if ($last-override) then $last-override else $context/preceding-sibling::*[last()]"/>
 
+                <xsl:variable name="tmp-lvl" select="$current/../../w:lvl[@w:ilvl = ($ilvl+1)]"/>
+                <xsl:variable name="current-lvl" select="$current/../../w:lvl[@w:ilvl = $ilvl]"/>
+
                 <xsl:variable name="value"
                   select="if (letex:get-lvl-override($context) and $context/w:numPr) then
-                          count($context/preceding-sibling::w:p[not(ancestor::w:tbl)][w:pPr/w:numPr/w:numId/@w:val = $context/w:numPr/w:numId/@w:val
-                                                                and w:pPr/w:numPr/w:ilvl/@w:val = $context/w:numPr/w:ilvl/@w:val
+                          count($context/preceding-sibling::w:p[not(ancestor::w:tbl)][w:numPr/w:numId/@w:val = $context/w:numPr/w:numId/@w:val
+                                                                and w:numPr/w:ilvl/@w:val = $context/w:numPr/w:ilvl/@w:val
                                                                 and . &gt;&gt; $last-override-stop])
                           + $start
                           + (if
-                          ($last-override-stop/preceding-sibling::w:p[w:pPr/w:numPr/w:numId/@w:val = $context/w:numPr/w:numId/@w:val
-                                                                      and w:pPr/w:numPr/w:ilvl/@w:val = $context/w:numPr/w:ilvl/@w:val])
+                          ($last-override-stop/preceding-sibling::w:p[w:numPr/w:numId/@w:val = $context/w:numPr/w:numId/@w:val
+                                                                      and w:numPr/w:ilvl/@w:val = $context/w:numPr/w:ilvl/@w:val])
                           then 1 else 0)
                           + (if (letex:get-lvl-override($context)/w:startOverride/@w:val &gt; 1)
                              then (xs:integer(letex:get-lvl-override($context)/w:startOverride/@w:val) - 1) else 0)
@@ -237,6 +240,8 @@
                           + $start
                           + (if (letex:get-lvl-override($stop-count)
                                  and letex:get-lvl-override($stop-count)/w:startOverride/@w:val = 1) then 1 else 0)
+                          (:KW 10.8.12 - wenn es tiefere ebenen gibt, die ebenen ueberspringen, den zaehler der aktuellen ebene korrigieren:)
+                          + (if (exists($context/preceding-sibling::w:p[letex:get-lvl-of-numbering(., true())/generate-id() = $tmp-lvl/generate-id() and . &gt;&gt; $stop-count][count(./preceding-sibling::w:p[letex:get-lvl-of-numbering(., true())/generate-id() = $current-lvl/generate-id() and . &gt;&gt; $stop-count]) = 0])) then 1 else 0)
                           "/>
                 <xsl:number value="$value" format="{$fmt}"/>
               </xsl:when>
@@ -244,18 +249,23 @@
               <!-- eine andere Ebene wird gezählt -->
               <xsl:otherwise>
                 <xsl:variable name="tmp-lvl" select="$current/../../w:lvl[@w:ilvl = (xs:integer(regex-group(1)) - 1)]"/>
+                <xsl:variable name="current-lvl" select="$current/../../w:lvl[@w:ilvl = xs:integer(regex-group(1))]"/>
                 <xsl:variable name="last-step"
                   select="$context/preceding-sibling::w:p[
                           letex:get-lvl-of-numbering(., true())/../generate-id() = $current/../../generate-id()
                           and
                           letex:get-lvl-of-numbering(., true())/@w:ilvl &lt; (xs:integer(regex-group(1)) - 1)][1]"/>
                 <xsl:variable name="stop-count" select="if ($last-step) then $last-step else $context/preceding-sibling::*[last()]"/>
+                <xsl:variable name="count-preced" select="count($context/preceding-sibling::w:p[letex:get-lvl-of-numbering(., true())/generate-id() = $tmp-lvl/generate-id() and . &gt;&gt; $stop-count])"/>
+                
                 <xsl:variable name="value"
                   select="$tmp-lvl/w:start/@w:val - 1
-                          + count($context/preceding-sibling::w:p[letex:get-lvl-of-numbering(., true())/generate-id() = $tmp-lvl/generate-id()
-                          and . &gt;&gt; $stop-count])
-                          + (if ($stop-count/generate-id() = $context/preceding-sibling::w:p[letex:get-lvl-of-numbering(., true())/generate-id() = $tmp-lvl/generate-id()][last()]/generate-id())
-                          then 1 else 0)"/>
+                          (:KW 10.8.12 - wenn es keinen vorgaengerknoten in der gezaehlten ebene gibt, darf die numerierung
+                          trotzdem nicht null werden; ebenfalls muessen darauf folgende knoten auch inkrementiert werden:)
+                          + (if (($count-preced = 0) or (exists($context/preceding-sibling::w:p[letex:get-lvl-of-numbering(., true())/generate-id() = $current-lvl/generate-id() and . &gt;&gt; $stop-count][count(./preceding-sibling::w:p[letex:get-lvl-of-numbering(., true())/generate-id() = $tmp-lvl/generate-id() and . &gt;&gt; $stop-count]) = 0]))) 
+                          then $count-preced+1 
+                          else ($count-preced + (if ($stop-count/generate-id() = $context/preceding-sibling::w:p[letex:get-lvl-of-numbering(., true())/generate-id() = $tmp-lvl/generate-id()][last()]/generate-id())
+                          then 1 else 0)))"/>
                 <xsl:number value="$value" format="{letex:get-numbering-format($tmp-lvl/w:numFmt/@w:val, 'this should never happen')}"/>
               </xsl:otherwise>
 
@@ -268,7 +278,6 @@
           </xsl:non-matching-substring>
 
         </xsl:analyze-string>
-
       </xsl:when>
       
       <!-- keine Counter, Text ausgeben -->
