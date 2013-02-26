@@ -660,13 +660,13 @@
       </xsl:if>
     </xsl:variable>
     <xsl:choose>
-      <xsl:when test="exists(docx2hub:wrap) and exists(self::css:rule)">
+      <xsl:when test="exists(docx2hub:wrap) and exists(self::css:rule | self::dbk:style)">
         <xsl:copy>
-          <xsl:copy-of select="@*"/>
           <xsl:attribute name="remap" select="docx2hub:wrap/@element" />
+          <xsl:sequence select="@*, $content" />
         </xsl:copy>
       </xsl:when>
-      <xsl:when test="exists(docx2hub:wrap) and not(self::css:rule)">
+      <xsl:when test="exists(docx2hub:wrap) and not(self::css:rule or self::dbk:style)">
         <xsl:sequence select="docx2hub:wrap($content, (docx2hub:wrap))" />
       </xsl:when>
       <xsl:otherwise>
