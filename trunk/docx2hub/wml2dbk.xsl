@@ -381,7 +381,7 @@ Entwicklung: le-tex publishing services oHG (2008)
   <!-- GI 2012-10-08 §§§
        Want to get rid of the warnings. Does that hurt? Not tested.
        -->
-  <xsl:template match="w:p/w:numPr | css:rule/w:numPr | style/w:numPr |
+  <xsl:template match="w:p/w:numPr | css:rule/w:numPr | css:rule/w:tblPr | style/w:numPr |
                        /*/w:numbering | /*/w:docRels | /*/w:fonts | /*/w:comments" mode="wml-to-dbk" priority="-0.25"/>
 
   <xsl:template match="dbk:* | css:*" mode="wml-to-dbk">
