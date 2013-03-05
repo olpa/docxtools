@@ -75,7 +75,13 @@
           </xsl:if>
         </imagedata>
       </imageobject>
-      <xsl:variable name="img-file-name" select="key($key-name, current()/@r:id)/@Target" as="xs:string" />
+      <xsl:variable name="img-file-name" select="key($key-name, current()/@r:id)/@Target" as="xs:string?" />
+      <xsl:if test="empty($img-file-name)">
+        <xsl:message>KN:<xsl:value-of select="$key-name"/>
+          RID:<xsl:copy-of select="current()/@r:id"/>
+          IF:<xsl:copy-of select="key($key-name, current()/@r:id)"/>
+        </xsl:message>  
+      </xsl:if>
       <xsl:if test="matches($img-file-name, '^media/image[0-9]+\.(jpe?g|png|tiff?)$')">
         <xsl:call-template name="signal-error">
           <xsl:with-param name="error-code" select="'W2D_502'"/>
