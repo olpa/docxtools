@@ -1,6 +1,7 @@
 SAXON	= saxon
 JING = jing
 UMASK	= umask 002
+HUBVERSION = 1.0
 
 MAKEFILEDIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
@@ -19,6 +20,7 @@ usage:
 	@echo "  make -f $(MAKEFILEDIR)/Makefile path_to/xyz.hub.xml.val"
 	@echo "where path_to/xyz.docx is the source docx file"
 	@echo "Use XSLTPARAMS=\"srcpath=no\" if you don't need srcpath attributes (will speed things up) (is default now)"
+	@echo "Use HUBVERSION=1.1 for Hub 1.1 output."
 
 %.hub.xml: %.docx.tmp/word/document.xml $(MAKEFILEDIR)/Makefile $(shell find $(MAKEFILEDIR) -name \*.xsl) $(MAKEFILEDIR)/*xml
 	-$(UMASK); \
@@ -28,6 +30,7 @@ usage:
 		-s:$(call uri,$<) \
 		-xsl:$(call uri,$(MAKEFILEDIR)/main.xsl) \
 		error-msg-file-path=$(call uri,$(ERROR_MSG_PATH)) \
+		hub-version=$(HUBVERSION) \
 		$(XSLTPARAMS) \
 		> $@ \
 		2> $(abspath $(dir $@))/xslt_wml2dbk.log
