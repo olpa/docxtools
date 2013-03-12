@@ -26,7 +26,8 @@
 
   <xsl:template match="w:tbl" mode="wml-to-dbk">
     <informaltable>
-      <xsl:apply-templates select="w:tblPr/@role" mode="#current" />
+      <xsl:apply-templates select="w:tblPr/@role|w:tblPr/@css:*[matches(name(.),'border(\-.+)?\-style')]" mode="#current" />
+<!--      <xsl:attribute name="frame" select="if (some $i in (w:tblPr/@css:*[matches(name(.),'border\-.+\-style')]) satisfies (exists($i) and not($i=('nil','none')))) then 'all' else 'none'"/>-->
       <tgroup>
         <xsl:attribute name="cols">
           <xsl:value-of select="count(w:tblGrid/w:gridCol)"/>
@@ -152,10 +153,15 @@
 
   <xsl:template match="w:tr" mode="tables">
     <row>
+      <xsl:apply-templates select="@*" mode="wml-to-dbk"/>
       <xsl:apply-templates mode="#current"/>
     </row>
   </xsl:template>
-
+  
+<!--  <xsl:template match="@css:*[matches(name(.),'border\-')]" mode="tables">
+    <xsl:attribute name="{name(.)}" select="."/>
+  </xsl:template>
+-->
   <!-- Table-Level Property Exceptions -->
 
   <xsl:template match="w:trPr" mode="tables"/>
@@ -172,7 +178,9 @@
   <xsl:template match="w:tc[not(w:tcPr/w:vMerge[count(@* except @srcpath) = 0])]" mode="tables">
     <xsl:param name="col-widths" tunnel="yes" as="xs:integer*"/>
     <xsl:element name="entry">
-      <xsl:copy-of select="@*"  />
+      <xsl:copy-of select="ancestor::w:tbl/w:tblPr/@css:* except ancestor::w:tbl/w:tblPr/@css:width"/>
+      <xsl:copy-of select="ancestor::w:tr/@css:* except ancestor::w:tr/@css:width"/>
+      <xsl:copy-of select="@*" />
       <!-- Process any spans -->
       <xsl:call-template name="cell.span"/>
       <xsl:call-template name="cell.morerows"/>

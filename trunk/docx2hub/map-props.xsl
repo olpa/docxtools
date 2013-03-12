@@ -176,6 +176,14 @@
       <xsl:apply-templates mode="#current" />
     </xsl:copy>
   </xsl:template>
+  
+  <xsl:template match="w:tblPrEx" mode="docx2hub:add-props">
+    <xsl:apply-templates select="node() except w:tblW" mode="#current"/>
+  </xsl:template>
+  
+  <xsl:template match="w:trPr" mode="docx2hub:add-props">
+    <xsl:apply-templates mode="#current"/>
+  </xsl:template>
 
   <xsl:template match="w:tcPr" mode="docx2hub:add-props" priority="2">
     <xsl:apply-templates mode="#current" />
@@ -189,7 +197,7 @@
     <xsl:apply-templates select="@w:left | @w:right | @w:firstLine, @w:hanging" mode="#current" />
   </xsl:template>
 
-  <xsl:template match="w:pBdr | w:tcBorders" mode="docx2hub:add-props" priority="2">
+  <xsl:template match="w:pBdr | w:tcBorders | w:tblBorders | w:tblCellMar" mode="docx2hub:add-props" priority="2">
     <xsl:apply-templates select="w:left | w:right | w:top | w:bottom" mode="#current" />
   </xsl:template>
 
@@ -210,7 +218,11 @@
                        | w:pPr/* 
                        | w:tblPr/*
                        | w:tcBorders/* 
+                       | w:tblBorders/*
                        | w:tcPr/*
+                       | w:trPr/*
+                       | w:tblPrEx/*
+                       | w:tblCellMar/*
                        | w:ind/@* 
                        | w:tab/@*
                        | w:tcW/@* 
@@ -236,7 +248,8 @@
                        | @w:rsidR
                        | @w:rsidRPr
                        | @w:rsidRDefault
-                       | @w:rsidP"
+                       | @w:rsidP
+                       | @w:rsidTr"
     mode="docx2hub:add-props" />
 
   <xsl:function name="docx2hub:propkey" as="xs:string">
@@ -245,7 +258,7 @@
       <xsl:when test="$prop/self::attribute()">
         <xsl:sequence select="string-join((name($prop/..), name($prop)), '/@')" />
       </xsl:when>
-      <xsl:when test="$prop/(parent::w:pBdr, parent::w:tcBorders)">
+      <xsl:when test="$prop/(parent::w:pBdr, parent::w:tcBorders, parent::w:tblBorders, parent::w:tblCellMar)">
         <xsl:sequence select="string-join((name($prop/..), name($prop)), '/')" />
       </xsl:when>
       <xsl:otherwise>
@@ -322,14 +335,19 @@
         <!-- According to § 17.3.1.5 and other sections, the top/bottom borders don't apply
              if a set of paras has identical border settings. The between setting should be used instead.
              TODO -->
-        <xsl:if test="not($val/@w:val eq 'nil')">
           <xsl:variable name="orientation" select="replace(../@name, '^.+:', '')" as="xs:string" />
           <docx2hub:attribute name="css:border-{$orientation}-style"><xsl:value-of select="docx2hub:border-style($val/@w:val)" /></docx2hub:attribute>
+        <xsl:if test="not($val/@w:val = ('nil','none'))">
           <docx2hub:attribute name="css:border-{$orientation}-width"><xsl:value-of select="docx2hub:pt-length($val/@w:sz)" /></docx2hub:attribute>
           <xsl:if test="$val/@w:color ne 'auto'">
             <docx2hub:attribute name="css:border-{$orientation}-color"><xsl:value-of select="docx2hub:color($val/@w:color)" /></docx2hub:attribute>
           </xsl:if>
         </xsl:if>
+      </xsl:when>
+      
+      <xsl:when test=". eq 'docx-padding'">
+        <xsl:variable name="orientation" select="replace(../@name, '^.+:', '')" as="xs:string" />
+        <docx2hub:attribute name="css:padding-{$orientation}"><xsl:value-of select="docx2hub:pt-length($val/@w:w)" /></docx2hub:attribute>
       </xsl:when>
 
       <xsl:when test=". eq 'docx-charstyle'">

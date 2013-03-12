@@ -119,10 +119,20 @@
         </prop>
         <prop name="w:tabs" type="tablist" />
         <prop name="w:tblBorders" type="passthru" />
+        <prop name="w:tblBorders/w:bottom" type="docx-border" />
+        <prop name="w:tblBorders/w:left" type="docx-border" />
+        <prop name="w:tblBorders/w:right" type="docx-border" />
+        <prop name="w:tblBorders/w:top" type="docx-border"  />
         <prop name="w:tblCellMar" type="passthru" />
+        <prop name="w:tblCellMar/w:bottom" type="docx-padding" />
+        <prop name="w:tblCellMar/w:left" type="docx-padding" />
+        <prop name="w:tblCellMar/w:right" type="docx-padding" />
+        <prop name="w:tblCellMar/w:top" type="docx-padding" />
         <prop name="w:tblGrid" type="passthru" />
         <prop name="w:tblInd" implement="maybe later" />
+        <prop name="w:tblLayout" />
         <prop name="w:tblLook" />
+        <prop name="w:tblPrEx" type="passthru"/>
         <prop name="w:tblStyle" type="docx-parastyle"/>
         <prop name="w:tblW" type="passthru" />
         <prop name="w:tcBorders/w:bottom" type="docx-border" />
@@ -133,6 +143,12 @@
         <prop name="w:u" type="docx-underline" />
         <prop name="w:uiPriority" />
         <prop name="w:unhideWhenUsed" />
+        <prop name="w:vAlign">
+          <val match="both" target-name="css:vertical-align" target-value="middle"/>
+          <val match="bottom" target-name="css:vertical-align" target-value="bottom"/>
+          <val match="center" target-name="css:vertical-align" target-value="middle"/>
+          <val match="top" target-name="css:vertical-align" target-value="top"/>
+        </prop>
         <prop name="w:vanish" type="docx-boolean-prop" target-name="css:display" default="inherit" active="none"/>
       	<prop name="w:vertAlign" type="docx-position" />
       	<prop name="w:w" type="docx-font-stretch" target-name="css:font-stretch"/>
