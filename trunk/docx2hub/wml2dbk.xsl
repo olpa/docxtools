@@ -380,15 +380,27 @@ Entwicklung: le-tex publishing services oHG (2008)
 
   <!-- GI 2012-10-08 §§§
        Want to get rid of the warnings. Does that hurt? Not tested.
+       KW 2013-03-28: It hurts in case of w:numPr. Indentation properties are missing.
        -->
-  <xsl:template match="w:p/w:numPr | css:rule/w:numPr | css:rule/w:tblPr | style/w:numPr |
-                       /*/w:numbering | /*/w:docRels | /*/w:fonts | /*/w:comments" mode="wml-to-dbk" priority="-0.25"/>
+  <xsl:template match="w:p/w:numPr | css:rule/w:numPr | style/w:numPr | css:rule/w:tblPr | /*/w:numbering | /*/w:docRels | /*/w:fonts | /*/w:comments" mode="wml-to-dbk" priority="-0.25"/>
 
   <xsl:template match="dbk:* | css:*" mode="wml-to-dbk">
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*" mode="#current" />
       <xsl:apply-templates select="node()" mode="#current" />
     </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="css:rule | *:style" mode="wml-to-dbk">
+    <xsl:copy copy-namespaces="no">
+      <xsl:if test="w:numPr">
+        <xsl:variable name="ilvl" select="w:numPr/w:ilvl/@w:val"/>
+        <xsl:variable name="lvl-properties" select="key('abstract-numbering-by-id',key('numbering-by-id',w:numPr/w:numId/@w:val)/w:abstractNumId/@w:val)/w:lvl[@w:ilvl=$ilvl]"/>
+        <xsl:apply-templates select="$lvl-properties/@* except $lvl-properties/@w:ilvl" mode="#current"/>
+      </xsl:if>
+      <xsl:apply-templates select="@*" mode="#current" />
+      <xsl:apply-templates select="node()" mode="#current" />
+    </xsl:copy>   
   </xsl:template>
 
   <!-- default for attributes -->
@@ -468,6 +480,11 @@ Entwicklung: le-tex publishing services oHG (2008)
 
   <xsl:template match="w:p" mode="wml-to-dbk">
     <xsl:element name="para">
+      <xsl:if test="w:numPr">
+        <xsl:variable name="ilvl" select="w:numPr/w:ilvl/@w:val"/>
+        <xsl:variable name="lvl-properties" select="key('abstract-numbering-by-id',key('numbering-by-id',w:numPr/w:numId/@w:val)/w:abstractNumId/@w:val)/w:lvl[@w:ilvl=$ilvl]"/>
+        <xsl:apply-templates select="$lvl-properties/@* except $lvl-properties/@w:ilvl" mode="#current"/>
+      </xsl:if>
       <xsl:apply-templates select="@* except @*[matches(name(),'^w:rsid')]" mode="#current"/>
       <xsl:if test="false() (: §§§ :)
                     and
