@@ -68,10 +68,18 @@
           </xsl:when>
         </xsl:choose>
       </info>
-      <xsl:copy-of select="../../w:numbering, ../../w:docRels, ../../w:footnoteRels, ../../w:commentRels, ../../w:fonts" />
+      <xsl:apply-templates select="../../w:numbering" mode="#current"/>
+      <xsl:copy-of select="../../w:docRels, ../../w:footnoteRels, ../../w:commentRels, ../../w:fonts"/>
       <xsl:apply-templates select="../../w:comments, ../../w:footnotes" mode="#current"/>
       <xsl:apply-templates mode="#current"/>
     </xsl:element>
+  </xsl:template>
+  
+  <xsl:template match="*[ancestor-or-self::w:numbering]" mode="docx2hub:add-props" priority="-1">
+    <xsl:copy>
+      <xsl:copy-of select="@*"/>
+      <xsl:apply-templates mode="#current"/>
+    </xsl:copy>
   </xsl:template>
 
   <xsl:template name="docx2hub:hub-1.0-styles">
@@ -146,6 +154,13 @@
         <xsl:sequence select="$atts"/>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template match="w:lvl" mode="docx2hub:add-props">
+    <xsl:copy>
+      <xsl:apply-templates mode="#current" select="@*"/>
+      <xsl:apply-templates mode="#current"/>
+    </xsl:copy>
   </xsl:template>
 
   <xsl:template match="w:basedOn/@w:val" mode="docx2hub:add-props" />
@@ -638,7 +653,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="w:tabs/w:tab" mode="docx2hub:add-props" as="element(dbk:tab)" priority="2">
+  <xsl:template match="w:tabs/w:tab[not(ancestor::w:abstractNum)]" mode="docx2hub:add-props" as="element(dbk:tab)" priority="2">
     <tab>
       <xsl:apply-templates select="@*" mode="#current" />
     </tab>
