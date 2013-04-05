@@ -37,7 +37,10 @@
                                       then @w:font
                                       else
                                         if (self::attribute(w:val)) (: in w:lvlText :)
-                                        then ../../w:rPr/w:rFonts/@w:ascii
+                                        then 
+                                          if (parent::w:lvlText[../w:rPr/w:rFonts/@w:ascii=('Symbol', 'Wingdings')])
+                                          then ../../w:rPr/w:rFonts/@w:ascii
+                                          else parent::w:lvlText/../@css:font-family
                                         else (../w:rPr/w:rFonts/@w:ascii, ../@css:font-family)[1]" as="xs:string?"/>
     <xsl:if test="empty($font)">
       <xsl:call-template name="signal-error">
