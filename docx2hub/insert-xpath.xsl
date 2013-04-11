@@ -44,7 +44,7 @@
   <xsl:template match="*[ self::w:p or self::w:t or self::w:tbl or self::w:tc or self::w:hyperlink or self::w:r ]
                         [ /*/name() = ('w:document', 'w:footnotes', 'w:endnotes', 'w:comments')]" mode="insert-xpath">
     <xsl:copy copy-namespaces="no">
-      <xsl:if test="$srcpath eq 'yes'">
+      <xsl:if test="$srcpaths eq 'yes'">
         <xsl:attribute name="srcpath" select="docx2hub:srcpath(.)"/>
       </xsl:if>
       <xsl:apply-templates select="@*" mode="#current"/>
