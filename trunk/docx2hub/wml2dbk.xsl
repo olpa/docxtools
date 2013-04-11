@@ -49,7 +49,7 @@ Entwicklung: le-tex publishing services oHG (2008)
 
 
   <xsl:param name="debug" select="'yes'" as="xs:string?"/>
-  <xsl:param name="srcpath" select="'no'" as="xs:string?"/>
+  <xsl:param name="srcpaths" select="'no'" as="xs:string?"/>
   <xsl:param name="base-dir" select="replace(base-uri(), '[^/]+$', '')"/>
   <xsl:variable name="debug-dir" select="concat(replace($base-dir, '^(.+/)(.+?/)$', '$1'), 'debug')"/>
   <!-- Links that probably have been inserted by Word without user consent: -->
@@ -890,7 +890,7 @@ Entwicklung: le-tex publishing services oHG (2008)
     <xsl:attribute name="role" select="replace(., ' ', '_')" />
   </xsl:template>
 
-  <xsl:template match="@srcpath[$srcpath != 'yes']" mode="wml-to-dbk" priority="2" />
+  <xsl:template match="@srcpath[$srcpaths != 'yes']" mode="wml-to-dbk" priority="2" />
 
 
   <xsl:function name="docx2hub:twips2mm" as="xs:string">
