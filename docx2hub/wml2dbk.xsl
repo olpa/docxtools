@@ -63,6 +63,12 @@ Entwicklung: le-tex publishing services oHG (2008)
             then document(concat($base-dir, '/footnotes.xml'))/w:footnotes
             else ()" 
     as="element(w:footnotes)?" />
+  <xsl:variable 
+    name="endnotes" 
+    select="if (doc-available(concat($base-dir, '/endnotes.xml'))) 
+    then document(concat($base-dir, '/endnotes.xml'))/w:endnotes
+    else ()" 
+    as="element(w:endnotes)?" />
   <xsl:variable name="docRels" select="if (doc-available(concat($base-dir, '/_rels/document.xml.rels'))) 
                                             then document(concat($base-dir, '/_rels/document.xml.rels'))/rel:Relationships
                                             else ()" />
