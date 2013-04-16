@@ -414,7 +414,7 @@
         </xsl:choose>
       </xsl:variable>
       <xsl:attribute name="morerows" select="$counts[1]" />
-      <xsl:attribute name="style" select="'border-bottom: none;'" />
+      <xsl:attribute name="css:border-bottom-style" select="'none'" />
     </xsl:if>
   </xsl:template>
 
