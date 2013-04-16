@@ -50,7 +50,8 @@
           </xsl:when>
           <xsl:otherwise>
             <xsl:copy copy-namespaces="no">
-              <xsl:copy-of select="@*" />
+              <xsl:copy-of select="@* except @srcpath" />
+              <xsl:copy-of select="current-group()/@srcpath"/>
               <xsl:apply-templates select="current-group()[not(self::dbk:anchor)]/node() 
                                            union current-group()[self::dbk:anchor]" mode="#current" />
             </xsl:copy>
@@ -92,7 +93,7 @@
     <xsl:param name="elt" as="node()*" />
     <xsl:perform-sort>
       <xsl:sort/>
-      <xsl:sequence select="for $a in ($elt/@* except $elt/@letex:processed) return letex:attr-hash($a)" />
+      <xsl:sequence select="for $a in ($elt/@* except ($elt/@letex:processed, $elt/@srcpath)) return letex:attr-hash($a)" />
     </xsl:perform-sort>
   </xsl:function>
 
