@@ -445,7 +445,7 @@
 
       <xsl:when test=". eq 'docx-shd'">
         <xsl:choose>
-          <xsl:when test="$val/@w:val eq 'clear'">
+          <xsl:when test="$val/@w:val = ('clear','nil')">
             <xsl:if test="$val/@w:fill ne 'auto'">
               <docx2hub:attribute name="css:background-color"><xsl:value-of select="concat('#', $val/@w:fill)" /></docx2hub:attribute>
             </xsl:if>
@@ -466,7 +466,7 @@
             </xsl:choose>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:message>map-props.xsl: w:shd/@w:val other than 'clear', 'pct*', and 'solid' not implemented.
+            <xsl:message>map-props.xsl: w:shd/@w:val other than 'clear', 'nil', 'pct*', and 'solid' not implemented.
             <xsl:copy-of select="$val" />
             </xsl:message>
           </xsl:otherwise>
