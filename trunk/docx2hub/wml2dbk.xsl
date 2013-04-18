@@ -680,7 +680,7 @@ Entwicklung: le-tex publishing services oHG (2008)
 
 
   <!-- runs (w:r) -->
-  <xsl:template match="w:r[@*][not(count(*)=count(w:instrText))]" mode="wml-to-dbk">
+  <xsl:template match="w:r[@* except @srcpath][not(count(*)=count(w:instrText))]" mode="wml-to-dbk">
     <xsl:element name="phrase">
       <xsl:apply-templates select="@* except @*[matches(name(),'^w:rsid')]" mode="#current"/>
       <xsl:apply-templates mode="#current"/>
