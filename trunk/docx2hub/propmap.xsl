@@ -139,6 +139,11 @@
         <prop name="w:tcBorders/w:left" type="docx-border" />
         <prop name="w:tcBorders/w:right" type="docx-border" />
         <prop name="w:tcBorders/w:top" type="docx-border"  />
+        <prop name="w:tcMar" type="passthru" />
+        <prop name="w:tcMar/w:bottom" type="docx-padding" />
+        <prop name="w:tcMar/w:left" type="docx-padding" />
+        <prop name="w:tcMar/w:right" type="docx-padding" />
+        <prop name="w:tcMar/w:top" type="docx-padding" />
         <prop name="w:tcW/@w:w" type="docx-length-attr" target-name="css:width"/>
         <prop name="w:u" type="docx-underline" />
         <prop name="w:uiPriority" />
