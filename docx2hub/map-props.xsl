@@ -212,7 +212,7 @@
     <xsl:apply-templates select="@w:left | @w:right | @w:firstLine, @w:hanging" mode="#current" />
   </xsl:template>
 
-  <xsl:template match="w:pBdr | w:tcBorders | w:tblBorders | w:tblCellMar" mode="docx2hub:add-props" priority="2">
+  <xsl:template match="w:pBdr | w:tcBorders | w:tblBorders | w:tblCellMar | w:tcMar" mode="docx2hub:add-props" priority="2">
     <xsl:apply-templates select="w:left | w:right | w:top | w:bottom" mode="#current" />
   </xsl:template>
 
@@ -238,6 +238,7 @@
                        | w:trPr/*
                        | w:tblPrEx/*
                        | w:tblCellMar/*
+                       | w:tcMar/*
                        | w:ind/@* 
                        | w:tab/@*
                        | w:tcW/@* 
@@ -273,7 +274,7 @@
       <xsl:when test="$prop/self::attribute()">
         <xsl:sequence select="string-join((name($prop/..), name($prop)), '/@')" />
       </xsl:when>
-      <xsl:when test="$prop/(parent::w:pBdr, parent::w:tcBorders, parent::w:tblBorders, parent::w:tblCellMar)">
+      <xsl:when test="$prop/(parent::w:pBdr, parent::w:tcBorders, parent::w:tblBorders, parent::w:tblCellMar, parent::w:tcMar)">
         <xsl:sequence select="string-join((name($prop/..), name($prop)), '/')" />
       </xsl:when>
       <xsl:otherwise>
