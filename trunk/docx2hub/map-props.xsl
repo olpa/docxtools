@@ -520,10 +520,20 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- ISO/IEC 29500-1, 17.3.2.40: 
+    This color therefore can be automatically be modified by a consumer as appropriate, 
+    for example, in order to ensure that the underline can be distinguished against the 
+    page's background color. --> 
+  <xsl:variable name="docx2hub:auto-color" select="'black'" as="xs:string"/>
+
   <xsl:function name="docx2hub:color" as="xs:string?" >
     <xsl:param name="val" as="xs:string"/>
     <xsl:choose>
-      <xsl:when test="$val = ('auto', 'none')" />
+      <xsl:when test="$val = 'none'" />
+      <xsl:when test="$val = 'auto'" >
+        <!-- not tested yet whether this interferes with <w:shd w:fill="…"/> -->
+        <xsl:sequence select="$docx2hub:auto-color" />
+      </xsl:when>
       <xsl:when test="matches($val, '^#[0-9a-f]{6}$')">
         <!-- e.g., v:shape/@fillcolor -->
         <xsl:sequence select="upper-case($val)" />
