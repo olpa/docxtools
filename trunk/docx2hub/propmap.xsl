@@ -97,6 +97,7 @@
         <prop name="w:semiHidden" />
         <prop name="w:shadow" type="docx-boolean-prop" target-name="css:text-shadow" default="none" active="1pt 1pt"/>
         <prop name="w:shd" type="docx-shd" />
+        <prop name="w:smallCaps" type="docx-boolean-prop" target-name="css:font-variant" default="normal" active="small-caps"/>
       	<prop name="w:snapToGrid" />
       	<prop name="w:spacing/@w:after" type="docx-length-attr" target-name="css:margin-bottom" />
         <prop name="w:spacing/@w:before" type="docx-length-attr" target-name="css:margin-top" />

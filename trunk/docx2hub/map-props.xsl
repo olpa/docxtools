@@ -338,7 +338,7 @@
 
       <xsl:when test=". eq 'docx-boolean-prop'">
         <xsl:choose>
-          <xsl:when test="$val/@w:val = '0'">
+          <xsl:when test="$val/@w:val = ('0','false')">
             <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="../@default" /></docx2hub:attribute>
           </xsl:when>
           <xsl:otherwise>
