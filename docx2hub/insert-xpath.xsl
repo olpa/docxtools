@@ -95,16 +95,33 @@
     <xsl:copy copy-namespaces="no">
       <!-- Font des Standardtextes -->
       <xsl:variable name="normal" select="key('docx2hub:style', 'Normal')" as="element(w:style)?" />
-      <xsl:attribute name="default-font"
+      <xsl:variable name="default-font" as="xs:string"
         select="if ($normal/w:rPr/w:rFonts/@w:ascii)
                 then $normal/w:rPr/w:rFonts/@w:ascii
                 else w:docDefaults/w:rPrDefault/w:rPr/w:rFonts/@w:ascii" />
       <!-- Font-size des Standardtextes -->
-      <xsl:attribute name="default-font-size"
+      <xsl:variable name="default-font-size" as="xs:string"
         select="if ($normal/w:rPr/w:sz/@w:val)
                 then $normal/w:rPr/w:sz/@w:val
-                else 20" />
-      <xsl:apply-templates select="@*, node() except w:latentStyles" mode="#current" />
+                else '20'" />
+      <xsl:apply-templates select="@*, node() except w:latentStyles" mode="#current" >
+        <xsl:with-param name="default-font" select="$default-font" tunnel="yes"/>
+        <xsl:with-param name="default-font-size" select="$default-font-size" tunnel="yes"/>
+      </xsl:apply-templates>
+    </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="key('docx2hub:style', 'Normal')/w:rPr" mode="insert-xpath">
+    <xsl:param name="default-font" as="xs:string?" tunnel="yes"/>
+    <xsl:param name="default-font-size" as="xs:string" tunnel="yes"/>
+    <xsl:copy copy-namespaces="no">
+      <xsl:apply-templates select="@* | node()" mode="#current"/>
+      <xsl:if test="not(w:sz)">
+        <w:sz w:val="{$default-font-size}"/>
+      </xsl:if>
+      <xsl:if test="not(w:rFonts) and $default-font">
+        <w:rFonts w:ascii="{$default-font}"/>
+      </xsl:if>
     </xsl:copy>
   </xsl:template>
   
