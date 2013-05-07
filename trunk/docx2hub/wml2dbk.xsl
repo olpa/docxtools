@@ -409,6 +409,9 @@ Entwicklung: le-tex publishing services oHG (2008)
     </xsl:copy>   
   </xsl:template>
 
+  <xsl:template match="@*:paraId" mode="wml-to-dbk" priority="3" />
+  <xsl:template match="@*:textId" mode="wml-to-dbk" priority="3" />
+
   <!-- default for attributes -->
   <xsl:template match="@*" mode="wml-to-dbk" priority="1">
     <xsl:copy/>
