@@ -2,29 +2,18 @@
 <xsl:stylesheet version="2.0"
 
   xmlns:xsl		= "http://www.w3.org/1999/XSL/Transform"
-  xmlns:fn              = "http://www.w3.org/2005/xpath-functions"
   xmlns:xs		= "http://www.w3.org/2001/XMLSchema"
   xmlns:w		= "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-  xmlns:word200x	= "http://schemas.microsoft.com/office/word/2003/wordml"
-  xmlns:v		= "urn:schemas-microsoft-com:vml" 
   xmlns:dbk		= "http://docbook.org/ns/docbook"
-  xmlns:wx		= "http://schemas.microsoft.com/office/word/2003/auxHint"
-  xmlns:o		= "urn:schemas-microsoft-com:office:office"
-  xmlns:pkg		= "http://schemas.microsoft.com/office/2006/xmlPackage"
-  xmlns:r		= "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns:rel		= "http://schemas.openxmlformats.org/package/2006/relationships"
-  xmlns:exsl		= 'http://exslt.org/common'
-  xmlns:saxon		= "http://saxon.sf.net/"
   xmlns:letex		= "http://www.le-tex.de/namespace"
-  xmlns:mml             = "http://www.w3.org/Math/DTD/mathml2/mathml2.dtd"
   xmlns:docx2hub = "http://www.le-tex.de/namespace/docx2hub"
   xmlns:css="http://www.w3.org/1996/css"
   xmlns="http://docbook.org/ns/docbook"
 
-  exclude-result-prefixes = "w o v wx xs dbk pkg r rel word200x exsl saxon fn letex mml docx2hub"
+  exclude-result-prefixes = "w xs dbk letex docx2hub"
   >
 
-  <xsl:function name="letex:insert-numbering" as="element(*)*">
+  <xsl:function name="letex:insert-numbering" as="item()*">
     <xsl:param name="context" as="node()"/>
     <xsl:if test="not($context/name() eq 'w:p')">
       <xsl:call-template name="signal-error">
@@ -37,22 +26,45 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:if>
-    <xsl:variable name="lvl" select="letex:get-lvl-of-numbering($context, false())"/>
+    <xsl:variable name="lvl" select="letex:get-lvl-of-numbering($context, false())" as="element(w:lvl)?"/>
     <xsl:choose>
       <xsl:when test="exists($lvl)">
+        <xsl:if test="not($lvl/w:lvlText)">
+          <xsl:call-template name="signal-error">
+            <xsl:with-param name="error-code" select="'W2D_061'"/>
+            <xsl:with-param name="exit" select="'yes'"/>
+            <xsl:with-param name="hash">
+              <value key="xpath">
+                <xsl:value-of select="$lvl/@srcpath"/>
+              </value>
+              <value key="level">INT</value>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
+        <!-- should we also propagate $lvl/w:pPr/dbk:tabs? Then we might end up with
+          two tabs declarations on a paragraph. Text case: DIN EN 1865-2, tr document,
+          the heading_1 elements -->
+        <xsl:apply-templates select="$lvl/w:pPr/@*" mode="numbering">
+          <xsl:with-param name="context" select="$context" tunnel="yes"/>
+        </xsl:apply-templates>
+        <xsl:apply-templates select="$context/dbk:tabs" mode="#current"/>
         <xsl:element name="phrase">
-          <xsl:attribute name="role" select="'hub:identifier'" />
-          <xsl:apply-templates select="$lvl" mode="numbering">
+          <xsl:attribute name="role" select="'hub:identifier'"/>
+          <xsl:apply-templates select="$lvl/w:rPr/@*, $lvl/w:lvlText" mode="numbering">
             <xsl:with-param name="context" select="$context" tunnel="yes"/>
           </xsl:apply-templates>
         </xsl:element>
         <tab/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:sequence select="()"/>
+        <xsl:apply-templates select="$context/dbk:tabs" mode="#current"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:function>
+
+  <xsl:template match="dbk:tabs" mode="numbering">
+    <xsl:copy-of select="." copy-namespaces="no"/>
+  </xsl:template>
 
   <xsl:function name="letex:get-lvl-of-numbering" as="element(w:lvl)?">
     <xsl:param name="context" as="node()"/>
@@ -116,20 +128,6 @@
         <value key="info-text"><xsl:value-of select="concat('Element: ', name(), '     Parent: ', ../name())"/></value>
       </xsl:with-param>
     </xsl:call-template>
-  </xsl:template>
-
-  <xsl:template match="w:lvl" mode="numbering">
-    <xsl:if test="not(w:lvlText)">
-      <xsl:call-template name="signal-error">
-        <xsl:with-param name="error-code" select="'W2D_061'"/>
-        <xsl:with-param name="exit" select="'yes'"/>
-        <xsl:with-param name="hash">
-          <value key="xpath"><xsl:value-of select="@srcpath"/></value>
-          <value key="level">INT</value>
-        </xsl:with-param>
-      </xsl:call-template>
-    </xsl:if>
-    <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
   <xsl:template match="w:start" mode="numbering">
