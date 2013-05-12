@@ -60,7 +60,7 @@
         <xsl:if test="doc-available(resolve-uri('numbering.xml', base-uri()))">
           <xsl:sequence select="document(resolve-uri('numbering.xml', base-uri()))/w:numbering" />
         </xsl:if>
-        <xsl:if test="doc-available(resolve-uri('footnotes.xml'))">
+        <xsl:if test="doc-available(resolve-uri('footnotes.xml', base-uri()))">
           <xsl:apply-templates select="document(resolve-uri('footnotes.xml', base-uri()))/w:footnotes" mode="#current" />
         </xsl:if>
         <xsl:if test="doc-available(resolve-uri('endnotes.xml', base-uri()))">

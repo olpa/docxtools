@@ -26,7 +26,7 @@
   <xsl:template match="w:endnoteReference" mode="wml-to-dbk">
     <footnote role="endnote">
       <xsl:variable name="id" select="@w:id"/>
-      <xsl:apply-templates select="$endnotes//w:endnote[@w:id = $id]" mode="#current"/>
+      <xsl:apply-templates select="/w:root/w:endnotes/w:endnote[@w:id = $id]" mode="#current"/>
     </footnote>
   </xsl:template>
 
