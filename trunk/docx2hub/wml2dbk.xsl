@@ -1,52 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
-<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Stylesheet zur Word 2007 XML nach DocBook (version 4.4) Konvertierung
-
-Entwicklung: le-tex publishing services oHG (2008)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-
-
 <xsl:stylesheet version="2.0"
-
-    xmlns:xsl		= "http://www.w3.org/1999/XSL/Transform"
-    xmlns:fn            = "http://www.w3.org/2005/xpath-functions"
-    xmlns:xs		= "http://www.w3.org/2001/XMLSchema"
-    xmlns:w		= "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-    xmlns:word200x	= "http://schemas.microsoft.com/office/word/2003/wordml"
-    xmlns:v		= "urn:schemas-microsoft-com:vml" 
-    xmlns:dbk		= "http://docbook.org/ns/docbook"
-    xmlns:wx		= "http://schemas.microsoft.com/office/word/2003/auxHint"
-    xmlns:o		= "urn:schemas-microsoft-com:office:office"
-    xmlns:pkg		= "http://schemas.microsoft.com/office/2006/xmlPackage"
-    xmlns:r		= "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-    xmlns:rel		= "http://schemas.openxmlformats.org/package/2006/relationships"
-    xmlns:exsl		= 'http://exslt.org/common'
-    xmlns:saxon		= "http://saxon.sf.net/"
-    xmlns:letex		= "http://www.le-tex.de/namespace"
-    xmlns:m             = "http://schemas.openxmlformats.org/officeDocument/2006/math"
-    xmlns:mml           = "http://www.w3.org/Math/DTD/mathml2/mathml2.dtd"
-    xmlns:mc            = "http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:xlink = "http://www.w3.org/1999/xlink"
+  xmlns:xsl		= "http://www.w3.org/1999/XSL/Transform"
+  xmlns:xs		= "http://www.w3.org/2001/XMLSchema"
+  xmlns:w		= "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+  xmlns:dbk		= "http://docbook.org/ns/docbook"
+  xmlns:r		= "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:rel		= "http://schemas.openxmlformats.org/package/2006/relationships"
+  xmlns:letex		= "http://www.le-tex.de/namespace"
+  xmlns:m             = "http://schemas.openxmlformats.org/officeDocument/2006/math"
+  xmlns:mc            = "http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:xlink = "http://www.w3.org/1999/xlink"
   xmlns:docx2hub = "http://www.le-tex.de/namespace/docx2hub"
   xmlns:css="http://www.w3.org/1996/css"
   xmlns="http://docbook.org/ns/docbook"
-    exclude-result-prefixes = "w o v wx xs dbk pkg r rel word200x exsl saxon fn letex m mml mc xlink docx2hub"
+  exclude-result-prefixes = "w xs dbk r rel letex m mc xlink docx2hub"
 >
 
   <!-- ================================================================================ -->
   <!-- IMPORT OF OTHER STYLESHEETS -->
   <!-- ================================================================================ -->
 
-  <!-- Do not sort catch-all.xsl in alphabetical order. Must be first! -->
   <xsl:import href="modules/catch-all/catch-all.xsl"/>
-
-  <!-- sorted imports -->
-  <!-- To avoid conflicts sort in alphabetical order. -->
   <xsl:import href="modules/error-handler/error-handler.xsl"/>
-
   <xsl:import href="letex-util/resolve-uri/resolve-uri.xsl"/>
-
 
   <xsl:param name="debug" select="'yes'" as="xs:string?"/>
   <xsl:param name="srcpaths" select="'no'" as="xs:string?"/>
@@ -57,27 +33,6 @@ Entwicklung: le-tex publishing services oHG (2008)
   <xsl:param name="hub-version" select="'1.0'" as="xs:string"/>
   
   <xsl:variable name="symbol-font-map" select="document('Symbol.xml')" as="document-node(element(symbols))" />
-  <xsl:variable 
-    name="footnotes" 
-    select="if (doc-available(concat($base-dir, '/footnotes.xml'))) 
-            then document(concat($base-dir, '/footnotes.xml'))/w:footnotes
-            else ()" 
-    as="element(w:footnotes)?" />
-  <xsl:variable 
-    name="endnotes" 
-    select="if (doc-available(concat($base-dir, '/endnotes.xml'))) 
-    then document(concat($base-dir, '/endnotes.xml'))/w:endnotes
-    else ()" 
-    as="element(w:endnotes)?" />
-  <xsl:variable name="docRels" select="if (doc-available(concat($base-dir, '/_rels/document.xml.rels'))) 
-                                            then document(concat($base-dir, '/_rels/document.xml.rels'))/rel:Relationships
-                                            else ()" />
-  <xsl:variable name="footnoteRels" select="if (doc-available(concat($base-dir, '/_rels/footnotes.xml.rels'))) 
-                                            then document(concat($base-dir, '/_rels/footnotes.xml.rels'))/rel:Relationships
-                                            else ()" />
-  <xsl:variable name="commentRels" select="if (doc-available(concat($base-dir, '/_rels/comments.xml.rels'))) 
-                                            then document(concat($base-dir, '/_rels/comments.xml.rels'))/rel:Relationships
-                                            else ()" />
 
   <xsl:key name="style-by-id" match="w:style" use="@w:styleId" />
   <xsl:key name="numbering-by-id" match="w:num" use="@w:numId" />
@@ -388,7 +343,15 @@ Entwicklung: le-tex publishing services oHG (2008)
        Want to get rid of the warnings. Does that hurt? Not tested.
        KW 2013-03-28: It hurts in case of w:numPr. Indentation properties are missing.
        -->
-  <xsl:template match="w:p/w:numPr | css:rule/w:numPr | style/w:numPr | css:rule/w:tblPr | /*/w:numbering | /*/w:docRels | /*/w:fonts | /*/w:comments" mode="wml-to-dbk" priority="-0.25"/>
+  <xsl:template match="  w:p/w:numPr 
+                       | css:rule/w:numPr 
+                       | style/w:numPr 
+                       | css:rule/w:tblPr 
+                       | /*/w:numbering 
+                       | /*/w:docRels 
+                       | /*/w:fonts 
+                       | /*/w:comments 
+                       | /*/w:footnotes" mode="wml-to-dbk" priority="-0.25"/>
 
   <xsl:template match="dbk:* | css:*" mode="wml-to-dbk">
     <xsl:copy copy-namespaces="no">
@@ -416,6 +379,10 @@ Entwicklung: le-tex publishing services oHG (2008)
   <xsl:template match="@*" mode="wml-to-dbk" priority="1">
     <xsl:copy/>
   </xsl:template>
+
+  <!-- The characters have already been mapped to unicode, so hopefully the surrounding
+       text’s font will be able to render them. -->
+  <xsl:template match="@css:font-family[. eq 'Symbol']" mode="wml-to-dbk" priority="2"/>
 
   <xsl:template match="@*" mode="wml-to-dbk">
     <xsl:call-template name="signal-error" xmlns="">
@@ -489,11 +456,6 @@ Entwicklung: le-tex publishing services oHG (2008)
 
   <xsl:template match="w:p" mode="wml-to-dbk">
     <xsl:element name="para">
-      <xsl:if test="w:numPr">
-        <xsl:variable name="ilvl" select="w:numPr/w:ilvl/@w:val"/>
-        <xsl:variable name="lvl-properties" select="key('abstract-numbering-by-id',key('numbering-by-id',w:numPr/w:numId/@w:val)/w:abstractNumId/@w:val)/w:lvl[@w:ilvl=$ilvl]"/>
-        <xsl:apply-templates select="$lvl-properties/@* except $lvl-properties/@w:ilvl" mode="#current"/>
-      </xsl:if>
       <xsl:apply-templates select="@* except @*[matches(name(),'^w:rsid')]" mode="#current"/>
       <xsl:if test="false() (: §§§ :)
                     and
@@ -517,7 +479,7 @@ Entwicklung: le-tex publishing services oHG (2008)
           <xsl:call-template name="inline-field-function"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:apply-templates mode="#current"/>
+          <xsl:apply-templates select="node() except dbk:tabs" mode="#current"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:element>
@@ -640,14 +602,14 @@ Entwicklung: le-tex publishing services oHG (2008)
   </xsl:template>
 
   <xsl:template match="@r:id[parent::w:hyperlink]" mode="wml-to-dbk" priority="1.5">
-    <xsl:variable name="key-name" as="node()*"
+    <xsl:variable name="key-name" as="xs:string"
       select="if (ancestor::w:footnote)
-              then $footnoteRels
+              then 'footnote-rel-by-id'
               else if (ancestor::w:comment) 
-                then $commentRels
-                else $docRels" />
+                then 'comment-rel-by-id'
+                else 'doc-rel-by-id'" />
     <xsl:variable name="value" select="."/>
-    <xsl:variable name="rel-item" select="$key-name/rel:Relationship[@Id=$value]"/>
+    <xsl:variable name="rel-item" select="key($key-name, current())" as="element(rel:Relationship)" />
     <xsl:choose>
       <xsl:when test="exists(parent::w:hyperlink/@w:anchor)">
         <xsl:attribute name="linkend" select="concat(
