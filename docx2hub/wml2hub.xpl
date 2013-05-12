@@ -85,7 +85,7 @@
     <p:with-option name="attribute-value" select="$unwrap-tooltip-links"/>
   </p:add-attribute>
 
-  <letex:xslt-mode mode="insert-xpath">
+  <letex:xslt-mode msg="yes" mode="insert-xpath">
     <p:input port="source"><p:pipe step="document" port="result" /></p:input>
     <p:input port="parameters"><p:pipe step="params" port="result" /></p:input>
     <p:input port="stylesheet"><p:pipe step="stylesheet" port="result" /></p:input>
@@ -95,7 +95,7 @@
     <p:with-param name="srcpaths" select="$srcpaths"/>
   </letex:xslt-mode>
   
-  <letex:xslt-mode mode="docx2hub:add-props">
+  <letex:xslt-mode msg="yes" mode="docx2hub:add-props">
     <p:input port="parameters"><p:pipe step="params" port="result" /></p:input>
     <p:input port="stylesheet"><p:pipe step="stylesheet" port="result" /></p:input>
     <p:with-option name="prefix" select="concat('docx2hub/', $basename, '/03')"/>
@@ -103,7 +103,7 @@
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
   </letex:xslt-mode>
   
-  <letex:xslt-mode mode="docx2hub:props2atts">
+  <letex:xslt-mode msg="yes" mode="docx2hub:props2atts">
     <p:input port="parameters"><p:pipe step="params" port="result" /></p:input>
     <p:input port="stylesheet"><p:pipe step="stylesheet" port="result" /></p:input>
     <p:with-option name="prefix" select="concat('docx2hub/', $basename, '/04')"/>
@@ -111,7 +111,7 @@
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
   </letex:xslt-mode>
   
-  <letex:xslt-mode mode="docx2hub:remove-redundant-run-atts">
+  <letex:xslt-mode msg="yes" mode="docx2hub:remove-redundant-run-atts">
     <p:input port="parameters"><p:pipe step="params" port="result" /></p:input>
     <p:input port="stylesheet"><p:pipe step="stylesheet" port="result" /></p:input>
     <p:with-option name="prefix" select="concat('docx2hub/', $basename, '/05')"/>
@@ -119,7 +119,7 @@
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
   </letex:xslt-mode>
   
-  <letex:xslt-mode mode="docx2hub:separate-field-functions">
+  <letex:xslt-mode msg="yes" mode="docx2hub:separate-field-functions">
     <p:input port="parameters"><p:pipe step="params" port="result" /></p:input>
     <p:input port="stylesheet"><p:pipe step="stylesheet" port="result" /></p:input>
     <p:with-option name="prefix" select="concat('docx2hub/', $basename, '/11')"/>
@@ -127,7 +127,7 @@
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
   </letex:xslt-mode>
   
-  <letex:xslt-mode mode="wml-to-dbk">
+  <letex:xslt-mode msg="yes" mode="wml-to-dbk">
     <p:input port="parameters"><p:pipe step="params" port="result" /></p:input>
     <p:input port="stylesheet"><p:pipe step="stylesheet" port="result" /></p:input>
     <p:with-option name="prefix" select="concat('docx2hub/', $basename, '/20')"/>
@@ -137,7 +137,7 @@
     <p:with-param name="srcpaths" select="$srcpaths"/>
   </letex:xslt-mode>
   
-  <letex:xslt-mode mode="docx2hub:join-runs">
+  <letex:xslt-mode msg="yes" mode="docx2hub:join-runs">
     <p:input port="parameters"><p:pipe step="params" port="result" /></p:input>
     <p:input port="stylesheet"><p:pipe step="stylesheet" port="result" /></p:input>
     <p:with-option name="prefix" select="concat('docx2hub/', $basename, '/24')"/>
