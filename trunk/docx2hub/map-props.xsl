@@ -183,6 +183,12 @@
     <xsl:apply-templates mode="#current" />
   </xsl:template>
 
+  <xsl:template match="w:lvl/w:rPr | w:lvl/w:pPr" mode="docx2hub:add-props" priority="3">
+    <xsl:copy copy-namespaces="no">
+      <xsl:apply-templates mode="#current" />  
+    </xsl:copy>
+  </xsl:template>
+  
   <!-- § 17.3.1.29: this is only for the paragraph mark's formatting: -->
   <xsl:template match="w:pPr/w:rPr" mode="docx2hub:add-props" priority="2.5" />
 
@@ -299,7 +305,7 @@
     <xsl:param name="val" as="node()" tunnel="yes" />
     <xsl:variable name="atts" as="element(*)*">
       <!-- in the following line, val is a potential child of prop (do not cofuse with $val)! -->
-      <xsl:apply-templates select="@type, val" mode="#current" />
+      <xsl:apply-templates select="@type, val, @target-value[not(../(@type, val))]" mode="#current" />
     </xsl:variable>
     <xsl:choose>
       <xsl:when test="empty($atts) and @default">
@@ -310,6 +316,10 @@
         <xsl:sequence select="$atts" />
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+
+  <xsl:template match="prop[not(@type | val)]/@target-value" mode="docx2hub:add-props">
+    <xsl:call-template name="docx2hub:XML-Hubformat-atts"/>
   </xsl:template>
 
   <xsl:template match="val" mode="docx2hub:add-props" as="element(*)?">
@@ -435,7 +445,12 @@
       </xsl:when>
 
       <xsl:when test=". eq 'docx-length-attr-negated'">
-        <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="docx2hub:pt-length(concat('-', $val))" /></docx2hub:attribute>
+        <xsl:variable name="string-val" select="string(($val/@w:val, $val)[1])" as="xs:string"/>
+        <docx2hub:attribute name="{../@target-name}">
+          <xsl:value-of select="if (matches($string-val, '^-'))
+                                then docx2hub:pt-length(replace($string-val, '^-', ''))
+                                else docx2hub:pt-length(concat('-', $string-val))" />
+        </docx2hub:attribute>
       </xsl:when>
 
       <xsl:when test=". eq 'docx-parastyle'">
@@ -485,6 +500,31 @@
         </tabs>
       </xsl:when>
 
+      <xsl:when test=". eq 'docx-text-direction'">
+        <!-- I find 17.18.93 ST_TextDirection remarkably unclear about this. What also bothers me is that
+             the value 'btLr' doesn’t appear in the table in that section. In Annex N.1 on p. 5563, they mention
+             that btLr et al. have been dropped in Wordprocessing ML. -->
+        <xsl:choose>
+          <xsl:when test="$val/@w:val = ('tbLr', 'btLr')">
+            <!-- preliminary value – only works in IE, while the CSS3 writing mode prop values don’t work -->
+            <docx2hub:attribute name="css:writing-mode">bt-lr</docx2hub:attribute>
+          </xsl:when>
+          <xsl:when test="matches($val/@w:val, 'tb', 'i')">
+            <!-- looks funny -->
+            <docx2hub:attribute name="css:transform">rotate(90deg)</docx2hub:attribute>
+          </xsl:when>
+          <xsl:when test="matches($val/@w:val, 'bt', 'i')">
+            <!-- looks funny -->
+            <docx2hub:attribute name="css:transform">rotate(-90deg)</docx2hub:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:message>Unsupported text direction property <xsl:sequence select="$val"/></xsl:message>
+          </xsl:otherwise>
+        </xsl:choose>
+        <!-- no effect: -->
+        <!--<docx2hub:attribute name="css:width">fit-content</docx2hub:attribute>-->
+      </xsl:when>
+      
       <xsl:when test=". eq 'linear'">
         <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="if ($val/self::attribute())
                                                                            then $val
@@ -604,10 +644,16 @@
         <xsl:message>empty argument for docx2hub:pt-length, defaulting to zero. </xsl:message>
         <xsl:sequence select="'0'"/>
       </xsl:when>
+      <xsl:when test="not($val castable as xs:integer)">
+        <xsl:message>argument '<xsl:value-of select="$val"/>' for docx2hub:pt-length not castable as xs:integer, defaulting to zero. </xsl:message>
+        <xsl:sequence select="'0'"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="if (matches($val, '%$'))
+          then $val
+          else concat(xs:string(xs:integer($val) * 0.05), 'pt')" />
+      </xsl:otherwise>
     </xsl:choose>
-    <xsl:sequence select="if (matches($val, '%$'))
-                          then $val
-                          else concat(xs:string(xs:integer($val) * 0.05), 'pt')" />
   </xsl:function>
 
   <xsl:function name="docx2hub:border-style" as="xs:string" >
@@ -664,7 +710,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="w:tabs/w:tab[not(ancestor::w:abstractNum)]" mode="docx2hub:add-props" as="element(dbk:tab)" priority="2">
+  <xsl:template match="w:tabs/w:tab" mode="docx2hub:add-props" as="element(dbk:tab)" priority="2">
     <tab>
       <xsl:apply-templates select="@*" mode="#current" />
     </tab>
@@ -689,7 +735,6 @@
       <xsl:apply-templates select="docx2hub:style-link" mode="#current" />
       <xsl:apply-templates select="docx2hub:attribute[not(@name = following-sibling::docx2hub:remove-attribute/@name)]" mode="#current" />
       <xsl:apply-templates select="docx2hub:color-percentage[not(@name = following-sibling::docx2hub:remove-attribute/@name)]" mode="#current" />
-      <xsl:apply-templates select="node() except (docx2hub:attribute | docx2hub:wrap | docx2hub:style-link | dbk:tabs)" mode="#current" />
       <xsl:variable name="remaining-tabs" as="element(dbk:tab)*">
         <xsl:for-each-group select="dbk:tabs/dbk:tab" group-by="docx2hub:attribute[@name eq 'horizontal-position']">
           <xsl:if test="not(current-group()[last()]/docx2hub:attribute[@name eq 'clear'])">
@@ -702,6 +747,7 @@
           <xsl:sequence select="$remaining-tabs" />
         </tabs>
       </xsl:if>
+      <xsl:apply-templates select="node() except (docx2hub:attribute | docx2hub:wrap | docx2hub:style-link | dbk:tabs)" mode="#current" />
     </xsl:variable>
     <xsl:choose>
       <xsl:when test="exists(docx2hub:wrap) and exists(self::css:rule | self::dbk:style)">

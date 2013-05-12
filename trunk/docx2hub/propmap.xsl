@@ -81,7 +81,8 @@
         <prop name="w:pBdr/w:left" type="docx-border" />
         <prop name="w:pBdr/w:right" type="docx-border" />
         <prop name="w:pBdr/w:top" type="docx-border"  />
-      	<prop name="w:position" target-name="css:vertical-align" type="docx-length-attr"/>
+        <prop name="w:position" target-name="css:top" type="docx-length-attr-negated"/>
+        <prop name="w:position" target-name="css:position" target-value="relative"/>
         <prop name="w:pStyle" type="docx-parastyle" />
         <prop name="w:qFormat" />
         <prop name="w:rFonts" type="docx-font-family" target-name="css:font-family" />
@@ -147,6 +148,7 @@
         <prop name="w:tcMar/w:right" type="docx-padding" />
         <prop name="w:tcMar/w:top" type="docx-padding" />
         <prop name="w:tcW/@w:w" type="docx-length-attr" target-name="css:width"/>
+        <prop name="w:textDirection" type="docx-text-direction"/>
         <prop name="w:u" type="docx-underline" />
         <prop name="w:uiPriority" />
         <prop name="w:unhideWhenUsed" />
@@ -157,7 +159,7 @@
           <val match="top" target-name="css:vertical-align" target-value="top"/>
         </prop>
         <prop name="w:vanish" type="docx-boolean-prop" target-name="css:display" default="inherit" active="none"/>
-      	<prop name="w:vertAlign" type="docx-position" />
+      	<prop name="w:vertAlign" type="docx-position" /><!-- superscript etc. -->
         <prop name="w:vMerge" />
       	<prop name="w:w" type="docx-font-stretch" target-name="css:font-stretch"/>
         <prop name="w:widowControl" type="docx-boolean-prop" target-name="css:orphans" default="1" active="2"/>
