@@ -185,7 +185,9 @@
 
   <xsl:template match="w:lvl/w:rPr | w:lvl/w:pPr" mode="docx2hub:add-props" priority="3">
     <xsl:copy copy-namespaces="no">
-      <xsl:apply-templates mode="#current" />  
+      <xsl:apply-templates mode="#current" />
+      <!-- in order for subsequent (numbering.xsl) symbol mappings, the original rFonts must also be preserved -->
+      <xsl:copy-of select="*"/>
     </xsl:copy>
   </xsl:template>
   
