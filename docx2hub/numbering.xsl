@@ -43,14 +43,19 @@
         </xsl:if>
         <!-- should we also propagate $lvl/w:pPr/dbk:tabs? Then we might end up with
           two tabs declarations on a paragraph. Text case: DIN EN 1865-2, tr document,
-          the heading_1 elements -->
-        <xsl:apply-templates select="$lvl/w:pPr/@*" mode="numbering">
+          the heading_1 elements.
+          We are only inserting attributes that are not already present on the context
+          paragraph. 
+        -->
+        <xsl:apply-templates mode="numbering"
+          select="$lvl/w:pPr/@*[letex:different-style-att(., $context)]">
           <xsl:with-param name="context" select="$context" tunnel="yes"/>
         </xsl:apply-templates>
         <xsl:apply-templates select="$context/dbk:tabs" mode="#current"/>
         <xsl:element name="phrase">
           <xsl:attribute name="role" select="'hub:identifier'"/>
-          <xsl:apply-templates select="$lvl/w:rPr/@*, $lvl/w:lvlText" mode="numbering">
+          <xsl:apply-templates mode="numbering"
+            select="$lvl/w:rPr/@*[letex:different-style-att(., $context)], $lvl/w:lvlText" >
             <xsl:with-param name="context" select="$context" tunnel="yes"/>
           </xsl:apply-templates>
         </xsl:element>
@@ -60,6 +65,15 @@
         <xsl:apply-templates select="$context/dbk:tabs" mode="#current"/>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:function>
+
+  <xsl:key name="style-by-name" match="css:rule | dbk:style" use="@name | @role"/>
+
+  <xsl:function name="letex:different-style-att" as="xs:boolean">
+    <xsl:param name="att" as="attribute(*)"/>
+    <xsl:param name="context" as="element(*)"/>
+    <xsl:variable name="context-atts" select="key('style-by-name', $context/@role, $att/root())/@* | $context/@*" as="attribute(*)*"/>
+    <xsl:sequence select="not(some $a in $context-atts satisfies ($a/name() = $att/name() and string($a) = string($att)))"/>
   </xsl:function>
 
   <xsl:template match="dbk:tabs" mode="numbering">
