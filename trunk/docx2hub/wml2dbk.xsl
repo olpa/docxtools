@@ -500,7 +500,7 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:if>
-    <xsl:for-each-group select="node()" 
+    <xsl:for-each-group select="node() except dbk:tabs" 
       group-adjacent="if (count(self::w:r[w:fldChar/@w:fldCharType='begin'])
                       + count(preceding-sibling::w:r[w:fldChar/@w:fldCharType='begin'])
                       (: - count(self::w:r[w:fldChar/@w:fldCharType='end']) :)
