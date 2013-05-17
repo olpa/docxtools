@@ -32,7 +32,8 @@
   <xsl:param name="unwrap-tooltip-links" select="'no'" as="xs:string?"/>
   <xsl:param name="hub-version" select="'1.0'" as="xs:string"/>
   
-  <xsl:variable name="symbol-font-map" select="document('Symbol.xml')" as="document-node(element(symbols))" />
+  <xsl:variable name="symbol-font-map" as="document-node(element(symbols))"
+                select="if (doc-available('Symbol.xml')) then document('Symbol.xml') else if (doc-available('fontmaps/Symbol.xml')) then document('fontmaps/Symbol.xml') else ()"/>
 
   <xsl:key name="style-by-id" match="w:style" use="@w:styleId" />
   <xsl:key name="numbering-by-id" match="w:num" use="@w:numId" />

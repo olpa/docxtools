@@ -394,7 +394,9 @@
       </xsl:when>
 
       <xsl:when test=". eq 'docx-font-family'">
-        <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="$val/(@w:ascii, @w:cs)[1]" /></docx2hub:attribute>
+        <xsl:if test="$val/@ascii or $val/@cs">
+          <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="$val/(@w:ascii, @w:cs)[1]" /></docx2hub:attribute>
+        </xsl:if>
       </xsl:when>
 
       <xsl:when test=". eq 'docx-font-size'">
