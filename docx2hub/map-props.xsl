@@ -147,6 +147,11 @@
       <xsl:when test="$wrap-in-style-element">
         <xsl:element name="{if ($hub-version = '1.0') then 'style' else 'css:rule'}">
           <xsl:apply-templates select="." mode="docx2hub:XML-Hubformat-add-properties_layout-type"/>
+          <xsl:if test="not($hub-version = '1.0')">
+            <docx2hub:attribute name="name">
+              <xsl:value-of select="docx2hub:css-compatible-name(@w:styleId)"/>
+            </docx2hub:attribute>
+          </xsl:if>
           <xsl:sequence select="$atts"/>
         </xsl:element>
       </xsl:when>
@@ -627,18 +632,12 @@
   <xsl:template name="docx2hub:style-name" as="element(docx2hub:attribute)">
     <xsl:param name="val" as="element(*)"/><!-- w:pStyle, w:cStyle -->
     <xsl:param name="linked" as="xs:string?"/>
-    <xsl:variable name="looked-up" as="xs:string" select="key(
-        'docx2hub:style',
-        if ($linked)
-          then $linked
-          else $val/@w:val,
-        root($val)
-      )/w:name/@w:val" />
+    <xsl:variable name="looked-up" as="xs:string" select="if ($linked) then $linked else $val/@w:val" />
     <docx2hub:attribute name="role">
       <xsl:value-of select="if ($hub-version eq '1.0')
                               then $looked-up
                               else docx2hub:css-compatible-name($looked-up)" />
-    </docx2hub:attribute>    
+    </docx2hub:attribute>
   </xsl:template>
 
   <xsl:function name="docx2hub:pt-length" as="xs:string" >
@@ -802,9 +801,13 @@
   <xsl:template match="w:tblPr[following-sibling::w:tblPr]" mode="docx2hub:props2atts" />
   <xsl:template match="w:tcPr[following-sibling::w:tcPr]" mode="docx2hub:props2atts" />
 
-
-
-    
+  <xsl:template match="w:numPr[not(following-sibling::w:numPr)][not(w:numId)]" mode="docx2hub:props2atts">
+    <w:numPr>
+      <xsl:apply-templates select="(preceding-sibling::w:numPr/w:numId)[1]" mode="#current"/>
+      <xsl:apply-templates select="node()" mode="#current"/>
+    </w:numPr>
+  </xsl:template>
+   
   <xsl:template match="docx2hub:remove-attribute" mode="docx2hub:props2atts" />
 
   <xsl:template match="docx2hub:style-link" mode="docx2hub:props2atts">

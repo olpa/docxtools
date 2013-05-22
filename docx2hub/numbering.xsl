@@ -85,9 +85,13 @@
     <xsl:param name="just-count" as="xs:boolean"/>
     <!-- for-each: just to avoid an XTDE1270 which shouldn't happen when the 3-arg form of key() is invoked: -->
     <xsl:for-each select="$context">
-    <xsl:variable name="numPr" select="if ($just-count) then
-                                       if ($context/w:numPr[w:numId/@w:val]) then $context/w:numPr else ()
-                                       else if ($context/w:numPr) then $context/w:numPr else ()"/>
+    <xsl:variable name="numPr" select="if ($just-count) 
+                                       then if ($context/w:numPr[w:numId/@w:val]) 
+                                            then $context/w:numPr 
+                                            else ()
+                                       else if ($context/w:numPr) 
+                                            then $context/w:numPr 
+                                            else ()"/>
     <xsl:variable name="style" select="key('docx2hub:style-by-role', @role, root($context))/w:numPr" as="element(w:numPr)?"/>
     <xsl:sequence select="if ($numPr)
                           then key(
@@ -98,18 +102,28 @@
                                  @w:ilvl = $numPr/w:ilvl/@w:val
                                ]
                           else if ($style)
-                          then key(
-                                 'abstract-numbering-by-id', 
-                                 key('numbering-by-id', $style/w:numId/@w:val, root($context))/w:abstractNumId/@w:val,
-                                 root($context)
-                               )/w:lvl[
-                                 @w:ilvl = (
-                                   if ($style/w:ilvl/@w:val) 
-                                   then $style/w:ilvl/@w:val
-                                   else '0'
-                                 )
-                               ]
-                          else ()"/>
+                               then if ($style/w:ilvl/@w:val) 
+                                    then key(
+                                          'abstract-numbering-by-id', 
+                                          key('numbering-by-id', $style/w:numId/@w:val, root($context))/w:abstractNumId/@w:val,
+                                          root($context)
+                                         )/w:lvl[@w:ilvl = $style/w:ilvl/@w:val] 
+                                    else if ($context/@role and exists(key(
+                                                                        'abstract-numbering-by-id', 
+                                                                        key('numbering-by-id', $style/w:numId/@w:val, root($context))/w:abstractNumId/@w:val,
+                                                                        root($context)
+                                                                       )/w:lvl[w:pStyle[@w:val = $context/@role]]))
+                                         then key(
+                                                'abstract-numbering-by-id', 
+                                                key('numbering-by-id', $style/w:numId/@w:val, root($context))/w:abstractNumId/@w:val,
+                                                root($context)
+                                              )/w:lvl[w:pStyle[@w:val = $context/@role]]
+                                         else key(
+                                                'abstract-numbering-by-id', 
+                                                key('numbering-by-id', $style/w:numId/@w:val, root($context))/w:abstractNumId/@w:val,
+                                                root($context)
+                                               )/w:lvl[@w:ilvl = '0']
+                               else ()"/>
     </xsl:for-each>
   </xsl:function>
 
