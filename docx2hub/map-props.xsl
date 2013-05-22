@@ -355,7 +355,7 @@
 
       <xsl:when test=". eq 'docx-boolean-prop'">
         <xsl:choose>
-          <xsl:when test="$val/@w:val = ('0','false')">
+          <xsl:when test="$val/@w:val = ('0','false') and exists(../@default)">
             <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="../@default" /></docx2hub:attribute>
           </xsl:when>
           <xsl:otherwise>
@@ -364,16 +364,35 @@
         </xsl:choose>
       </xsl:when>
 
+      <xsl:when test=". eq 'docx-bdr'">
+        <xsl:variable name="borders" as="element(w:pBdr)">
+          <w:pBdr>
+            <xsl:for-each select="('left', 'right', 'bottom', 'top')">
+              <xsl:element name="w:{.}">
+                <xsl:copy-of select="$val/@*"/>
+              </xsl:element>
+            </xsl:for-each>
+          </w:pBdr>
+        </xsl:variable>
+        <xsl:apply-templates select="$borders/*" mode="#current"/>
+      </xsl:when>
+      
       <xsl:when test=". eq 'docx-border'">
         <!-- According to § 17.3.1.5 and other sections, the top/bottom borders don't apply
              if a set of paras has identical border settings. The between setting should be used instead.
              TODO -->
-          <xsl:variable name="orientation" select="replace(../@name, '^.+:', '')" as="xs:string" />
-          <docx2hub:attribute name="css:border-{$orientation}-style"><xsl:value-of select="docx2hub:border-style($val/@w:val)" /></docx2hub:attribute>
+        <xsl:variable name="orientation" select="replace(../@name, '^.+:', '')" as="xs:string"/>
+        <docx2hub:attribute name="css:border-{$orientation}-style">
+          <xsl:value-of select="docx2hub:border-style($val/@w:val)"/>
+        </docx2hub:attribute>
         <xsl:if test="not($val/@w:val = ('nil','none'))">
-          <docx2hub:attribute name="css:border-{$orientation}-width"><xsl:value-of select="docx2hub:pt-length($val/@w:sz)" /></docx2hub:attribute>
+          <docx2hub:attribute name="css:border-{$orientation}-width">
+            <xsl:value-of select="docx2hub:pt-length($val/@w:sz)"/>
+          </docx2hub:attribute>
           <xsl:if test="$val/@w:color ne 'auto'">
-            <docx2hub:attribute name="css:border-{$orientation}-color"><xsl:value-of select="docx2hub:color($val/@w:color)" /></docx2hub:attribute>
+            <docx2hub:attribute name="css:border-{$orientation}-color">
+              <xsl:value-of select="docx2hub:color($val/@w:color)"/>
+            </docx2hub:attribute>
           </xsl:if>
         </xsl:if>
       </xsl:when>

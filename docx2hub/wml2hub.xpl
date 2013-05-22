@@ -29,7 +29,7 @@
     
   <p:option name="docx" required="true"/>
   <p:option name="debug" required="false" select="'no'"/>
-  <p:option name="debug-dir-uri" required="false" select="''"/>
+  <p:option name="debug-dir-uri" required="false" select="'debug'"/>
   <p:option name="srcpaths" required="false" select="'no'"/>
   <p:option name="unwrap-tooltip-links" required="false" select="'no'"/>
   <p:option name="hub-version" required="false" select="'1.1'"/>
