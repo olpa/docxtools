@@ -43,7 +43,9 @@
         <prop name="w:autoSpaceDN" />
         <prop name="w:b" type="docx-boolean-prop" target-name="css:font-weight" default="normal" active="bold"/>
         <prop name="w:bCs" />
-      	<prop name="w:bidi" type="docx-boolean-prop" target-name="css:direction" default="ltr" active="rtl"/>
+        <prop name="w:bdr" type="docx-bdr" />
+        <prop name="w:bidi" type="docx-boolean-prop" target-name="css:direction" default="ltr" active="rtl"/>
+        <prop name="w:caps" type="docx-boolean-prop" target-name="css:text-transform" active="uppercase"/>
         <prop name="w:color" type="docx-color" target-name="css:color"/>
         <prop name="w:gridSpan" /><!-- will be calculated by tables.xsl -->
         <prop name="w:highlight" type="docx-color" target-name="css:background-color"/>
@@ -65,6 +67,7 @@
       	<prop name="w:keepLines" />
       	<prop name="w:keepNext" />
       	<prop name="w:kern" />
+        <prop name="w:kinsoku" />
         <prop name="w:lang" type="linear" target-name="xml:lang" />
         <prop name="w:link" />
         <prop name="w:locked" />
@@ -76,6 +79,7 @@
         <prop name="w:noWrap" type="docx-boolean-prop" target-name="css:white-space" default="normal" active="nowrap"/>
         <prop name="w:numPr" type="passthru" />
         <prop name="w:outlineLvl" type="docx-hierarchy-level"/>
+        <prop name="w:overflowPunct"/>
         <prop name="w:pageBreakBefore" type="docx-boolean-prop" target-name="css:page-break-before" default="auto" active="always"/>
         <prop name="w:pBdr/w:bottom" type="docx-border" />
         <prop name="w:pBdr/w:left" type="docx-border" />
