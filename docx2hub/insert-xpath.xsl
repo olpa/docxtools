@@ -2,8 +2,8 @@
 <xsl:stylesheet version="2.0"
 
   xmlns:xsl		= "http://www.w3.org/1999/XSL/Transform"
-  xmlns:fn              = "http://www.w3.org/2005/xpath-functions"
   xmlns:xs		= "http://www.w3.org/2001/XMLSchema"
+  xmlns:a     = "http://schemas.openxmlformats.org/drawingml/2006/main"
   xmlns:w		= "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:word200x	= "http://schemas.microsoft.com/office/word/2003/wordml"
   xmlns:v		= "urn:schemas-microsoft-com:vml" 
@@ -56,7 +56,17 @@
     <xsl:document>
       <w:root>
         <xsl:attribute name="xml:base" select="replace($base-dir, 'word/$', '')" />
-        <xsl:apply-templates select="document(resolve-uri('styles.xml', base-uri()))/w:styles" mode="#current"/>
+        <xsl:variable name="rels" as="document-node(element(rel:Relationships))"
+          select="document(resolve-uri('_rels/document.xml.rels', base-uri()))"/>
+        <!-- At the moment, we only need themes for default font resolution that takes place
+             in the current mode. Therefore, we don’t include the theme documents below  
+             /w:root yet. We rather pass them as a tunneled variable. -->
+        <xsl:variable name="themes" as="document-node(element(a:theme))*"
+          select="for $t in $rels/rel:Relationships/rel:Relationship[@Type eq 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme']/@Target
+                  return document(resolve-uri($t, base-uri()))"/>
+        <xsl:apply-templates select="document(resolve-uri('styles.xml', base-uri()))/w:styles" mode="#current">
+          <xsl:with-param name="themes" select="$themes" tunnel="yes"/>
+        </xsl:apply-templates>
         <xsl:if test="doc-available(resolve-uri('numbering.xml', base-uri()))">
           <xsl:sequence select="document(resolve-uri('numbering.xml', base-uri()))/w:numbering" />
         </xsl:if>
@@ -90,15 +100,32 @@
     </xsl:document>
   </xsl:template>
 
+  <!-- theme support incomplete … -->
+  <xsl:function name="letex:theme-font" as="xs:string">
+    <xsl:param name="rFonts" as="element(w:rFonts)"/>
+    <xsl:param name="themes" as="document-node(element(a:theme))*"/>
+    <xsl:choose>
+      <xsl:when test="$rFonts/@w:asciiTheme">
+        <!-- minor font is for the bulk text (major is for the headings).
+             Spec sez dat w:asciiTheme has precedence over w:ascii (I don’t find it now, and it wasn’t all clear there) -->
+        <xsl:sequence select="($themes/a:theme/a:themeElements/a:fontScheme/a:minorFont/a:latin/@typeface)[1]"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="$rFonts/@w:ascii"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:function>
 
   <xsl:template match="/w:styles" mode="insert-xpath">
+    <xsl:param name="themes" as="document-node(element(a:theme))*" tunnel="yes"/>
+    <xsl:message select="count($themes)"/>
     <xsl:copy copy-namespaces="no">
       <!-- Font des Standardtextes -->
       <xsl:variable name="normal" select="key('docx2hub:style', 'Normal')" as="element(w:style)?" />
       <xsl:variable name="default-font" as="xs:string"
         select="if ($normal/w:rPr/w:rFonts/@w:ascii)
                 then $normal/w:rPr/w:rFonts/@w:ascii
-                else w:docDefaults/w:rPrDefault/w:rPr/w:rFonts/@w:ascii" />
+                else letex:theme-font(w:docDefaults/w:rPrDefault/w:rPr/w:rFonts, $themes)" />
       <!-- Font-size des Standardtextes -->
       <xsl:variable name="default-font-size" as="xs:string"
         select="if ($normal/w:rPr/w:sz/@w:val)
