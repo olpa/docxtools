@@ -36,6 +36,8 @@
 
   <xsl:template match="w:footnoteRef" mode="wml-to-dbk">
     <!-- setzt die Nummer der Fußnote. Prüfen!! -->
+    <!-- GI 2013-05-23: Apparently both Word 2013 and LibreOffice 4.0.3 generate a number even if the 
+      footnote doesn’t contain a footnoteRef. See for example DIN EN 419251-1, Sect. 6.1 -->
     <xsl:variable name="footnote-num-format" select="/w:root/w:settings/w:footnotePr/w:numFmt/@w:val" as="xs:string?"/>
     <phrase role="hub:identifier">
           <xsl:number value="(count(preceding::w:footnoteRef) + 1)" 
