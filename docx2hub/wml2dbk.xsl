@@ -352,7 +352,8 @@
                        | /*/w:docRels 
                        | /*/w:fonts 
                        | /*/w:comments 
-                       | /*/w:footnotes" mode="wml-to-dbk" priority="-0.25"/>
+                       | /*/w:footnotes
+                       | /*/w:docVars" mode="wml-to-dbk" priority="-0.25"/>
 
   <xsl:template match="dbk:* | css:*" mode="wml-to-dbk">
     <xsl:copy copy-namespaces="no">

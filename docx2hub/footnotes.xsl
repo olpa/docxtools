@@ -39,13 +39,30 @@
     <!-- GI 2013-05-23: Apparently both Word 2013 and LibreOffice 4.0.3 generate a number even if the 
       footnote doesn’t contain a footnoteRef. See for example DIN EN 419251-1, Sect. 6.1 -->
     <xsl:variable name="footnote-num-format" select="/w:root/w:settings/w:footnotePr/w:numFmt/@w:val" as="xs:string?"/>
+    <xsl:variable name="footnote-number">
+      <xsl:number value="(count(preceding::w:footnoteRef) + 1)" 
+        format="{
+        if ($footnote-num-format)
+        then letex:get-numbering-format($footnote-num-format, '') 
+        else '1'
+        }"/>
+    </xsl:variable>
     <phrase role="hub:identifier">
-          <xsl:number value="(count(preceding::w:footnoteRef) + 1)" 
-            format="{
-                      if ($footnote-num-format)
-                      then letex:get-numbering-format($footnote-num-format, '') 
-                      else '1'
-                    }"/>
+      <xsl:choose>
+        <xsl:when test="//w:docVar[@w:name='footnote_check']">
+          <xsl:choose>
+            <xsl:when test="some $i in (tokenize(//w:docVar[@w:name='footnote_check']/@w:val,'&#xD;')) satisfies tokenize($i,',')[1]=$footnote-number">
+              <xsl:value-of select="tokenize(tokenize(//w:docVar[@w:name='footnote_check']/@w:val,'&#xD;')[tokenize(.,',')[1]=$footnote-number],',')[2]"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$footnote-number"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$footnote-number"/>
+        </xsl:otherwise>
+      </xsl:choose>
     </phrase>
   </xsl:template>
 
