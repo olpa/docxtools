@@ -33,7 +33,9 @@
   <p:option name="srcpaths" required="false" select="'no'"/>
   <p:option name="unwrap-tooltip-links" required="false" select="'no'"/>
   <p:option name="hub-version" required="false" select="'1.1'"/>
-  
+
+  <p:serialization port="result" omit-xml-declaration="false"/>
+
   <!-- import libs with extension steps -->
   
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl" />
@@ -41,6 +43,7 @@
   <p:import href="http://transpect.le-tex.de/xproc-util/xml-model/prepend-hub-xml-model.xpl" />
   <p:import href="http://transpect.le-tex.de/xproc-util/xslt-mode/xslt-mode.xpl"/>
   <p:import href="wml2hub.lib.xpl" />
+
 
   <p:variable name="basename" select="replace($docx, '^(.+?)([^/\\]+)\.docx$', '$2')"/>
 
