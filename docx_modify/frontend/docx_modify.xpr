@@ -15,6 +15,7 @@
     </meta>
     <projectTree name="docx_modify.xpr">
         <folder masterFiles="true" name="Master Files">
+            <file name="lib/xsl/identity.xsl"/>
             <file name="docx2hub/wml2dbk.xsl"/>
         </folder>
     </projectTree>
