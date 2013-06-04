@@ -1,25 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <xsl:stylesheet version="2.0"
-
   xmlns:xsl		= "http://www.w3.org/1999/XSL/Transform"
-  xmlns:fn              = "http://www.w3.org/2005/xpath-functions"
   xmlns:xs		= "http://www.w3.org/2001/XMLSchema"
   xmlns:w		= "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-  xmlns:word200x	= "http://schemas.microsoft.com/office/word/2003/wordml"
-  xmlns:v		= "urn:schemas-microsoft-com:vml" 
+  xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+  xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+  xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape"
+  xmlns:wpg="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup"
+  xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main"
+  xmlns:wp14="http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing"
+  xmlns:v="urn:schemas-microsoft-com:vml"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
   xmlns:dbk		= "http://docbook.org/ns/docbook"
-  xmlns:wx		= "http://schemas.microsoft.com/office/word/2003/auxHint"
-  xmlns:o		= "urn:schemas-microsoft-com:office:office"
-  xmlns:pkg		= "http://schemas.microsoft.com/office/2006/xmlPackage"
-  xmlns:r		= "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-  xmlns:rel		= "http://schemas.openxmlformats.org/package/2006/relationships"
-  xmlns:exsl		= 'http://exslt.org/common'
   xmlns:saxon		= "http://saxon.sf.net/"
   xmlns:letex		= "http://www.le-tex.de/namespace"
   xmlns:docx2hub = "http://www.le-tex.de/namespace/docx2hub"
   xmlns:mml             = "http://www.w3.org/Math/DTD/mathml2/mathml2.dtd"
-
-  exclude-result-prefixes = "w o v wx xs dbk pkg r rel word200x exsl saxon fn letex mml"
+  exclude-result-prefixes = "xs dbk saxon letex mml docx2hub"
 >
 
   <!-- ================================================================================ -->
