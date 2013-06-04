@@ -122,7 +122,6 @@
 
   <xsl:template match="/w:styles" mode="insert-xpath">
     <xsl:param name="themes" as="document-node(element(a:theme))*" tunnel="yes"/>
-    <xsl:message select="count($themes)"/>
     <xsl:copy copy-namespaces="no">
       <xsl:attribute name="xml:base" select="base-uri()" />
       <!-- Font des Standardtextes -->
