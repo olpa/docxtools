@@ -68,7 +68,7 @@
           <xsl:with-param name="themes" select="$themes" tunnel="yes"/>
         </xsl:apply-templates>
         <xsl:if test="doc-available(resolve-uri('numbering.xml', base-uri()))">
-          <xsl:sequence select="document(resolve-uri('numbering.xml', base-uri()))/w:numbering" />
+          <xsl:apply-templates select="document(resolve-uri('numbering.xml', base-uri()))/w:numbering" mode="#current"/>
         </xsl:if>
         <xsl:if test="doc-available(resolve-uri('footnotes.xml', base-uri()))">
           <xsl:apply-templates select="document(resolve-uri('footnotes.xml', base-uri()))/w:footnotes" mode="#current" />
@@ -76,22 +76,22 @@
         <xsl:if test="doc-available(resolve-uri('endnotes.xml', base-uri()))">
           <xsl:apply-templates select="document(resolve-uri('endnotes.xml', base-uri()))/w:endnotes" mode="#current" />
         </xsl:if>
-        <xsl:sequence select="document(resolve-uri('settings.xml', base-uri()))/w:settings" />
+        <xsl:apply-templates select="document(resolve-uri('settings.xml', base-uri()))/w:settings" mode="#current"/>
         <xsl:if test="doc-available(resolve-uri('comments.xml', base-uri()))">
           <xsl:apply-templates select="document(resolve-uri('comments.xml', base-uri()))/w:comments" mode="#current" />
         </xsl:if>
-        <xsl:sequence select="document(resolve-uri('fontTable.xml', base-uri()))/w:fonts" />
+        <xsl:apply-templates select="document(resolve-uri('fontTable.xml', base-uri()))/w:fonts" mode="#current"/>
         <w:docRels>
-          <xsl:sequence select="document(resolve-uri('_rels/document.xml.rels', base-uri()))/rel:Relationships" />
+          <xsl:apply-templates select="document(resolve-uri('_rels/document.xml.rels', base-uri()))/rel:Relationships" mode="#current"/>
         </w:docRels>
         <xsl:if test="doc-available(resolve-uri('_rels/footnotes.xml.rels', base-uri()))">
           <w:footnoteRels>
-            <xsl:sequence select="document(resolve-uri('_rels/footnotes.xml.rels', base-uri()))/rel:Relationships" />
+            <xsl:apply-templates select="document(resolve-uri('_rels/footnotes.xml.rels', base-uri()))/rel:Relationships" mode="#current"/>
           </w:footnoteRels>
         </xsl:if>
         <xsl:if test="doc-available(resolve-uri('_rels/comments.xml.rels', base-uri()))">
           <w:commentRels>
-            <xsl:sequence select="document(resolve-uri('_rels/comments.xml.rels', base-uri()))/rel:Relationships" />
+            <xsl:apply-templates select="document(resolve-uri('_rels/comments.xml.rels', base-uri()))/rel:Relationships" mode="#current"/>
           </w:commentRels>
         </xsl:if>
         <!-- reproduce the document (with srcpaths), using the default identity template from catch-all.xsl: -->
@@ -100,11 +100,21 @@
     </xsl:document>
   </xsl:template>
 
+  <xsl:template match="w:document | w:numbering | w:endnotes | w:footnotes | w:settings | w:fonts | rel:Relationships" mode="insert-xpath">
+    <xsl:copy copy-namespaces="no">
+      <xsl:attribute name="xml:base" select="base-uri()" />
+      <xsl:apply-templates select="@*, node()" mode="#current"/>      
+    </xsl:copy>
+  </xsl:template>
+
   <!-- theme support incomplete … -->
   <xsl:function name="letex:theme-font" as="xs:string">
-    <xsl:param name="rFonts" as="element(w:rFonts)"/>
+    <xsl:param name="rFonts" as="element(w:rFonts)?"/>
     <xsl:param name="themes" as="document-node(element(a:theme))*"/>
     <xsl:choose>
+      <xsl:when test="not($themes | $rFonts)">
+        <xsl:sequence select="'Arial'"/>
+      </xsl:when>
       <xsl:when test="$rFonts/@w:asciiTheme">
         <!-- minor font is for the bulk text (major is for the headings).
              Spec sez dat w:asciiTheme has precedence over w:ascii (I don’t find it now, and it wasn’t all clear there) -->
@@ -120,6 +130,7 @@
     <xsl:param name="themes" as="document-node(element(a:theme))*" tunnel="yes"/>
     <xsl:message select="count($themes)"/>
     <xsl:copy copy-namespaces="no">
+      <xsl:attribute name="xml:base" select="base-uri()" />
       <!-- Font des Standardtextes -->
       <xsl:variable name="normal" select="key('docx2hub:style', 'Normal')" as="element(w:style)?" />
       <xsl:variable name="default-font" as="xs:string"
