@@ -922,14 +922,14 @@
 						            <mml:maction actiontype="lit">
 							              <mml:mtext>
 									<xsl:call-template name="checkDirectFormatting"/>
-								                <xsl:value-of select=".//m:t"/>
+								                <xsl:value-of select=".//*:t"/>
 							              </mml:mtext>
 						            </mml:maction>
 					          </xsl:when>
 					          <xsl:otherwise>
 						            <mml:mtext>
 									<xsl:call-template name="checkDirectFormatting"/>
-							              <xsl:value-of select=".//m:t"/>
+							              <xsl:value-of select=".//*:t"/>
 						            </mml:mtext>
 					          </xsl:otherwise>
 				        </xsl:choose>
@@ -938,7 +938,7 @@
 				        <xsl:choose>
 					          <xsl:when test="$fLit=1">
 						            <mml:maction actiontype="lit">
-							              <xsl:for-each select=".//m:t">
+							              <xsl:for-each select=".//*:t">
 								                <xsl:call-template name="ParseMt">
 									                  <xsl:with-param name="sToParse" select="text()"/>
 									                  <xsl:with-param name="scr" select="../m:rPr[last()]/m:scr/@m:val"/>
@@ -949,7 +949,7 @@
 						            </mml:maction>
 					          </xsl:when>
 					          <xsl:otherwise>
-						            <xsl:for-each select=".//m:t">
+						            <xsl:for-each select=".//*:t">
 							              <xsl:call-template name="ParseMt">
 								                <xsl:with-param name="sToParse" select="text()"/>
 								                <xsl:with-param name="scr" select="../m:rPr[last()]/m:scr/@m:val"/>
@@ -1081,7 +1081,7 @@
 		    <xsl:param name="align"/>
 		    <xsl:param name="ndCur"/>
 		    <xsl:variable name="sAllMt">
-			      <xsl:for-each select="$ndCur/m:t">
+			      <xsl:for-each select="$ndCur/*:t">
 				        <xsl:value-of select="."/>
 			      </xsl:for-each>
 		    </xsl:variable>
