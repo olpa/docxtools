@@ -26,7 +26,7 @@
   <xsl:template match="w:endnoteReference" mode="wml-to-dbk">
     <footnote role="endnote">
       <xsl:variable name="id" select="@w:id"/>
-      <xsl:apply-templates select="/w:root/w:endnotes/w:endnote[@w:id = $id]" mode="#current"/>
+      <xsl:apply-templates select="/*/w:endnotes/w:endnote[@w:id = $id]" mode="#current"/>
     </footnote>
   </xsl:template>
 
@@ -37,7 +37,7 @@
   <xsl:template match="w:endnoteRef" mode="wml-to-dbk">
     <xsl:attribute name="role" select="'endnote'"/>
     <!-- setzt die Nummer der Fußnote. Prüfen!! -->
-    <xsl:variable name="endnote-num-format" select="/w:root/w:settings/w:endnotePr/w:numFmt/@w:val" as="xs:string?"/>
+    <xsl:variable name="endnote-num-format" select="/*/w:settings/w:endnotePr/w:numFmt/@w:val" as="xs:string?"/>
     <phrase role="hub:identifier">
           <xsl:number value="(count(preceding::w:endnoteRef) + 1)" 
             format="{
