@@ -15,6 +15,7 @@
 
   <xsl:function name="letex:insert-numbering" as="item()*">
     <xsl:param name="context" as="node()"/>
+   
     <xsl:if test="not($context/name() eq 'w:p')">
       <xsl:call-template name="signal-error">
         <xsl:with-param name="error-code" select="'W2D_060'"/>
@@ -59,10 +60,11 @@
             <xsl:with-param name="context" select="$context" tunnel="yes"/>
           </xsl:apply-templates>
         </xsl:element>
-        <tab/>
+         <tab/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:apply-templates select="$context/dbk:tabs" mode="#current"/>
+        <!--KW 11.6.13: mode hart reingeschrieben wegen null pointer exception-->
+        <xsl:apply-templates select="$context/dbk:tabs" mode="wml-to-dbk"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:function>

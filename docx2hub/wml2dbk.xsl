@@ -327,7 +327,7 @@
   <!-- ================================================================================ -->
 
   <!-- default for elements -->
-  <xsl:template match="*" mode="wml-to-dbk">
+  <xsl:template match="*" mode="wml-to-dbk" priority="-1">
     <xsl:call-template name="signal-error" xmlns="">
       <xsl:with-param name="error-code" select="'W2D_020'"/>
       <xsl:with-param name="exit" select="'no'"/>
@@ -346,7 +346,7 @@
        -->
   <xsl:template match="  w:p/w:numPr 
                        | css:rule/w:numPr 
-                       | style/w:numPr 
+                       | *:style/w:numPr 
                        | css:rule/w:tblPr 
                        | /*/w:numbering 
                        | /*/w:docRels 
@@ -354,10 +354,10 @@
                        | /*/w:comments 
                        | /*/w:footnotes
                        | /*/w:docVars
-                       | /*/w:endnotes" mode="wml-to-dbk" priority="-0.25"/>
+                       | /*/w:endnotes" mode="wml-to-dbk" priority="-0.25"/>    
 
   <xsl:template match="dbk:* | css:*" mode="wml-to-dbk" priority="-0.1">
-    <xsl:copy copy-namespaces="no">
+     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*" mode="#current" />
       <xsl:apply-templates select="node()" mode="#current" />
     </xsl:copy>
@@ -385,7 +385,7 @@
 
   <!-- The characters have already been mapped to unicode, so hopefully the surrounding
        text’s font will be able to render them. -->
-  <xsl:template match="@css:font-family[. eq 'Symbol']" mode="wml-to-dbk" priority="2"/>
+  <xsl:template match="@css:font-family[. eq 'Symbol']" mode="wml-to-dbk" priority="2"/> 
 
   <xsl:template match="@*" mode="wml-to-dbk">
     <xsl:call-template name="signal-error" xmlns="">
@@ -431,11 +431,9 @@
     </xsl:call-template>
   </xsl:template>
 
-  <xsl:template match="w:commentRels" mode="wml-to-dbk"/>
-
+  <xsl:template match="w:commentRels" mode="wml-to-dbk"/>    
 
   <!-- element section -->
-
 
   <xsl:template match="w:document" mode="wml-to-dbk">
     <xsl:apply-templates select="@* except @srcpath | node()" mode="wml-to-dbk"/>
@@ -550,15 +548,15 @@
   
   <!-- comments -->
   <xsl:template match="w:commentRangeStart" mode="wml-to-dbk"/>
+  
   <xsl:template match="w:commentRangeEnd" mode="wml-to-dbk"/>
+  
   <xsl:template match="w:proofErr" mode="wml-to-dbk"/>
-
-
-
+ 
   <!-- paragraph properties (w:pPr) -->
 
   <xsl:template match="w:pPr" mode="wml-to-dbk">
-    <!-- para properties are collected by para-props.xsl -->
+     <!-- para properties are collected by para-props.xsl -->
   </xsl:template>
 
   <!-- run properties (w:rPr) -->
@@ -592,7 +590,7 @@
   </xsl:template>
 
   <xsl:template match="@w:anchor[parent::w:hyperlink]" mode="wml-to-dbk" priority="1.5">
-    <xsl:choose>
+     <xsl:choose>
       <xsl:when test="exists(parent::w:hyperlink/@r:id)"/>
       <xsl:otherwise>
         <xsl:attribute name="linkend" select="."/>
@@ -635,10 +633,8 @@
   </xsl:template>
 
   <xsl:template match="@w:history[parent::w:hyperlink]" mode="wml-to-dbk" priority="1.5"/>
-
-
+ 
   <xsl:template match="w:smartTagPr" mode="wml-to-dbk"/>
-
 
   <!-- textbox -->
   <xsl:template match="w:txbxContent" mode="wml-to-dbk">
@@ -669,6 +665,7 @@
     <xsl:param name="instrText" as="xs:string?" tunnel="yes"/>
     <xsl:param name="text" as="node()*" tunnel="yes"/>
     <xsl:param name="nodes" as="node()*" tunnel="yes"/>
+    
     <xsl:variable name="tokens" select="tokenize(normalize-space($instrText), ' ')"/>
     <xsl:variable name="func" select="doc('')//letex:field-functions/letex:field-function[@name = $tokens[1]]"/>
     <xsl:choose>
@@ -775,17 +772,14 @@
 
   <!-- w:sectPr ignorieren -->
   <xsl:template match="w:sectPr" mode="wml-to-dbk"/>
-
+ 
   <xsl:template match="w:tcPr" mode="wml-to-dbk"/>
 
   <!-- Umbruchshilfe zur exakten Reproduktion des Umbruchs -->
-  <xsl:template match="w:lastRenderedPageBreak" mode="wml-to-dbk">
-  </xsl:template>
-
+  <xsl:template match="w:lastRenderedPageBreak" mode="wml-to-dbk"/>
 
   <!-- Background -->
-  <xsl:template match="w:background[parent::w:document]" mode="wml-to-dbk">
-  </xsl:template>
+  <xsl:template match="w:background[parent::w:document]" mode="wml-to-dbk"/>
 
   <!-- fldSimple -->
   <xsl:template match="w:fldSimple" mode="wml-to-dbk">
@@ -795,7 +789,7 @@
 
   <!-- drawing -->
   <xsl:template match="w:drawing" mode="wml-to-dbk">
-    <!-- weg damit, wenn dann in extra include -->
+     <!-- weg damit, wenn dann in extra include -->
   </xsl:template>
 
   <!-- whitespace elements, etc. -->
@@ -813,9 +807,8 @@
     <phrase role="cr"/>
   </xsl:template>
 
-  <xsl:template match="w:softHyphen" mode="wml-to-dbk">
-  </xsl:template>
-
+  <xsl:template match="w:softHyphen" mode="wml-to-dbk"/>
+ 
   <xsl:template match="w:noBreakHyphen" mode="wml-to-dbk">
       <xsl:value-of select="'&#x2011;'"/>
   </xsl:template>
@@ -866,13 +859,10 @@
 
   <xsl:template match="@srcpath[$srcpaths != 'yes']" mode="wml-to-dbk" priority="2" />
 
-
   <xsl:function name="docx2hub:twips2mm" as="xs:string">
     <xsl:param name="val" as="xs:integer"/>
     <xsl:sequence select="concat(xs:string($val * 0.01763889), 'mm')" />
   </xsl:function>
-
-
 
 </xsl:stylesheet>
 
