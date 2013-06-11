@@ -38,7 +38,6 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="w:annotationRef" mode="wml-to-dbk">
-  </xsl:template>
+  <xsl:template match="w:annotationRef" mode="wml-to-dbk"/>
 
 </xsl:stylesheet>
