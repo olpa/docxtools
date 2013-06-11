@@ -51,7 +51,7 @@
       <w:root>
         <xsl:attribute name="xml:base" select="replace($base-dir, 'word/$', '')" />
         <xsl:variable name="rels" as="document-node(element(rel:Relationships))"
-          select="document(resolve-uri('_rels/document.xml.rels', base-uri()))"/>
+          select="document(resolve-uri(concat($base-dir,'_rels/document.xml.rels')))"/>
         <!-- At the moment, we only need themes for default font resolution that takes place
              in the current mode. Therefore, we don’t include the theme documents below  
              /w:root yet. We rather pass them as a tunneled variable. -->
