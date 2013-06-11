@@ -33,7 +33,7 @@
   <xsl:param name="hub-version" select="'1.0'" as="xs:string"/>
   
   <xsl:variable name="symbol-font-map" as="document-node(element(symbols))"
-                select="if (doc-available('Symbol.xml')) then document('Symbol.xml') else if (doc-available('fontmaps/Symbol.xml')) then document('fontmaps/Symbol.xml') else ()"/>
+                select="if (doc-available('Symbol.xml')) then document('Symbol.xml') else document('fontmaps/Symbol.xml')"/>
 
   <xsl:key name="style-by-id" match="w:style" use="@w:styleId" />
   <xsl:key name="numbering-by-id" match="w:num" use="@w:numId" />
@@ -353,9 +353,10 @@
                        | /*/w:fonts 
                        | /*/w:comments 
                        | /*/w:footnotes
-                       | /*/w:docVars" mode="wml-to-dbk" priority="-0.25"/>
+                       | /*/w:docVars
+                       | /*/w:endnotes" mode="wml-to-dbk" priority="-0.25"/>
 
-  <xsl:template match="dbk:* | css:*" mode="wml-to-dbk">
+  <xsl:template match="dbk:* | css:*" mode="wml-to-dbk" priority="-0.1">
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*" mode="#current" />
       <xsl:apply-templates select="node()" mode="#current" />
