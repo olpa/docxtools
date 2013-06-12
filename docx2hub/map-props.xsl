@@ -55,6 +55,15 @@
             </keyword>
           </xsl:if>
         </keywordset>
+        <xsl:if test="exists(../../w:settings/w:docVars/w:docVar)">
+          <keywordset role="docVars">
+            <xsl:for-each select="../../w:settings/w:docVars/w:docVar">
+              <keyword role="{./@w:name}">
+                <xsl:value-of select="./@w:val"/>
+              </keyword>
+            </xsl:for-each>
+          </keywordset>
+        </xsl:if>
         <xsl:choose>
           <xsl:when test="$hub-version eq '1.0'">
             <xsl:call-template name="docx2hub:hub-1.0-styles">
@@ -69,7 +78,7 @@
         </xsl:choose>
       </info>
       <xsl:apply-templates select="../../w:numbering" mode="#current"/>
-      <xsl:copy-of select="../../w:docRels, ../../w:footnoteRels, ../../w:commentRels, ../../w:fonts, ../../w:settings/w:docVars"/>
+      <xsl:copy-of select="../../w:docRels, ../../w:footnoteRels, ../../w:commentRels, ../../w:fonts"/>
       <xsl:apply-templates select="../../w:comments, ../../w:footnotes, ../../w:endnotes" mode="#current"/>
       <xsl:apply-templates mode="#current"/>
     </xsl:element>
