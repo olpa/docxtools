@@ -6,7 +6,17 @@
             <serialized version="14.2" xml:space="preserve">
                 <map>
                     <entry>
+                        <String>catalogs.v5</String>
+                        <String-array>
+                            <String>${pdu}/xmlcatalog/catalog.xml</String>
+                        </String-array>
+                    </entry>
+                    <entry>
                         <String>enable.project.master.files.support</String>
+                        <Boolean>true</Boolean>
+                    </entry>
+                    <entry>
+                        <String>key.xml.catalog.option.pane</String>
                         <Boolean>true</Boolean>
                     </entry>
                 </map>
