@@ -27,7 +27,9 @@
   </p:input>
   <p:output port="result" primary="true"/>
     
-  <p:option name="docx" required="true"/>
+  <p:option name="docx" required="true">
+    <p:documentation>A file name as recognized by your system's JVM. Not a file: URI.</p:documentation>
+  </p:option>
   <p:option name="debug" required="false" select="'no'"/>
   <p:option name="debug-dir-uri" required="false" select="'debug'"/>
   <p:option name="srcpaths" required="false" select="'no'"/>
