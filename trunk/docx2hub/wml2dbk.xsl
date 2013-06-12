@@ -353,7 +353,6 @@
                        | /*/w:fonts 
                        | /*/w:comments 
                        | /*/w:footnotes
-                       | /*/w:docVars
                        | /*/w:endnotes" mode="wml-to-dbk" priority="-0.25"/>    
 
   <xsl:template match="dbk:* | css:*" mode="wml-to-dbk" priority="-0.1">

@@ -49,10 +49,10 @@
     </xsl:variable>
     <phrase role="hub:identifier">
       <xsl:choose>
-        <xsl:when test="//w:docVar[@w:name='footnote_check']">
+        <xsl:when test="//*:keywordset[@role='docVars']/*:keyword[@role='footnote_check']">
           <xsl:choose>
-            <xsl:when test="some $i in (tokenize(//w:docVar[@w:name='footnote_check']/@w:val,'&#xD;')) satisfies tokenize($i,',')[1]=$footnote-number">
-              <xsl:value-of select="tokenize(tokenize(//w:docVar[@w:name='footnote_check']/@w:val,'&#xD;')[tokenize(.,',')[1]=$footnote-number],',')[2]"/>
+            <xsl:when test="some $i in (tokenize(//*:keywordset[@role='docVars']/*:keyword[@role='footnote_check'],'&#xD;')) satisfies tokenize($i,',')[1]=$footnote-number">
+              <xsl:value-of select="tokenize(tokenize(//*:keywordset[@role='docVars']/*:keyword[@role='footnote_check'],'&#xD;')[tokenize(.,',')[1]=$footnote-number],',')[2]"/>
             </xsl:when>
             <xsl:otherwise>
               <xsl:value-of select="$footnote-number"/>
