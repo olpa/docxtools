@@ -13,6 +13,10 @@ if [ -z $DEBUG ]; then
     DEBUG=no
 fi
 
+if [ -z $HEAP ]; then
+    HEAP=1024m
+fi
+
 if [ -z $XSL ]; then
     echo "Please supply an .xsl file as first argument (e.g., $DIR/lib/xsl/identity.xsl)"
     exit 1
