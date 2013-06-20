@@ -703,6 +703,17 @@
             </xsl:call-template>
           </xsl:when>
           <xsl:when test="matches($instrText,'^[\s&#160;]*$')"/>
+          <xsl:when test="$tokens[1] = 'AUTOTEXT'">
+            <xsl:call-template name="signal-error" xmlns="">
+              <xsl:with-param name="error-code" select="'W2D_045'"/>
+              <xsl:with-param name="exit"/>
+              <xsl:with-param name="hash">
+                <value key="xpath"><xsl:value-of select="@srcpath"/></value>
+                <value key="level">WRN</value>
+                <value key="info-text"><xsl:value-of select="$instrText"/></value>
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:when>
           <xsl:otherwise>
             <xsl:call-template name="signal-error" xmlns="">
               <xsl:with-param name="error-code" select="'W2D_040'"/>
