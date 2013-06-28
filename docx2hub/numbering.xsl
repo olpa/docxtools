@@ -35,7 +35,7 @@
           select="$lvl/w:pPr/@*[letex:different-style-att(., $context)]">
           <xsl:with-param name="context" select="$context" tunnel="yes"/>
         </xsl:apply-templates>
-        <xsl:apply-templates select="$context/dbk:tabs" mode="#current"/>
+        <xsl:apply-templates select="$context/dbk:tabs" mode="wml-to-dbk"/>
         <phrase role="hub:identifier">
           <xsl:apply-templates mode="numbering"
             select="$lvl/w:rPr/@*[letex:different-style-att(., $context)]" >
