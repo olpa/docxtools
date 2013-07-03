@@ -9,6 +9,7 @@
   xmlns:wpg="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup"
   xmlns:a14="http://schemas.microsoft.com/office/drawing/2010/main"
   xmlns:wp14="http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing"
+  xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml"
   xmlns:w15="http://schemas.microsoft.com/office/word/2012/wordml"
   xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:o="urn:schemas-microsoft-com:office:office"
