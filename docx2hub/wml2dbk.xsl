@@ -12,6 +12,7 @@
   xmlns:xlink = "http://www.w3.org/1999/xlink"
   xmlns:docx2hub = "http://www.le-tex.de/namespace/docx2hub"
   xmlns:css="http://www.w3.org/1996/css"
+  xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
   xmlns="http://docbook.org/ns/docbook"
   exclude-result-prefixes = "w xs dbk r rel letex m mc xlink docx2hub"
 >
@@ -799,7 +800,13 @@
 
   <!-- drawing -->
   <xsl:template match="w:drawing" mode="wml-to-dbk">
-     <!-- weg damit, wenn dann in extra include -->
+    <xsl:if test="exists(wp:inline/wp:docPr[@descr and matches(@descr,'\.([Jj][pP][gG]|[gG][iI][fF]|[pP][nN][gG]|[tT][iI][fF][fF]?)$')])">
+      <mediaobject style="imagedata">
+        <imageobject>
+          <imagedata fileref="{wp:inline/wp:docPr/@descr}"/>
+        </imageobject>
+      </mediaobject>
+    </xsl:if>    
   </xsl:template>
 
   <!-- whitespace elements, etc. -->
