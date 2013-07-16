@@ -148,7 +148,15 @@
         (
           not(exists(letex:get-lvl-of-numbering(.))) 
             and 
-          not(w:numPr)
+          (
+            not(w:numPr) 
+              or
+            (
+              w:numPr[w:ilvl/@w:val='0' and w:numId/@w:val='0']
+                and
+              matches(@role,'List')   
+            )
+          )
         ) 
           or
         (
@@ -161,6 +169,16 @@
            satisfies (($i = xs:string($context/@role)) or ($i=$lvl/ancestor::w:abstractNum/w:lvl[@w:ilvl=$ilvl or @w:ilvl=$ilvl -1 or @w:ilvl=$ilvl+1]/w:pStyle/@w:val))) 
             and 
           (letex:get-lvl-of-numbering(.)/@w:ilvl=$ilvl+1 or letex:get-lvl-of-numbering(.)/@w:ilvl=$ilvl -1)
+        )
+          or 
+        (
+          exists(letex:get-lvl-of-numbering(.))
+            and
+          not($abstract-num-id = xs:double(letex:get-lvl-of-numbering(.)/ancestor::w:abstractNum/@w:abstractNumId))
+            and 
+          (letex:get-lvl-of-numbering(.)/@w:ilvl=$ilvl+1 or letex:get-lvl-of-numbering(.)/@w:ilvl=$ilvl -1)
+            and
+          not(matches(letex:get-lvl-of-numbering(.)/w:lvlText/@w:val,'%[0-9]+'))
         )
       ]
       [ 
@@ -177,7 +195,15 @@
               (
                 not(exists(letex:get-lvl-of-numbering(.))) 
                   and 
-                not(w:numPr)
+                (
+                  not(w:numPr) 
+                    or
+                  (
+                    w:numPr[w:ilvl/@w:val='0' and w:numId/@w:val='0']
+                      and
+                    matches(@role,'List')   
+                  )
+                )
               ) 
                 or
               (
@@ -190,6 +216,16 @@
                  satisfies (($i = xs:string($context/@role)) or ($i=$lvl/ancestor::w:abstractNum/w:lvl[@w:ilvl=$ilvl or @w:ilvl=$ilvl -1 or @w:ilvl=$ilvl+1]/w:pStyle/@w:val))) 
                   and 
                 (letex:get-lvl-of-numbering(.)/@w:ilvl=$ilvl+1 or letex:get-lvl-of-numbering(.)/@w:ilvl=$ilvl -1)
+              )
+                or 
+              (
+                exists(letex:get-lvl-of-numbering(.))
+                  and
+                not($abstract-num-id = xs:double(letex:get-lvl-of-numbering(.)/ancestor::w:abstractNum/@w:abstractNumId))
+                  and 
+                (letex:get-lvl-of-numbering(.)/@w:ilvl=$ilvl+1 or letex:get-lvl-of-numbering(.)/@w:ilvl=$ilvl -1)
+                  and
+                not(matches(letex:get-lvl-of-numbering(.)/w:lvlText/@w:val,'%[0-9]+'))
               )
             ) 
           ] 
