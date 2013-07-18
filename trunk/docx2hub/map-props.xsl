@@ -144,13 +144,13 @@
                                    else ()" mode="#current">
         <xsl:with-param name="wrap-in-style-element" select="false()"/>
       </xsl:apply-templates>
-      <xsl:variable name="mergeable-atts" as="element(*)*"> <!-- docx2hub:attribute, ... -->
+      <xsl:variable name="mergeable-atts" as="node()*"> <!-- docx2hub:attribute, ... -->
         <xsl:apply-templates select="* except w:basedOn" mode="#current" />
       </xsl:variable>
       <xsl:for-each-group select="$mergeable-atts[self::docx2hub:attribute]" group-by="@name">
         <docx2hub:attribute name="{current-grouping-key()}"><xsl:value-of select="current-group()" /></docx2hub:attribute>
       </xsl:for-each-group>
-      <xsl:sequence select="$mergeable-atts[not(self::docx2hub:attribute)]"/>
+      <xsl:sequence select="$mergeable-atts[self::*][not(self::docx2hub:attribute)]"/>
     </xsl:variable>
     <xsl:choose>
       <xsl:when test="$wrap-in-style-element">

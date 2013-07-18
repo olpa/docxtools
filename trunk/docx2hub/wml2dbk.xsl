@@ -354,7 +354,8 @@
                        | /*/w:fonts 
                        | /*/w:comments 
                        | /*/w:footnotes
-                       | /*/w:endnotes" mode="wml-to-dbk" priority="-0.25"/>    
+                       | /*/w:endnotes
+                       | mc:AlternateContent" mode="wml-to-dbk" priority="-0.25"/>    
 
   <xsl:template match="dbk:* | css:*" mode="wml-to-dbk" priority="-0.1">
      <xsl:copy copy-namespaces="no">
