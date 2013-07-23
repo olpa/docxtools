@@ -510,11 +510,14 @@
           </xsl:when>
           <xsl:when test="matches($val/@w:val, '^pct')">
             <xsl:choose>
-              <xsl:when test="$val/@w:fill = 'auto' and $val/@w:color = 'auto'">
-                <docx2hub:color-percentage target="css:background-color" use="css:color"><xsl:value-of select="replace($val/@w:val, '^pct', '')" /></docx2hub:color-percentage>
+              <xsl:when test="exists($val/@w:fill) and exists($val/@w:color)">
+                <xsl:if test="not(matches($val/@w:color,'auto'))">
+                  <docx2hub:attribute name="css:color"><xsl:value-of select="concat('#', $val/@w:color)"/></docx2hub:attribute>
+                </xsl:if>
+                <docx2hub:color-percentage target="css:background-color" use="css:color" fill="{if ($val/@w:fill='auto') then '#FFFFFF' else concat('#',$val/@w:fill)}"><xsl:value-of select="replace($val/@w:val, '^pct', '')" /></docx2hub:color-percentage>
               </xsl:when>
               <xsl:otherwise>
-                <xsl:message>map-props.xsl: w:shd/@w:val='pct*' only implemented for @w:color='auto' and @w:fill='auto'
+                <xsl:message>map-props.xsl: w:shd/@w:val='pct*' only implemented for existing @w:fill and @w:color
                 <xsl:copy-of select="$val" />
               </xsl:message>
             </xsl:otherwise>
@@ -822,8 +825,8 @@
   <xsl:template match="docx2hub:attribute[@name = ('fill-tint')]" mode="docx2hub:props2atts"/>
 
   <xsl:template match="docx2hub:color-percentage" mode="docx2hub:props2atts">
-    <xsl:variable name="color" select="(../docx2hub:attribute[@name eq 'css:color'][last()], '#000')[1]" as="xs:string" />
-    <xsl:attribute name="{@target}" select="letex:tint-hex-color($color, number(.) * 0.01)" />
+    <xsl:variable name="color" select="(../docx2hub:attribute[@name eq 'css:color'][last()], '#000000')[1]" as="xs:string" />
+    <xsl:attribute name="{@target}" select="letex:tint-hex-color-filled($color, number(.) * 0.01, @fill)" />
   </xsl:template>
 
   <!-- Let only the last setting prevail: -->
