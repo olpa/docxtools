@@ -816,7 +816,13 @@
   </xsl:template>
 
   <xsl:template match="w:br" mode="wml-to-dbk">
-    <br/>
+    <br>
+      <xsl:apply-templates select="@w:type" mode="#current"/>
+    </br>
+  </xsl:template>
+  
+  <xsl:template mode="wml-to-dbk" match="w:br/@w:type" priority="10">
+    <xsl:attribute name="role" select="."/>
   </xsl:template>
 
   <xsl:template match="w:cr" mode="wml-to-dbk">
