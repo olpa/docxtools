@@ -7,12 +7,10 @@ esac
 DIR="$( cd -P "$(dirname $( readlink -f "${BASH_SOURCE[0]}" ))" && pwd )"
 XSL="$( readlink -f "$1" )"
 DOCX="$( readlink -f "$2" )"
-DEBUG="$( readlink -f "$3" )"
-HEAP="$( readlink -f "$4" )"
 XPL="$DIR"/lib/xpl/docx_modify.xpl
 
 if [ -z $XSL ]; then
-    echo "Usage: docx_modifiy XSL DOCX [DEBUG] [HEAP]";
+    echo "Usage: [DEBUG=yes|no] [HEAP=xxxxm] docx_modifiy XSL DOCX";
     echo "Sample invocation (identity): ./docx_modifiy.sh lib/xsl/identity.xsl /path/to/myfile.docx yes";
     exit 1;
 fi
