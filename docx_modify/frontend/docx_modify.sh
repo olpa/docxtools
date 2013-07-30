@@ -7,6 +7,7 @@ esac
 DIR="$( cd -P "$(dirname $( readlink -f "${BASH_SOURCE[0]}" ))" && pwd )"
 XSL="$( readlink -f "$1" )"
 DOCX="$( readlink -f "$2" )"
+MODIFY_XPL="$( readlink -f "$3" )"
 XPL="$DIR"/lib/xpl/docx_modify.xpl
 
 if [ -z $XSL ]; then
@@ -32,6 +33,13 @@ if $cygwin; then
   XSL=file:/$(cygpath -ma $XSL)
   DOCX=$(cygpath -ma $DOCX)
   XPL=file:/$(cygpath -ma $XPL)
+  if [ ! -z $MODIFY_XPL ]; then
+    MODIFY_XPL=file:/$(cygpath -ma $MODIFY_XPL)
+  fi
+fi
+
+if [ ! -z $MODIFY_XPL ]; then
+  MODIFY_XPL="-i xpl=$MODIFY_XPL"
 fi
 
 $DIR/calabash/calabash.sh -i xslt="$XSL" "$XPL" file="$DOCX" debug=$DEBUG
