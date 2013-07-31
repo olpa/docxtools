@@ -42,4 +42,4 @@ if [ ! -z $MODIFY_XPL ]; then
   MODIFY_XPL="-i xpl=$MODIFY_XPL"
 fi
 
-$DIR/calabash/calabash.sh -i xslt="$XSL" "$XPL" file="$DOCX" debug=$DEBUG
+$DIR/calabash/calabash.sh -i xslt="$XSL" $MODIFY_XPL "$XPL" file="$DOCX" debug=$DEBUG
