@@ -97,7 +97,7 @@
     </xsl:document>
   </xsl:template>
 
-  <xsl:template match="w:document | w:numbering | w:endnotes | w:footnotes | w:settings | w:fonts | rel:Relationships" mode="insert-xpath">
+  <xsl:template match="w:document | w:numbering | w:endnotes | w:footnotes | w:settings | w:fonts | rel:Relationships | w:comments" mode="insert-xpath">
     <xsl:copy copy-namespaces="no">
       <xsl:attribute name="xml:base" select="base-uri()" />
       <xsl:apply-templates select="@*, node()" mode="#current"/>      
