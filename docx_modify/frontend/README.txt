@@ -12,6 +12,14 @@ Windows users: use the calabash/calabash.sh style invocation (see
 below), except that you use calabash/calabash.bat instead of the .sh
 script. Sorry no docx_modify.bat file yet.
 
+Installation: 
+
+svn checkout \
+    https://subversion.le-tex.de/docxtools/trunk/docx_modify/frontend/ \
+    docx_modify 
+Will fetch XML Calabash with an extension and other prerequisites from
+svn externals.  System requirements: 2 GB RAM, Java 1.6 or newer.
+
 Sample invocation (identity with debug):
 DEBUG=yes ./docx_modifiy.sh lib/xsl/identity.xsl /path/to/myfile.docx
 
