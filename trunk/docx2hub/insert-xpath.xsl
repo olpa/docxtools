@@ -18,6 +18,7 @@
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
   xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math"
   xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape"
+  xmlns:ct="http://schemas.openxmlformats.org/package/2006/content-types"
   xmlns:docx2hub = "http://www.le-tex.de/namespace/docx2hub"
   exclude-result-prefixes="xs docx2hub mml letex dbk"
               
@@ -91,13 +92,16 @@
             <xsl:apply-templates select="document(resolve-uri('_rels/comments.xml.rels', base-uri()))/rel:Relationships" mode="#current"/>
           </w:commentRels>
         </xsl:if>
+        <w:ContentTypes>
+          <xsl:apply-templates select="document(resolve-uri('../%5BContent_Types%5D.xml', base-uri()))/ct:Types" mode="#current"/>
+        </w:ContentTypes>
         <!-- reproduce the document (with srcpaths), using the default identity template from catch-all.xsl: -->
         <xsl:next-match/>
       </w:root>
     </xsl:document>
   </xsl:template>
 
-  <xsl:template match="w:document | w:numbering | w:endnotes | w:footnotes | w:settings | w:fonts | rel:Relationships | w:comments" mode="insert-xpath">
+  <xsl:template match="w:document | w:numbering | w:endnotes | w:footnotes | w:settings | w:fonts | rel:Relationships | w:comments | ct:Types" mode="insert-xpath">
     <xsl:copy copy-namespaces="no">
       <xsl:attribute name="xml:base" select="base-uri()" />
       <xsl:apply-templates select="@*, node()" mode="#current"/>      
