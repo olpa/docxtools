@@ -79,6 +79,9 @@
           <xsl:apply-templates select="document(resolve-uri('comments.xml', base-uri()))/w:comments" mode="#current" />
         </xsl:if>
         <xsl:apply-templates select="document(resolve-uri('fontTable.xml', base-uri()))/w:fonts" mode="#current"/>
+        <w:docTypes>
+          <xsl:apply-templates select="document(resolve-uri('../%5BContent_Types%5D.xml', base-uri()))/ct:Types" mode="#current"/>
+        </w:docTypes>
         <w:docRels>
           <xsl:apply-templates select="document(resolve-uri('_rels/document.xml.rels', base-uri()))/rel:Relationships" mode="#current"/>
         </w:docRels>
@@ -92,9 +95,6 @@
             <xsl:apply-templates select="document(resolve-uri('_rels/comments.xml.rels', base-uri()))/rel:Relationships" mode="#current"/>
           </w:commentRels>
         </xsl:if>
-        <w:ContentTypes>
-          <xsl:apply-templates select="document(resolve-uri('../%5BContent_Types%5D.xml', base-uri()))/ct:Types" mode="#current"/>
-        </w:ContentTypes>
         <!-- reproduce the document (with srcpaths), using the default identity template from catch-all.xsl: -->
         <xsl:next-match/>
       </w:root>
