@@ -25,7 +25,7 @@
 >
 
   <xsl:import href="propmap.xsl"/>
-  <xsl:import href="letex-util/colors/colors.xsl"/>
+  <xsl:import href="http://transpect.le-tex.de/xslt-util/colors/colors.xsl"/>
 
   <xsl:key name="docx2hub:style" match="w:style" use="@w:styleId" />
   <xsl:key name="docx2hub:style-by-role" match="css:rule | dbk:style" use="if ($hub-version eq '1.0') then @role else @name" />
