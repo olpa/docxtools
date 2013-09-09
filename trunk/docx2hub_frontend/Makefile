@@ -6,15 +6,14 @@ else
         uri = $(shell echo file:$(abspath $(1))  | perl -pe 's/ /%20/g')
 endif
 
+MAKEFILEDIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
-CALABASH = calabash/calabash.sh
+CALABASH = $(MAKEFILEDIR)/calabash/calabash.sh
 UMASK	= umask 002
 HUBVERSION = 1.0
 DEBUG = no
 DEBUGDIR = debug
 SRCPATHS = no
-
-MAKEFILEDIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
 usage:
 	@echo "Usage:"
@@ -28,7 +27,12 @@ usage:
 	-$(UMASK); \
 	$(CALABASH) \
 	-o result=$*.hub.xml \
-	docx2hub/wml2hub.xpl \
+	$(MAKEFILEDIR)/docx2hub/wml2hub.xpl \
 	docx=$*.docx \
 	debug=$(DEBUG) \
 	debug-dir-uri=$(call uri,$(DEBUGDIR))
+
+%.docx.tmp/word/document.xml: %.docx
+	-$(UMASK); mkdir "$<.tmp"
+	$(UMASK); unzip -o -d "$<.tmp" "$<"
+	$(UMASK); find "$<.tmp" -exec touch "{}" \;
