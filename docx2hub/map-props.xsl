@@ -156,12 +156,19 @@
       <xsl:when test="$wrap-in-style-element">
         <xsl:element name="{if ($hub-version = '1.0') then 'style' else 'css:rule'}">
           <xsl:apply-templates select="." mode="docx2hub:XML-Hubformat-add-properties_layout-type"/>
-          <xsl:if test="not($hub-version = '1.0')">
-            <docx2hub:attribute name="name">
-              <xsl:value-of select="docx2hub:css-compatible-name(@w:styleId)"/>
-            </docx2hub:attribute>
-          </xsl:if>
           <xsl:sequence select="$atts"/>
+          <xsl:choose>
+            <xsl:when test="$hub-version = '1.0'">
+              <docx2hub:attribute name="role">
+                <xsl:value-of select="docx2hub:css-compatible-name(@w:styleId)"/>
+              </docx2hub:attribute>  
+            </xsl:when>
+            <xsl:otherwise>
+              <docx2hub:attribute name="name">
+                <xsl:value-of select="docx2hub:css-compatible-name(@w:styleId)"/>
+              </docx2hub:attribute>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:element>
       </xsl:when>
       <xsl:otherwise>
