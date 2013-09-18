@@ -883,8 +883,13 @@
   <xsl:template match="@*[parent::w:smartTag]" mode="wml-to-dbk">
     <!-- Attribute von smartTag vorerst ignoriert. -->
   </xsl:template>
-
-
+  
+  <!-- The following template removes indentation if the document.xml was processed 
+    earlier with libxml without indent flag.  If you miss breaks, it's dead certain 
+    that this template is the cause. -->
+  <xsl:template match="text()[not(parent::w:t)][matches(., '^&#xa;$')]" mode="wml-to-dbk" priority="2">
+    <xsl:next-match/>
+  </xsl:template>
 
   <xsl:template match="@role" mode="wml-to-dbk" priority="2">
     <xsl:attribute name="role" select="replace(., ' ', '_')" />
