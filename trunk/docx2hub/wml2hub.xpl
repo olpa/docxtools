@@ -163,6 +163,18 @@
       <p:pipe step="unzip" port="result"/>
     </p:with-option>
   </p:add-attribute>
+  
+  <p:store>
+    <p:with-option name="href" select="concat($docx, '.hub')"/>
+  </p:store>
+  
+  <p:identity>
+    <p:input port="source">
+      <p:inline>
+        <c:request>OK</c:request>
+      </p:inline>
+    </p:input>
+  </p:identity>
 
   <letex:prepend-hub-xml-model name="pi">
     <p:with-option name="hub-version" select="$hub-version"/>
