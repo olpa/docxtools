@@ -774,9 +774,7 @@
     <xsl:param name="nodes" as="node()*"/>
     <xsl:variable name="text-tokens" select="for $x in $nodes//text() return $x"/>
     <xsl:element name="mediaobject">
-      <xsl:attribute name="style" select="'imagedata'"/>
       <imageobject>
-        <xsl:attribute name="style" select="'width:3in;height:3in'"/>
         <imagedata fileref="{replace(tokenize($instr, ' ')[matches(.,'^&#x22;.*&#x22;$')][1],'&#x22;','')}"/>
       </imageobject>
     </xsl:element>
@@ -803,7 +801,7 @@
   <xsl:template match="w:drawing" mode="wml-to-dbk">
     <xsl:choose>
       <xsl:when test="exists(wp:inline/wp:docPr[@descr and matches(@descr,'\.([Jj][pP][gG]|[gG][iI][fF]|[pP][nN][gG]|[tT][iI][fF][fF]?)$')])">
-        <mediaobject style="imagedata">
+        <mediaobject>
           <imageobject>
             <imagedata fileref="{wp:inline/wp:docPr/@descr}"/>
           </imageobject>
