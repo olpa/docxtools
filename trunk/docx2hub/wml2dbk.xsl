@@ -14,7 +14,7 @@
   xmlns:css="http://www.w3.org/1996/css"
   xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
   xmlns="http://docbook.org/ns/docbook"
-  exclude-result-prefixes = "w xs dbk r rel letex m mc xlink docx2hub"
+  exclude-result-prefixes = "w xs dbk r rel letex m mc xlink docx2hub wp"
 >
 
   <!-- ================================================================================ -->
