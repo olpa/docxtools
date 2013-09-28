@@ -36,7 +36,8 @@
 <!--           <xsl:attribute name="width" select="w:tblPr/w:tblW/@w:w"/> -->
         </xsl:if>
         <xsl:apply-templates select="w:tblGrid" mode="colspec">
-          <xsl:with-param name="width" select="if (w:tblPr/w:tblW/@w:type = 'pct') then 0 else w:tblPr/w:tblW/@w:w" tunnel="yes"/>
+          <xsl:with-param name="width" 
+            select="if (not(w:tblPr/w:tblW) or w:tblPr/w:tblW/@w:type = 'pct') then 0 else w:tblPr/w:tblW/@w:w" tunnel="yes"/>
         </xsl:apply-templates>
         <xsl:if test="w:tr[w:trPr/w:tblHeader]">
           <thead>
