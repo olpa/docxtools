@@ -26,6 +26,9 @@
     <p:empty/>
   </p:input>
   <p:output port="result" primary="true"/>
+  <p:output port="insert-xpath">
+    <p:pipe step="insert-xpath" port="result"/>
+  </p:output>
     
   <p:option name="docx" required="true">
     <p:documentation>A file name as recognized by your system's JVM. Not a file: URI.</p:documentation>
@@ -100,6 +103,8 @@
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
     <p:with-param name="srcpaths" select="$srcpaths"/>
   </letex:xslt-mode>
+
+  <p:identity name="insert-xpath" />
   
   <letex:xslt-mode msg="yes" mode="docx2hub:add-props">
     <p:input port="parameters"><p:pipe step="params" port="result" /></p:input>
