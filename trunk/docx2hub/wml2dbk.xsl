@@ -824,7 +824,7 @@
 
   <xsl:template match="w:br" mode="wml-to-dbk">
     <br>
-      <xsl:apply-templates select="@w:type" mode="#current"/>
+      <xsl:apply-templates select="@srcpath, @w:type" mode="#current"/>
     </br>
   </xsl:template>
   
