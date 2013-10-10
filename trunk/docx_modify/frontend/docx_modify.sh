@@ -61,6 +61,10 @@ if [ -z $DEBUG ]; then
     DEBUG=no
 fi
 
+if [ -z $DEBUGDIR ]; then
+    DEBUGDIR=$DOCX.tmp/debug
+fi
+
 if [ -z $HEAP ]; then
     HEAP=1024m
 fi
@@ -78,4 +82,4 @@ if [ ! -z $MODIFY_XPL ]; then
   MODIFY_XPL="-i xpl=$MODIFY_XPL"
 fi
 
-$DIR/calabash/calabash.sh -i xslt="$XSL" $MODIFY_XPL "$XPL" file="$DOCX" debug=$DEBUG
+$DIR/calabash/calabash.sh -i xslt="$XSL" $MODIFY_XPL "$XPL" file="$DOCX" debug=$DEBUG debug-dir-uri=$DEBUGDIR
