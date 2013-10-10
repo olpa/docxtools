@@ -127,25 +127,25 @@
   </xsl:template>
 
   <xsl:template name="debug">
-    <xsl:result-document href="{letex:resolve-uri($debug-dir, '/01_insert-xpath.xml')}" format="debug">
+    <xsl:result-document href="{resolve-uri(concat($debug-dir, '/01_insert-xpath.xml'))}" format="debug">
       <xsl:sequence select="$insert-xpath"/>
     </xsl:result-document>
-    <xsl:result-document href="{letex:resolve-uri($debug-dir, '/03_add-props.xml')}" format="debug">
+    <xsl:result-document href="{resolve-uri(concat($debug-dir, '/03_add-props.xml'))}" format="debug">
       <xsl:sequence select="$docx2hub:add-props"/>
     </xsl:result-document>
-    <xsl:result-document href="{letex:resolve-uri($debug-dir, '/04_props2atts.xml')}" format="debug">
+    <xsl:result-document href="{resolve-uri(concat($debug-dir, '/04_props2atts.xml'))}" format="debug">
       <xsl:sequence select="$docx2hub:props2atts"/>
     </xsl:result-document>
-    <xsl:result-document href="{letex:resolve-uri($debug-dir, '/05_remove-redundant-run-atts.xml')}" format="debug">
+    <xsl:result-document href="{resolve-uri(concat($debug-dir, '/05_remove-redundant-run-atts.xml'))}" format="debug">
       <xsl:sequence select="$docx2hub:remove-redundant-run-atts"/>
     </xsl:result-document>
-    <xsl:result-document href="{letex:resolve-uri($debug-dir, '/11_separate-field-functions.xml')}" format="debug">
+    <xsl:result-document href="{resolve-uri(concat($debug-dir, '/11_separate-field-functions.xml'))}" format="debug">
       <xsl:sequence select="$docx2hub:separate-field-functions"/>
     </xsl:result-document>
-    <xsl:result-document href="{letex:resolve-uri($debug-dir, '/20_wml-to-dbk.xml')}" format="debug">
+    <xsl:result-document href="{resolve-uri(concat($debug-dir, '/20_wml-to-dbk.xml'))}" format="debug">
       <xsl:sequence select="$wml-to-dbk"/>
     </xsl:result-document>
-    <xsl:result-document href="{letex:resolve-uri($debug-dir, '/24_join-runs.xml')}" format="debug">
+    <xsl:result-document href="{resolve-uri(concat($debug-dir, '/24_join-runs.xml'))}" format="debug">
       <xsl:sequence select="$docx2hub:join-runs"/>
     </xsl:result-document>
   </xsl:template>

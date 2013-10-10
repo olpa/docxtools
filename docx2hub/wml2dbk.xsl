@@ -23,7 +23,6 @@
 
   <xsl:import href="modules/catch-all/catch-all.xsl"/>
   <xsl:import href="modules/error-handler/error-handler.xsl"/>
-  <xsl:import href="http://transpect.le-tex.de/xslt-util/resolve-uri/resolve-uri.xsl"/>
 
   <xsl:param name="debug" select="'yes'" as="xs:string?"/>
   <xsl:param name="srcpaths" select="'no'" as="xs:string?"/>
