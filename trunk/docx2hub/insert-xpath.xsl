@@ -84,16 +84,25 @@
         </w:docTypes>
         <w:docRels>
           <xsl:apply-templates select="document(resolve-uri('_rels/document.xml.rels', base-uri()))/rel:Relationships" mode="#current"/>
+        </w:docRels>
+        <w:headerRels>
           <xsl:for-each select="document(resolve-uri('_rels/document.xml.rels', base-uri()))/rel:Relationships/rel:Relationship[
-                                  @Type = (
-                                    'http://schemas.openxmlformats.org/officeDocument/2006/relationships/header',
-                                    'http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer'
-                                  )]">
+                                  @Type eq 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/header'
+                                ]">
             <xsl:if test="doc-available(resolve-uri(concat(@Target, '.rels'), base-uri()))">
               <xsl:apply-templates select="document(resolve-uri(concat(@Target, '.rels'), base-uri()))/rel:Relationships" mode="#current"/>
             </xsl:if>
           </xsl:for-each>
-        </w:docRels>
+        </w:headerRels>
+        <w:footerRels>
+          <xsl:for-each select="document(resolve-uri('_rels/document.xml.rels', base-uri()))/rel:Relationships/rel:Relationship[
+                                  @Type eq 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer'
+                                ]">
+            <xsl:if test="doc-available(resolve-uri(concat(@Target, '.rels'), base-uri()))">
+              <xsl:apply-templates select="document(resolve-uri(concat(@Target, '.rels'), base-uri()))/rel:Relationships" mode="#current"/>
+            </xsl:if>
+          </xsl:for-each>
+        </w:footerRels>
         <xsl:if test="doc-available(resolve-uri('_rels/footnotes.xml.rels', base-uri()))">
           <w:footnoteRels>
             <xsl:apply-templates select="document(resolve-uri('_rels/footnotes.xml.rels', base-uri()))/rel:Relationships" mode="#current"/>
