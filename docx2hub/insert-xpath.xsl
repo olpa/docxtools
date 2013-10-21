@@ -100,15 +100,21 @@
         <!-- apply header and footer content and relations -->
         <xsl:for-each select="('header', 'footer')">
           <xsl:variable name="type" select="current()" as="xs:string"/>
-          <xsl:element name="w:{$type}Rels">
-            <xsl:for-each select="document(resolve-uri('_rels/document.xml.rels', $base-uri))/rel:Relationships/rel:Relationship[
-                                    @Type eq concat('http://schemas.openxmlformats.org/officeDocument/2006/relationships/', $type)
-                                  ]">
-              <xsl:if test="doc-available(resolve-uri(concat('_rels/', @Target, '.rels'), $base-uri))">
-                <xsl:apply-templates select="document(resolve-uri(concat('_rels/', @Target, '.rels'), $base-uri))/rel:Relationships" mode="#current"/>
-              </xsl:if>
-            </xsl:for-each>
-          </xsl:element>
+          <xsl:if test="some $rel-file
+                        in document(resolve-uri('_rels/document.xml.rels', $base-uri))/rel:Relationships/rel:Relationship[
+                          @Type eq concat('http://schemas.openxmlformats.org/officeDocument/2006/relationships/', $type)
+                        ]/@Target
+                        satisfies doc-available(resolve-uri(concat('_rels/', $rel-file, '.rels'), $base-uri))">
+            <xsl:element name="w:{$type}Rels">
+              <xsl:for-each select="document(resolve-uri('_rels/document.xml.rels', $base-uri))/rel:Relationships/rel:Relationship[
+                                      @Type eq concat('http://schemas.openxmlformats.org/officeDocument/2006/relationships/', $type)
+                                    ]">
+                <xsl:if test="doc-available(resolve-uri(concat('_rels/', @Target, '.rels'), $base-uri))">
+                  <xsl:apply-templates select="document(resolve-uri(concat('_rels/', @Target, '.rels'), $base-uri))/rel:Relationships" mode="#current"/>
+                </xsl:if>
+              </xsl:for-each>
+            </xsl:element>
+          </xsl:if>
           <xsl:element name="w:{$type}">
             <xsl:for-each select="document(resolve-uri('_rels/document.xml.rels', $base-uri))/rel:Relationships/rel:Relationship[
                                   @Type eq concat('http://schemas.openxmlformats.org/officeDocument/2006/relationships/', $type)
