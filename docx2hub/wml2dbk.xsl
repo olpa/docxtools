@@ -13,6 +13,7 @@
   xmlns:docx2hub = "http://www.le-tex.de/namespace/docx2hub"
   xmlns:css="http://www.w3.org/1996/css"
   xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+  xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
   xmlns="http://docbook.org/ns/docbook"
   exclude-result-prefixes = "w xs dbk r rel letex m mc xlink docx2hub wp"
 >
@@ -798,7 +799,35 @@
 
   <!-- drawing -->
   <xsl:template match="w:drawing" mode="wml-to-dbk">
+    <!-- the relationship between a image object and its file reference is a id reference between -->
+    <xsl:variable name="relationships-uri" select="concat($base-dir, '_rels/document.xml.rels' )" as="xs:string"/>
+    <xsl:variable name="relationships" select="document($relationships-uri)/rel:Relationships/rel:Relationship
+      [@Type eq 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image']" as="element(rel:Relationship)*"/>
     <xsl:choose>
+      <!-- this branch is for embedded pictures, never worked so far -->
+      <xsl:when test="descendant::a:blip[@r:embed]">
+        <xsl:variable name="relationship-id" select="descendant::a:blip/@r:embed" as="xs:string"/>
+        <xsl:variable name="file-uri" select="concat($base-dir, $relationships[@Id eq $relationship-id]/@Target)" as="xs:string"/>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="{$file-uri}"/>
+          </imageobject>
+        </mediaobject>
+      </xsl:when>
+      <!-- this branch is for linked pictures, now with the full uri instead of filename only -->
+      <xsl:when test="descendant::a:blip[@r:link]">
+        <xsl:variable name="relationship-id" select="descendant::a:blip/@r:link" as="xs:string"/>
+        <xsl:variable name="file-uri" select="$relationships[@Id eq $relationship-id]/@Target" as="xs:string"/>
+        <xsl:variable name="patch-file-uri" select="replace(
+            replace($file-uri, '(file:/)//(.+)', '$1$2'),
+            '\\', '/')" as="xs:string"/>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="{$patch-file-uri}"/>
+          </imageobject>
+        </mediaobject>
+      </xsl:when>
+      <!-- to be replaced or dropped soon -->
       <xsl:when test="exists(wp:inline/wp:docPr[@descr and matches(@descr,'\.([Jj][pP][gG]|[gG][iI][fF]|[pP][nN][gG]|[tT][iI][fF][fF]?)$')])">
         <mediaobject>
           <imageobject>
