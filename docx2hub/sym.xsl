@@ -47,7 +47,7 @@
         <xsl:with-param name="error-code" select="'W2D_080'"/>
         <xsl:with-param name="exit" select="'yes'"/>
         <xsl:with-param name="hash">
-          <value key="xpath"><xsl:value-of select="@srcpath"/></value>
+          <value key="xpath"><xsl:value-of select="(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]"/></value>
           <value key="level">INT</value>
         </xsl:with-param>
       </xsl:call-template>
@@ -72,7 +72,7 @@
         <xsl:otherwise>
           <xsl:choose>
             <xsl:when test="self::w:sym">
-              <symbol css:font-family="{$font}">
+              <symbol css:font-family="{$font}" srcpath="{(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]}">
                 <xsl:value-of select="$number"/>
               </symbol>
             </xsl:when>
@@ -83,7 +83,7 @@
                   <xsl:with-param name="error-code" select="'W2D_601'"/>
                   <xsl:with-param name="exit" select="'no'"/>
                   <xsl:with-param name="hash">
-                    <value key="xpath"><xsl:value-of select="@srcpath"/></value>
+                    <value key="xpath"><xsl:value-of select="(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]"/></value>
                     <value key="level">WRN</value>
                     <value key="info-text"><xsl:value-of select="$font"/> (0x<xsl:value-of select="letex:dec-to-hex(string-to-codepoints($number))"/>)</value>
                     <value key="pi">Zeichen <xsl:value-of select="string-to-codepoints($number)"/> aus Font <xsl:value-of select="$font"/> konnte nicht gemappt werden</value>
@@ -108,7 +108,7 @@
           <xsl:with-param name="error-code" select="'W2D_601'"/>
           <xsl:with-param name="exit" select="'no'"/>
           <xsl:with-param name="hash">
-            <value key="xpath"><xsl:value-of select="@srcpath"/></value>
+            <value key="xpath"><xsl:value-of select="(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]"/></value>
             <value key="level">WRN</value>
             <value key="info-text"><xsl:value-of select="$font"/> (0x<xsl:value-of select="$text"/>)</value>
             <value key="pi">Zeichen <xsl:value-of select="string-to-codepoints($text)"/> aus Font <xsl:value-of select="$font"/> konnte nicht gemappt werden</value>
@@ -139,14 +139,14 @@
                   <xsl:with-param name="error-code" select="'W2D_601'"/>
                   <xsl:with-param name="exit" select="'no'"/>
                   <xsl:with-param name="hash">
-                    <value key="xpath"><xsl:value-of select="$context/@srcpath"/></value>
+                    <value key="xpath"><xsl:value-of select="$context/(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]"/></value>
                     <value key="level">WRN</value>
                     <value key="info-text"><xsl:value-of select="concat($font, ': ', $tokens[2])"/></value>
                     <value key="pi">Zeichen <xsl:value-of select="string-to-codepoints($tokens[2])"/> aus Font <xsl:value-of select="$font"/> konnte nicht gemappt werden</value>
                     <value key="comment"/>
                   </xsl:with-param>
                 </xsl:call-template>
-                <symbol font-family="{$font}">
+                <symbol css:font-family="{$font}" srcpath="{(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]}">
                   <xsl:value-of select="$tokens[2]"/>
                 </symbol>
               </xsl:when>
@@ -160,14 +160,14 @@
               <xsl:with-param name="error-code" select="'W2D_601'"/>
               <xsl:with-param name="exit" select="'no'"/>
               <xsl:with-param name="hash">
-                <value key="xpath"><xsl:value-of select="$context/@srcpath"/></value>
+                <value key="xpath"><xsl:value-of select="$context/(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]"/></value>
                 <value key="level">WRN</value>
                 <value key="info-text"><xsl:value-of select="concat($font, ': ', $tokens[2])"/></value>
                 <value key="pi">Zeichen <xsl:value-of select="string-to-codepoints($tokens[2])"/> aus Font <xsl:value-of select="$font"/> konnte nicht gemappt werden</value>
                 <value key="comment"/>
               </xsl:with-param>
             </xsl:call-template>
-            <symbol font-family="{$font}">
+            <symbol css:font-family="{$font}" srcpath="{(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]}">
               <xsl:value-of select="$tokens[2]"/>
             </symbol>
           </xsl:otherwise>
@@ -178,7 +178,7 @@
           <xsl:with-param name="error-code" select="'W2D_602'"/>
           <xsl:with-param name="exit" select="'no'"/>
           <xsl:with-param name="hash">
-            <value key="xpath"><xsl:value-of select="$context/@srcpath"/></value>
+            <value key="xpath"><xsl:value-of select="$context/(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]"/></value>
             <value key="level">WRN</value>
             <value key="info-text"><xsl:value-of select="string-join($tokens, ' ')"/></value>
             <value key="comment"/>
