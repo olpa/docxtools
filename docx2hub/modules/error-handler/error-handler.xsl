@@ -75,7 +75,7 @@
           <xsl:message select="concat('##  Level: ', $hash/*:value[@key = 'level'])"/>
         </xsl:if>
         <xsl:if test="$hash/*:value[@key = 'comment']">
-          <letex:comment xpath="{$hash/*:value[@key = 'xpath']}">
+          <letex:comment srcpath="{$hash/*:value[@key = 'xpath']}">
             <xsl:value-of select="$msg-text"/>
           </letex:comment>
         </xsl:if>
