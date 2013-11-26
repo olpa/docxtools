@@ -415,7 +415,8 @@
         </xsl:choose>
       </xsl:variable>
       <xsl:attribute name="morerows" select="$counts[1]" />
-      <xsl:attribute name="css:border-bottom-style" select="'none'" />
+      <!-- uncommented, mk: do not invent information where none exist -->
+      <!--<xsl:attribute name="css:border-bottom-style" select="'none'" />-->
     </xsl:if>
   </xsl:template>
 
