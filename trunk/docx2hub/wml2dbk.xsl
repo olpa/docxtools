@@ -774,6 +774,7 @@
     <xsl:param name="nodes" as="node()*"/>
     <xsl:variable name="text-tokens" select="for $x in $nodes//text() return $x"/>
     <xsl:element name="mediaobject">
+      <xsl:apply-templates select="($nodes//@srcpath)[1]" mode="#current"/>
       <imageobject>
         <imagedata fileref="{replace(tokenize($instr, ' ')[matches(.,'^&#x22;.*&#x22;$')][1],'&#x22;','')}"/>
       </imageobject>
@@ -809,6 +810,7 @@
         <xsl:variable name="relationship-id" select="descendant::a:blip/@r:embed" as="xs:string"/>
         <xsl:variable name="file-uri" select="concat($base-dir, $relationships[@Id eq $relationship-id]/@Target)" as="xs:string"/>
         <mediaobject>
+          <xsl:apply-templates select="@srcpath" mode="#current"/>
           <imageobject>
             <imagedata fileref="{$file-uri}"/>
           </imageobject>
@@ -822,6 +824,7 @@
             replace($file-uri, '(file:/)//(.+)', '$1$2'),
             '\\', '/')" as="xs:string"/>
         <mediaobject>
+          <xsl:apply-templates select="@srcpath" mode="#current"/>
           <imageobject>
             <imagedata fileref="{$patch-file-uri}"/>
           </imageobject>
@@ -830,6 +833,7 @@
       <!-- to be replaced or dropped soon -->
       <xsl:when test="exists(wp:inline/wp:docPr[@descr and matches(@descr,'\.([Jj][pP][gG]|[gG][iI][fF]|[pP][nN][gG]|[tT][iI][fF][fF]?)$')])">
         <mediaobject>
+          <xsl:apply-templates select="@srcpath" mode="#current"/>
           <imageobject>
             <imagedata fileref="{wp:inline/wp:docPr/@descr}"/>
           </imageobject>
@@ -837,6 +841,7 @@
       </xsl:when>
       <xsl:when test="exists(wp:inline/wp:docPr/@name)">
         <mediaobject>
+          <xsl:apply-templates select="@srcpath" mode="#current"/>
           <imageobject>
             <imagedata fileref="{wp:inline/wp:docPr/@name}"/>
           </imageobject>
