@@ -39,7 +39,20 @@
                           )"/>
   </xsl:function>
 
-  <xsl:template match="*[ self::w:p or self::w:t or self::w:tbl or self::w:tc or self::w:hyperlink or self::w:r or self::w:br ]
+  <xsl:variable name="docx2hub:srcpath-elements" as="xs:string+"
+    select="( 'w:p',
+              'w:t',
+              'w:tbl',
+              'w:tc',
+              'w:hyperlink',
+              'w:r',
+              'w:br',
+              'v:imagedata',
+              'o:OLEObject',
+              'w:drawing'
+            )"/>
+
+  <xsl:template match="*[ name() = $docx2hub:srcpath-elements ]
                         [ /*/name() = ('w:document', 'w:footnotes', 'w:endnotes', 'w:comments')]" mode="insert-xpath">
     <xsl:copy copy-namespaces="no">
       <xsl:if test="$srcpaths eq 'yes'">
