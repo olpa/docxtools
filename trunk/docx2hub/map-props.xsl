@@ -790,7 +790,7 @@
           <xsl:sequence select="$remaining-tabs" />
         </tabs>
       </xsl:if>
-      <xsl:apply-templates select="* except (docx2hub:attribute | docx2hub:color-percentage | docx2hub:wrap | docx2hub:style-link | dbk:tabs)" mode="#current" />
+      <xsl:apply-templates select="node() except (docx2hub:attribute | docx2hub:color-percentage | docx2hub:wrap | docx2hub:style-link | dbk:tabs)" mode="#current" />
     </xsl:variable>
     <xsl:choose>
       <xsl:when test="exists(docx2hub:wrap) and exists(self::css:rule | self::dbk:style)">
