@@ -808,7 +808,7 @@
       <!-- this branch is for embedded pictures, never worked so far -->
       <xsl:when test="descendant::a:blip[@r:embed]">
         <xsl:variable name="relationship-id" select="descendant::a:blip/@r:embed" as="xs:string"/>
-        <xsl:variable name="file-uri" select="concat($base-dir, $relationships[@Id eq $relationship-id]/@Target)" as="xs:string"/>
+        <xsl:variable name="file-uri" select="concat('container:', $relationships[@Id eq $relationship-id]/@Target)" as="xs:string"/>
         <mediaobject>
           <xsl:apply-templates select="@srcpath" mode="#current"/>
           <imageobject>
