@@ -52,51 +52,6 @@
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
-  <xsl:template match="v:imagedata" mode="vml">
-    <xsl:param name="inline" select="false()" as="xs:boolean" tunnel="yes"/>
-    <xsl:variable name="key-name" as="xs:string"
-      select="if (ancestor::w:footnote)
-              then 'footnote-rel-by-id'
-              else 'doc-rel-by-id'" />
-    <xsl:variable name="styles" select="tokenize(parent::v:shape/@style,';')" as="xs:string*"/>
-    <xsl:element name="{if ($inline) then 'inlinemediaobject' else 'mediaobject'}">
-      <xsl:attribute name="role" select="'imagedata'"/>
-      <imageobject>
-        <!-- If these values are relevant, they have to be parsed and transformed to css: attributes.
-        <xsl:attribute name="style" select="parent::v:shape/@style"/>
-        -->
-        <xsl:apply-templates select="@* except @r:id" mode="#current"/>
-        <imagedata fileref="{key($key-name, current()/@r:id)/@Target}">
-          <xsl:if test="$styles[matches(.,'^width')]">
-            <xsl:attribute name="width" select="tokenize($styles[matches(.,'^width')],':')[2]"/>
-          </xsl:if>
-          <xsl:if test="$styles[matches(.,'^height')]">
-            <xsl:attribute name="depth" select="tokenize($styles[matches(.,'^height')],':')[2]"/>
-          </xsl:if>
-        </imagedata>
-      </imageobject>
-      <xsl:variable name="img-file-name" select="key($key-name, current()/@r:id)/@Target" as="xs:string?" />
-      <xsl:if test="empty($img-file-name)">
-        <xsl:message>KN:<xsl:value-of select="$key-name"/>
-          RID:<xsl:copy-of select="current()/@r:id"/>
-          IF:<xsl:copy-of select="key($key-name, current()/@r:id)"/>
-        </xsl:message>  
-      </xsl:if>
-      <xsl:if test="matches($img-file-name, '^media/image[0-9]+\.(jpe?g|png|tiff?)$')">
-        <xsl:call-template name="signal-error">
-          <xsl:with-param name="error-code" select="'W2D_502'"/>
-          <xsl:with-param name="exit" select="'no'"/>
-          <xsl:with-param name="hash">
-            <value key="xpath"><xsl:value-of select="@srcpath"/></value>
-            <value key="level">WRN</value>
-            <value key="comment"/>
-            <value key="info-text"><xsl:value-of select="$img-file-name"/></value>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:if>
-    </xsl:element>
-  </xsl:template>
-
   <xsl:template match="@o:title[parent::v:imagedata]" mode="vml">
   </xsl:template>
 
@@ -150,6 +105,7 @@
   <xsl:template match="@Type[parent::o:OLEObject]" mode="vml">
   </xsl:template>
 
+  <!-- see in images.xsl for v:shape with child v:imagedata -->
   <xsl:template match="v:shape" mode="vml">
     <!-- process attributes at child -->
     <xsl:apply-templates mode="#current"/>

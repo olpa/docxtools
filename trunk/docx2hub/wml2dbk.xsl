@@ -14,6 +14,7 @@
   xmlns:css="http://www.w3.org/1996/css"
   xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
   xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+  xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns="http://docbook.org/ns/docbook"
   exclude-result-prefixes = "w xs dbk r rel letex m mc xlink docx2hub wp"
 >
@@ -55,6 +56,7 @@
   <xsl:include href="index.xsl"/>
   <xsl:include href="numbering.xsl"/>
   <xsl:include href="objects.xsl"/>
+  <xsl:include href="images.xsl"/>
   <xsl:include href="omml2mml/omml2mml.xsl"/>
 <!--   <xsl:include href="para-props.xsl"/> -->
   <xsl:include href="sym.xsl"/>
@@ -796,58 +798,6 @@
   <xsl:template match="w:fldSimple" mode="wml-to-dbk">
     <!-- p1592 gehört zu Feldfunktionen. Wenn w:t darunter, muss der geschrieben werden -->
     <xsl:apply-templates mode="#current"/>
-  </xsl:template>
-
-  <!-- drawing -->
-  <xsl:template match="w:drawing" mode="wml-to-dbk">
-    <!-- the relationship between a image object and its file reference is a id reference between -->
-    <xsl:variable name="relationships-uri" select="concat($base-dir, '_rels/document.xml.rels' )" as="xs:string"/>
-    <xsl:variable name="relationships" select="document($relationships-uri)/rel:Relationships/rel:Relationship
-      [@Type eq 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image']" as="element(rel:Relationship)*"/>
-    <xsl:choose>
-      <!-- this branch is for embedded pictures, never worked so far -->
-      <xsl:when test="descendant::a:blip[@r:embed]">
-        <xsl:variable name="relationship-id" select="descendant::a:blip/@r:embed" as="xs:string"/>
-        <xsl:variable name="file-uri" select="concat('container:', $relationships[@Id eq $relationship-id]/@Target)" as="xs:string"/>
-        <mediaobject>
-          <xsl:apply-templates select="@srcpath" mode="#current"/>
-          <imageobject>
-            <imagedata fileref="{$file-uri}"/>
-          </imageobject>
-        </mediaobject>
-      </xsl:when>
-      <!-- this branch is for linked pictures, now with the full uri instead of filename only -->
-      <xsl:when test="descendant::a:blip[@r:link]">
-        <xsl:variable name="relationship-id" select="descendant::a:blip/@r:link" as="xs:string"/>
-        <xsl:variable name="file-uri" select="$relationships[@Id eq $relationship-id]/@Target" as="xs:string"/>
-        <xsl:variable name="patch-file-uri" select="replace(
-            replace($file-uri, '(file:/)//(.+)', '$1$2'),
-            '\\', '/')" as="xs:string"/>
-        <mediaobject>
-          <xsl:apply-templates select="@srcpath" mode="#current"/>
-          <imageobject>
-            <imagedata fileref="{$patch-file-uri}"/>
-          </imageobject>
-        </mediaobject>
-      </xsl:when>
-      <!-- to be replaced or dropped soon -->
-      <xsl:when test="exists(wp:inline/wp:docPr[@descr and matches(@descr,'\.([Jj][pP][gG]|[gG][iI][fF]|[pP][nN][gG]|[tT][iI][fF][fF]?)$')])">
-        <mediaobject>
-          <xsl:apply-templates select="@srcpath" mode="#current"/>
-          <imageobject>
-            <imagedata fileref="{wp:inline/wp:docPr/@descr}"/>
-          </imageobject>
-        </mediaobject>
-      </xsl:when>
-      <xsl:when test="exists(wp:inline/wp:docPr/@name)">
-        <mediaobject>
-          <xsl:apply-templates select="@srcpath" mode="#current"/>
-          <imageobject>
-            <imagedata fileref="{wp:inline/wp:docPr/@name}"/>
-          </imageobject>
-        </mediaobject>
-      </xsl:when>
-    </xsl:choose>
   </xsl:template>
 
   <!-- whitespace elements, etc. -->
