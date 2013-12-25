@@ -47,7 +47,9 @@
         <prop name="w:bdr" type="docx-bdr" />
         <prop name="w:bidi" type="docx-boolean-prop" target-name="css:direction" default="ltr" active="rtl"/>
         <prop name="w:caps" type="docx-boolean-prop" target-name="css:text-transform" active="uppercase"/>
+        <prop name="w:cantSplit" type="docx-boolean-prop" target-name="css:break-inside" active="avoid"/>
         <prop name="w:color" type="docx-color" target-name="css:color"/>
+        <prop name="w:contextualSpacing" implement="maybe later"/><!-- collapsible spacing between same-style paras, boolean prop. §17.3.1.9 -->
         <prop name="w:gridSpan" /><!-- will be calculated by tables.xsl -->
         <prop name="w:highlight" type="docx-color" target-name="css:background-color"/>
         <prop name="w:i" type="docx-boolean-prop" target-name="css:font-style" default="normal" active="italic"/>
@@ -154,6 +156,7 @@
         <prop name="w:tcMar/w:top" type="docx-padding" />
         <prop name="w:tcW/@w:w" type="docx-length-attr" target-name="css:width"/>
         <prop name="w:textDirection" type="docx-text-direction"/>
+        <prop name="w:trHeight" type="docx-table-row-height"/>
         <prop name="w:u" type="docx-underline" />
         <prop name="w:uiPriority" />
         <prop name="w:unhideWhenUsed" />
