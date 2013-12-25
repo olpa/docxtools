@@ -538,6 +538,20 @@
         </xsl:choose>
       </xsl:when>
 
+      <xsl:when test=". eq 'docx-table-row-height'">
+        <xsl:variable name="pt-length" select="docx2hub:pt-length($val/@w:val)" as="xs:string"/>
+        <xsl:choose>
+          <xsl:when test="$val/@w:hRule = 'auto'"/>
+          <xsl:when test="$val/@w:hRule = 'atLeast'">
+            <docx2hub:attribute name="css:min-height"><xsl:value-of select="$pt-length" /></docx2hub:attribute>    
+          </xsl:when>
+          <xsl:when test="$val/@w:hRule = 'exact'">
+            <docx2hub:attribute name="css:height"><xsl:value-of select="$pt-length" /></docx2hub:attribute>    
+          </xsl:when>
+        </xsl:choose>
+        
+      </xsl:when>
+      
       <xsl:when test=". eq 'docx-underline'">
         <!-- §§§ TODO -->
         <docx2hub:attribute name="css:text-decoration-line"><xsl:value-of select="'underline'" /></docx2hub:attribute>
@@ -704,6 +718,9 @@
     <xsl:choose>
       <xsl:when test="$val eq 'single'">
         <xsl:sequence select="'solid'" />
+      </xsl:when>
+      <xsl:when test="$val eq 'nil'">
+        <xsl:sequence select="'none'" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:sequence select="$val" />
