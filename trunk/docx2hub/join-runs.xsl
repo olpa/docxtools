@@ -132,7 +132,14 @@
   
   <!-- @type = ('column', 'page') --> 
   <xsl:template match="dbk:br[@role[not(. eq 'textWrapping')]]" mode="docx2hub:join-runs-br-attr">
-    <xsl:attribute name="css:page-break-after" select="'always'"/>
+    <xsl:choose>
+      <xsl:when test=". is ancestor::dbk:para[1]/node()[1]">
+        <xsl:attribute name="css:page-break-before" select="'always'"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name="css:page-break-after" select="'always'"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!-- sidebar -->
