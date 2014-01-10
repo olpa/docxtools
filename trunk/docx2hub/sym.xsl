@@ -72,9 +72,8 @@
         <xsl:otherwise>
           <xsl:choose>
             <xsl:when test="self::w:sym">
-              <symbol css:font-family="{$font}" srcpath="{(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]}">
-                <xsl:value-of select="$number"/>
-              </symbol>
+              <phrase xmlns="http://docbook.org/ns/docbook" role="hub:ooxml-symbol" css:font-family="{$font}" annotations="{$number}"
+                srcpath="{(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]}"/>
             </xsl:when>
             <xsl:otherwise>
               <text>
@@ -115,10 +114,12 @@
             <value key="comment"/>
           </xsl:with-param>
         </xsl:call-template>
-        <xsl:element name="{$text/name()}">
-          <xsl:copy-of select="$text/@*"/>
-          <xsl:value-of select="$text"/>
-        </xsl:element>
+        <xsl:for-each select="$text">
+          <xsl:copy>
+            <xsl:copy-of select="@*"/>
+            <xsl:value-of select="."/>
+          </xsl:copy>
+        </xsl:for-each>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -146,9 +147,8 @@
                     <value key="comment"/>
                   </xsl:with-param>
                 </xsl:call-template>
-                <symbol css:font-family="{$font}" srcpath="{(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]}">
-                  <xsl:value-of select="$tokens[2]"/>
-                </symbol>
+                <phrase xmlns="http://docbook.org/ns/docbook" role="hub:ooxml-symbol" css:font-family="{$font}" annotations="{$tokens[2]}"
+                  srcpath="{(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]}"/>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="key('symbol-by-number', upper-case($number), $symbol-font-map)/@char"/>
@@ -167,9 +167,8 @@
                 <value key="comment"/>
               </xsl:with-param>
             </xsl:call-template>
-            <symbol css:font-family="{$font}" srcpath="{(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]}">
-              <xsl:value-of select="$tokens[2]"/>
-            </symbol>
+            <phrase xmlns="http://docbook.org/ns/docbook" role="hub:ooxml-symbol" css:font-family="{$font}" annotations="{$tokens[2]}" 
+              srcpath="{(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]}"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
