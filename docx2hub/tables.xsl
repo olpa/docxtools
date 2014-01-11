@@ -49,7 +49,7 @@
           </thead>
         </xsl:if>
         <tbody>
-          <xsl:apply-templates select="node() except w:tr[w:trPr/w:tblHeader]" mode="tables">
+          <xsl:apply-templates select="* except w:tr[w:trPr/w:tblHeader]" mode="tables">
             <xsl:with-param name="cols" select="count(w:tblGrid/w:gridCol)" tunnel="yes"/>
             <xsl:with-param name="width" select="w:tblPr/w:tblW/@w:w" tunnel="yes"/>
             <xsl:with-param name="col-widths" select="(for $x in w:tblGrid/w:gridCol return $x/@w:w)" tunnel="yes"/>
@@ -79,12 +79,13 @@
   </xsl:template>
      
   <xsl:template match="w:tblGrid/w:gridCol" mode="colspec">
+    <xsl:variable name="pos" select="index-of(for $elt in ../* return generate-id($elt), generate-id())" as="xs:integer"/>
     <colspec>
       <xsl:attribute name="colnum">
-        <xsl:value-of select="position()"/>
+        <xsl:value-of select="$pos"/>
       </xsl:attribute>
       <xsl:attribute name="colname">
-        <xsl:value-of select="concat('col', position())"/>
+        <xsl:value-of select="concat('col', $pos)"/>
       </xsl:attribute>
       <xsl:if test="@w:w != ''">
         <xsl:attribute name="colwidth" select="docx2hub:twips2mm(@w:w)"/>
@@ -175,8 +176,7 @@
     <xsl:apply-templates select="." mode="wml-to-dbk"/>
   </xsl:template>
 
-  <!-- w:vMerge ohne Attribute bedeutet: Zelle, die von einem morerows-entry der vorigen Zeile okkupiert wird und die nicht in CALS erscheinen soll -->
-  <xsl:template match="w:tc[not(w:tcPr/w:vMerge[count(@* except @srcpath) = 0])]" mode="tables">
+  <xsl:template match="w:tc[not(docx2hub:is-blind-vmerged-cell(.))]" mode="tables">
     <xsl:param name="col-widths" tunnel="yes" as="xs:integer*"/>
     <xsl:element name="entry">
       <xsl:copy-of select="ancestor::w:tbl/w:tblPr/@css:* except ancestor::w:tbl/w:tblPr/@css:width"/>
@@ -375,7 +375,7 @@
   </xsl:function>
 
 
-  <xsl:template match="w:tc[w:tcPr/w:vMerge[count(@* except @srcpath) = 0]]" mode="tables"/>
+  <xsl:template match="w:tc[docx2hub:is-blind-vmerged-cell(.)]" mode="tables"/>
 
   <xsl:template name="cell.span">
     <xsl:variable name="span" select="0 + w:tcPr/w:gridSpan/@w:val
@@ -400,12 +400,20 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:function name="docx2hub:is-blind-vmerged-cell" as="xs:boolean">
+    <xsl:param name="cell" as="element(w:tc)"/>
+    <xsl:sequence select="exists($cell/w:tcPr/w:vMerge)
+                          and
+                          (every $att in $cell/w:tcPr/w:vMerge/@* satisfies ($att/self::attribute(srcpath) or $att/self::attribute(w:val)[. = 'continue']))"/>
+  </xsl:function>
+
   <xsl:template name="cell.morerows">
     <xsl:if test="w:tcPr/w:vMerge/@w:val = 'restart'">
       <xsl:variable name="counts" as="xs:integer*">
         <xsl:choose>
-          <xsl:when test="../following-sibling::w:tr[1]/w:tc[letex:colcount(1, .) = letex:colcount(1, current())]/w:tcPr/w:vMerge[count(@* except @srcpath) = 0]">
-            <xsl:for-each-group select="../following-sibling::w:tr/w:tc[letex:colcount(1, .) = letex:colcount(1, current())]" group-adjacent="if (w:tcPr/w:vMerge[count(@* except @srcpath) = 0]) then true() else false()">
+          <xsl:when test="../following-sibling::w:tr[1]/w:tc[letex:colcount(1, .) = letex:colcount(1, current())][docx2hub:is-blind-vmerged-cell(.)]">
+            <xsl:for-each-group select="../following-sibling::w:tr/w:tc[letex:colcount(1, .) = letex:colcount(1, current())]" 
+              group-adjacent="docx2hub:is-blind-vmerged-cell(.)">
               <xsl:sequence select="count(current-group())"/>
             </xsl:for-each-group>
           </xsl:when>
@@ -423,7 +431,7 @@
   <!-- recursively count preceding columns, including spans -->
   <xsl:function name="letex:colcount" as="xs:double">
     <xsl:param name="count" as="xs:double"/>
-    <xsl:param name="cell"  as="node()"/>
+    <xsl:param name="cell"  as="element(*)"/>
     
     <xsl:choose>
       <xsl:when test="$cell/preceding-sibling::w:tc">
