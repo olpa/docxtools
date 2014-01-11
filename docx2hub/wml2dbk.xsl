@@ -802,7 +802,14 @@
 
   <!-- whitespace elements, etc. -->
   <xsl:template match="w:tab" mode="wml-to-dbk">
-    <tab xml:space="preserve">&#9;</tab>
+    <xsl:choose>
+      <xsl:when test="$srcpaths eq 'yes'">
+        <tab xml:space="preserve" srcpath="{@srcpath}">&#9;</tab>
+      </xsl:when>
+      <xsl:otherwise>
+        <tab xml:space="preserve">&#9;</tab>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="w:br" mode="wml-to-dbk">
