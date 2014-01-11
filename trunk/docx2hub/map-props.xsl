@@ -269,7 +269,7 @@
                        | w:tblCellMar/*
                        | w:tcMar/*
                        | w:ind/@* 
-                       | w:tab/@*
+                       | w:tab/@*[local-name() ne 'srcpath']
                        | w:tcW/@* 
                        | w:spacing/@* 
                        | v:shape/@* 

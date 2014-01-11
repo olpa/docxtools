@@ -46,6 +46,7 @@
               'w:tc',
               'w:hyperlink',
               'w:r',
+              'w:tab',
               'w:br',
               'v:imagedata',
               'o:OLEObject',
