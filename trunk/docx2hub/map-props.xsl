@@ -126,7 +126,7 @@
         mode="#current">
         <xsl:sort select="@w:styleId" />
       </xsl:apply-templates>
-      <xsl:apply-templates select="key('docx2hub:style', distinct-values(.//w:rStyle/@w:val))[not(w:link)]" mode="#current">
+      <xsl:apply-templates select="key('docx2hub:style', distinct-values(.//w:rStyle/@w:val))" mode="#current">
         <xsl:sort select="@w:styleId" />
       </xsl:apply-templates>
       <xsl:apply-templates select="key('docx2hub:style', distinct-values(.//w:tblStyle/@w:val))" mode="#current">
@@ -686,7 +686,11 @@
   <xsl:template name="docx2hub:style-name" as="element(docx2hub:attribute)">
     <xsl:param name="val" as="element(*)"/><!-- w:pStyle, w:cStyle -->
     <xsl:param name="linked" as="xs:string?"/>
-    <xsl:variable name="looked-up" as="xs:string" select="if ($linked) then $linked else $val/@w:val" />
+    <!-- we choose not to use the linked (paragraph) style here because we’d have to
+      carefully select only the css:rule’s inline properties when recreating docx run properties
+      from hub. -->
+    <xsl:variable name="looked-up" as="xs:string" select="$val/@w:val" />
+    <!--<xsl:variable name="looked-up" as="xs:string" select="if ($linked) then $linked else $val/@w:val" />-->
     <docx2hub:attribute name="role">
       <xsl:value-of select="if ($hub-version eq '1.0')
                               then $looked-up
