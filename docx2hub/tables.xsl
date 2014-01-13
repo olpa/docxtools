@@ -155,16 +155,37 @@
 
   <xsl:template match="w:tr" mode="tables">
     <row>
-      <xsl:apply-templates select="@*" mode="wml-to-dbk"/>
-      <xsl:apply-templates mode="#current"/>
+      <xsl:apply-templates select="@css:*, @xml:lang, @srcpath" mode="wml-to-dbk"/>
+      <xsl:apply-templates select="@w:fill-cells-before" mode="wml-to-dbk"/>
+      <xsl:apply-templates select="w:tc" mode="#current">
+        <xsl:with-param name="row-overrides" as="attribute(*)*" select="w:tblPrEx/@*"/>
+        <xsl:with-param name="is-first-row-in-group" select="letex:node-index-of(../w:tr, .) = 1"  tunnel="yes"/>
+        <xsl:with-param name="is-last-row-in-group" select="letex:node-index-of(../w:tr, .) = count(../w:tr)"  tunnel="yes"/>
+      </xsl:apply-templates>
+      <xsl:apply-templates select="@w:fill-cells-after" mode="wml-to-dbk"/>
     </row>
   </xsl:template>
   
-<!--  <xsl:template match="@css:*[matches(name(.),'border\-')]" mode="tables">
-    <xsl:attribute name="{name(.)}" select="."/>
+  <xsl:template match="@w:fill-width-before | @w:fill-width-after" mode="wml-to-dbk" priority="10"/>
+  
+  <xsl:template match="@w:fill-cells-before" mode="wml-to-dbk" priority="10">
+    <xsl:param name="col-widths" as="xs:integer+" tunnel="yes"/>
+    <xsl:for-each select="1 to xs:integer(.)">
+      <entry role="hub:fill-grid" css:width="{docx2hub:twips2mm($col-widths[current()])}">
+        <para/>
+      </entry>
+    </xsl:for-each>  
   </xsl:template>
--->
-  <!-- Table-Level Property Exceptions -->
+  
+  <xsl:template match="@w:fill-cells-after" mode="wml-to-dbk" priority="10">
+    <xsl:param name="col-widths" as="xs:integer+" tunnel="yes"/>
+    <xsl:param name="cols" as="xs:integer" tunnel="yes"/>
+    <xsl:for-each select="($cols - xs:integer(.) + 1) to $cols">
+      <entry role="hub:fill-grid" css:width="{docx2hub:twips2mm($col-widths[current()])}">
+        <para/>
+      </entry>
+    </xsl:for-each>
+  </xsl:template>
 
   <xsl:template match="w:trPr" mode="tables"/>
 
@@ -177,10 +198,16 @@
   </xsl:template>
 
   <xsl:template match="w:tc[not(docx2hub:is-blind-vmerged-cell(.))]" mode="tables">
+    <xsl:param name="is-first-row-in-group" as="xs:boolean?" tunnel="yes"/>
     <xsl:param name="col-widths" tunnel="yes" as="xs:integer*"/>
+    <xsl:param name="row-overrides" as="attribute(*)*"/>
     <xsl:element name="entry">
       <xsl:copy-of select="ancestor::w:tbl/w:tblPr/@css:* except ancestor::w:tbl/w:tblPr/@css:width"/>
       <xsl:copy-of select="ancestor::w:tr/@css:* except ancestor::w:tr/@css:width"/>
+      <xsl:apply-templates select="$row-overrides" mode="wml-to-dbk">
+        <xsl:with-param name="is-first-cell" select="letex:node-index-of(../w:tc, .) = 1"/>
+        <xsl:with-param name="is-last-cell" select="letex:node-index-of(../w:tc, .) = count(../w:tc)"/>
+      </xsl:apply-templates>
       <xsl:copy-of select="@*" />
       <!-- Process any spans -->
       <xsl:call-template name="cell.span"/>
@@ -193,6 +220,29 @@
         <xsl:with-param name="nodes" select="node()"/>
       </xsl:call-template>
     </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="@css:border-insideV-style | @css:border-insideV-width | @css:border-insideV-color" mode="wml-to-dbk" priority="10">
+    <xsl:param name="is-first-row-in-group" as="xs:boolean?" tunnel="yes"/>
+    <xsl:param name="is-last-row-in-group" as="xs:boolean?" tunnel="yes"/>
+    <xsl:message select="'HURZI ', $is-first-row-in-group, $is-last-row-in-group"/>
+    <xsl:if test="not($is-first-row-in-group)">
+      <xsl:attribute name="{replace(name(), 'insideV', 'top')}" select="."/>
+    </xsl:if>
+    <xsl:if test="not($is-last-row-in-group)">
+      <xsl:attribute name="{replace(name(), 'insideV', 'bottom')}" select="."/>
+    </xsl:if>
+  </xsl:template>
+  
+  <xsl:template match="@css:border-insideH-style | @css:border-insideH-width | @css:border-insideH-color" mode="wml-to-dbk" priority="10">
+    <xsl:param name="is-first-cell" as="xs:boolean?" tunnel="yes"/>
+    <xsl:param name="is-last-cell" as="xs:boolean?" tunnel="yes"/>
+    <xsl:if test="not($is-first-cell)">
+      <xsl:attribute name="{replace(name(), 'insideH', 'left')}" select="."/>
+    </xsl:if>
+    <xsl:if test="not($is-last-cell)">
+      <xsl:attribute name="{replace(name(), 'insideH', 'right')}" select="."/>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="cell.align">
