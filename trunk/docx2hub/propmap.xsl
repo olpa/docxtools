@@ -133,6 +133,8 @@
         <prop name="w:tblBorders/w:left" type="docx-border" />
         <prop name="w:tblBorders/w:right" type="docx-border" />
         <prop name="w:tblBorders/w:top" type="docx-border"  />
+        <prop name="w:tblBorders/w:insideH" type="docx-border"  />
+        <prop name="w:tblBorders/w:insideV" type="docx-border"  />
         <prop name="w:tblCellMar" type="passthru" />
         <prop name="w:tblCellMar/w:bottom" type="docx-padding" />
         <prop name="w:tblCellMar/w:left" type="docx-padding" />
@@ -157,6 +159,12 @@
         <prop name="w:tcW/@w:w" type="docx-length-attr" target-name="css:width"/>
         <prop name="w:textDirection" type="docx-text-direction"/>
         <prop name="w:trHeight" type="docx-table-row-height"/>
+        <!-- trPr/… -->
+        <prop name="w:gridBefore" type="linear" target-name="w:fill-cells-before"/>
+        <prop name="w:wBefore/@w:w" type="docx-length-attr" target-name="w:fill-width-before"/>
+        <prop name="w:gridAfter" type="linear" target-name="w:fill-cells-after"/>
+        <prop name="w:wAfter/@w:w" type="docx-length-attr" target-name="w:fill-width-after"/>
+        
         <prop name="w:u" type="docx-underline" />
         <prop name="w:uiPriority" />
         <prop name="w:unhideWhenUsed" />

@@ -64,6 +64,12 @@
   <xsl:include href="tables.xsl"/>
 
 
+  <xsl:function name="letex:node-index-of" as="xs:integer?">
+    <xsl:param name="nodes" as="node()*"/>
+    <xsl:param name="node" as="node()"/>
+    <xsl:sequence select="index-of(for $n in $nodes return generate-id($n), generate-id($node))"/>
+  </xsl:function>
+
   <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
   <!-- named Templates -->
   <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->

@@ -215,7 +215,7 @@
   <!-- § 17.3.1.29: this is only for the paragraph mark's formatting: -->
   <xsl:template match="w:pPr/w:rPr" mode="docx2hub:add-props" priority="2.5" />
 
-  <xsl:template match="w:tblPr" mode="docx2hub:add-props" priority="2">
+  <xsl:template match="w:tblPr | w:tblPrEx" mode="docx2hub:add-props" priority="2">
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates mode="#current" />
     </xsl:copy>
@@ -242,7 +242,7 @@
   </xsl:template>
 
   <xsl:template match="w:pBdr | w:tcBorders | w:tblBorders | w:tblCellMar | w:tcMar" mode="docx2hub:add-props" priority="2">
-    <xsl:apply-templates select="w:left | w:right | w:top | w:bottom" mode="#current" />
+    <xsl:apply-templates select="w:left | w:right | w:top | w:bottom | w:insideH | w:insideV" mode="#current" />
   </xsl:template>
 
   <xsl:template match="w:spacing" mode="docx2hub:add-props" priority="2">
