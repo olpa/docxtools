@@ -405,7 +405,7 @@
         </docx2hub:attribute>
         <xsl:if test="not($val/@w:val = ('nil','none'))">
           <docx2hub:attribute name="css:border-{$orientation}-width">
-            <xsl:value-of select="docx2hub:pt-length($val/@w:sz)"/>
+            <xsl:value-of select="docx2hub:pt-border-size($val/@w:sz)"/>
           </docx2hub:attribute>
           <xsl:if test="$val/@w:color ne 'auto'">
             <docx2hub:attribute name="css:border-{$orientation}-color">
@@ -717,6 +717,25 @@
     </xsl:choose>
   </xsl:function>
 
+  <xsl:function name="docx2hub:pt-border-size" as="xs:string" >
+    <xsl:param name="val" as="xs:string?"/>
+    <xsl:choose>
+      <xsl:when test="not($val)">
+        <xsl:message>empty argument for docx2hub:pt-length, defaulting to zero. </xsl:message>
+        <xsl:sequence select="'0'"/>
+      </xsl:when>
+      <xsl:when test="not($val castable as xs:integer)">
+        <xsl:message>argument '<xsl:value-of select="$val"/>' for docx2hub:border-size not castable as xs:integer, defaulting to zero. </xsl:message>
+        <xsl:sequence select="'0'"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="if (matches($val, '%$'))
+          then $val
+          else concat(xs:string(xs:integer($val) * 0.125), 'pt')" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:function>
+  
   <xsl:function name="docx2hub:border-style" as="xs:string" >
     <xsl:param name="val" as="xs:string"/>
     <xsl:choose>
