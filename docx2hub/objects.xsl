@@ -4,6 +4,7 @@
   xmlns:xsl		= "http://www.w3.org/1999/XSL/Transform"
   xmlns:fn              = "http://www.w3.org/2005/xpath-functions"
   xmlns:xs		= "http://www.w3.org/2001/XMLSchema"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
   xmlns:w		= "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:word200x	= "http://schemas.microsoft.com/office/word/2003/wordml"
   xmlns:v		= "urn:schemas-microsoft-com:vml" 
@@ -24,7 +25,37 @@
   exclude-result-prefixes = "w o v wx xs dbk pkg r rel word200x exsl saxon fn letex w10 mml"
   >
 
+  <!-- for the time being, encapsulate this markup in a <sidebar role="hub:foreign">.
+    If there is content within this markup for which a Hub conversion exists, the usual
+    conversion rules will apply. -->
+  <xsl:template match="mc:AlternateContent" mode="wml-to-dbk">
+    <xsl:variable name="elt-name" as="xs:string">
+      <xsl:choose>
+        <xsl:when test="parent::w:r | parent::w:p">
+          <xsl:sequence select="'phrase'"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:sequence select="'sidebar'"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:element name="{$elt-name}">
+      <xsl:attribute name="role" select="'hub:foreign'"/>
+      <xsl:apply-templates select="." mode="foreign"/>
+    </xsl:element>
+  </xsl:template>
 
+  <xsl:template match="@* | * | w:drawing | w:txbxContent | w:pict" mode="foreign">
+    <xsl:copy copy-namespaces="no">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="w:*" mode="foreign">
+    <xsl:apply-templates select="." mode="wml-to-dbk"/>
+  </xsl:template>
+
+  
   <!-- Grundlegendes Problem: wie können displayed und inline voneinander unterschieden werden?
        Da Word nur malt, und hier keine explizite Unterscheidung vornimmt, geht es wohl nur mit Heuristik -->
   <xsl:template match="w:object" mode="wml-to-dbk">

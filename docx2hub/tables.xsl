@@ -155,10 +155,10 @@
 
   <xsl:template match="w:tr" mode="tables">
     <row>
-      <xsl:apply-templates select="@css:*, @xml:lang, @srcpath" mode="wml-to-dbk"/>
+      <xsl:apply-templates select="@css:*, w:tblPrEx/@css:background-color, @xml:lang, @srcpath" mode="wml-to-dbk"/>
       <xsl:apply-templates select="@w:fill-cells-before" mode="wml-to-dbk"/>
       <xsl:apply-templates select="w:tc" mode="#current">
-        <xsl:with-param name="row-overrides" as="attribute(*)*" select="w:tblPrEx/@*"/>
+        <xsl:with-param name="row-overrides" as="attribute(*)*" select="w:tblPrEx/(@* except @css:background-color)"/>
         <xsl:with-param name="is-first-row-in-group" select="letex:node-index-of(../w:tr, .) = 1"  tunnel="yes"/>
         <xsl:with-param name="is-last-row-in-group" select="letex:node-index-of(../w:tr, .) = count(../w:tr)"  tunnel="yes"/>
       </xsl:apply-templates>
@@ -225,7 +225,6 @@
   <xsl:template match="@css:border-insideV-style | @css:border-insideV-width | @css:border-insideV-color" mode="wml-to-dbk" priority="10">
     <xsl:param name="is-first-row-in-group" as="xs:boolean?" tunnel="yes"/>
     <xsl:param name="is-last-row-in-group" as="xs:boolean?" tunnel="yes"/>
-    <xsl:message select="'HURZI ', $is-first-row-in-group, $is-last-row-in-group"/>
     <xsl:if test="not($is-first-row-in-group)">
       <xsl:attribute name="{replace(name(), 'insideV', 'top')}" select="."/>
     </xsl:if>
