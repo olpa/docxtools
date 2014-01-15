@@ -712,6 +712,19 @@
               <xsl:with-param name="nodes" select="$nodes"/>
             </xsl:call-template>
           </xsl:when>
+          <xsl:when test="$tokens[1] = 'HYPERLINK'">
+            <xsl:variable name="without-options" select="$tokens[not(matches(., '\\[lo]'))]" as="xs:string+"/>
+            <xsl:variable name="local" as="xs:boolean" select="$tokens = '\l'"/>
+            <xsl:variable name="target" select="replace($without-options[2], '(^&quot;|&quot;$)', '')"/>
+            <xsl:variable name="tooltip" select="replace($without-options[3], '(^&quot;|&quot;$)', '')"/>
+            <link>
+              <xsl:attribute name="{if ($local) then 'linkend' else 'xlink:href'}" select="$target"/>
+              <xsl:if test="$tooltip">
+                <xsl:attribute name="xlink:title" select="$tooltip"/>
+              </xsl:if>
+              <xsl:apply-templates select="$text" mode="#current"/>
+            </link>
+          </xsl:when>
           <xsl:when test="matches($instrText,'^[\s&#160;]*$')"/>
           <xsl:when test="$tokens[1] = 'AUTOTEXT'">
             <xsl:call-template name="signal-error" xmlns="">
@@ -756,9 +769,7 @@
     </xsl:choose>
   </xsl:template>
 
-
   <letex:field-functions>
-    <letex:field-function name="HYPERLINK" element="link" attrib="xlink:href" value="2"/>
     <letex:field-function name="INDEX" destroy="yes"/>
     <letex:field-function name="NOTEREF" element="link" attrib="linkend" value="2"/>
     <letex:field-function name="PAGE"/>
