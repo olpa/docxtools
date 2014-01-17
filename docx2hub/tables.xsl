@@ -203,7 +203,7 @@
     <xsl:param name="row-overrides" as="attribute(*)*"/>
     <xsl:element name="entry">
       <xsl:copy-of select="ancestor::w:tbl/w:tblPr/@css:* except ancestor::w:tbl/w:tblPr/@css:width"/>
-      <xsl:copy-of select="ancestor::w:tr/@css:* except ancestor::w:tr/@css:width"/>
+      <xsl:copy-of select="ancestor::w:tr/(@css:* except (@css:width | @css:background-color | @css:height))"/>
       <xsl:apply-templates select="$row-overrides" mode="wml-to-dbk">
         <xsl:with-param name="is-first-cell" select="letex:node-index-of(../w:tc, .) = 1"/>
         <xsl:with-param name="is-last-cell" select="letex:node-index-of(../w:tc, .) = count(../w:tc)"/>
