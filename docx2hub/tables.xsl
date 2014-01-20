@@ -66,7 +66,7 @@
     <xsl:if test="not(sum(w:gridCol/@w:w) = $width) and not($width = 0)">
       <xsl:call-template name="signal-error" xmlns="">
         <xsl:with-param name="error-code" select="'W2D_052'"/>
-        <xsl:with-param name="exit" select="'no'"/>
+        <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
         <xsl:with-param name="hash">
           <value key="xpath"><xsl:value-of select="@srcpath"/></value>
           <value key="level">WRN</value>
@@ -104,7 +104,7 @@
   <xsl:template match="*" mode="tables">
     <xsl:call-template name="signal-error" xmlns="">
       <xsl:with-param name="error-code" select="'W2D_020'"/>
-      <xsl:with-param name="exit" select="'no'"/>
+      <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
       <xsl:with-param name="hash">
         <value key="xpath"><xsl:value-of select="@srcpath"/></value>
         <value key="level">INT</value>
@@ -117,7 +117,7 @@
   <xsl:template match="@*" mode="tables">
     <xsl:call-template name="signal-error" xmlns="">
       <xsl:with-param name="error-code" select="'W2D_021'"/>
-      <xsl:with-param name="exit" select="'no'"/>
+      <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
       <xsl:with-param name="hash">
         <value key="xpath"><xsl:value-of select="../@srcpath"/></value>
         <value key="level">INT</value>
@@ -130,7 +130,7 @@
   <xsl:template match="processing-instruction()" mode="tables">
     <xsl:call-template name="signal-error" xmlns="">
       <xsl:with-param name="error-code" select="'W2D_023'"/>
-      <xsl:with-param name="exit" select="'no'"/>
+      <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
       <xsl:with-param name="hash">
         <value key="xpath"><xsl:value-of select="preceding::*[1]/@srcpath"/></value>
         <value key="level">INT</value>
@@ -143,7 +143,7 @@
   <xsl:template match="comment()" mode="tables">
     <xsl:call-template name="signal-error" xmlns="">
       <xsl:with-param name="error-code" select="'W2D_022'"/>
-      <xsl:with-param name="exit" select="'no'"/>
+      <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
       <xsl:with-param name="hash">
         <value key="xpath"><xsl:value-of select="preceding::*[1]/@srcpath"/></value>
         <value key="level">INT</value>

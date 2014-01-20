@@ -45,7 +45,7 @@
     <xsl:if test="empty($font)">
       <xsl:call-template name="signal-error">
         <xsl:with-param name="error-code" select="'W2D_080'"/>
-        <xsl:with-param name="exit" select="'yes'"/>
+        <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
         <xsl:with-param name="hash">
           <value key="xpath"><xsl:value-of select="(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]"/></value>
           <value key="level">INT</value>
@@ -80,7 +80,7 @@
                 <xsl:value-of select="$number"/>
                 <xsl:call-template name="signal-error">
                   <xsl:with-param name="error-code" select="'W2D_601'"/>
-                  <xsl:with-param name="exit" select="'no'"/>
+                  <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
                   <xsl:with-param name="hash">
                     <value key="xpath"><xsl:value-of select="(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]"/></value>
                     <value key="level">WRN</value>
@@ -105,7 +105,7 @@
         </xsl:message>
         <xsl:call-template name="signal-error">
           <xsl:with-param name="error-code" select="'W2D_601'"/>
-          <xsl:with-param name="exit" select="'no'"/>
+          <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
           <xsl:with-param name="hash">
             <value key="xpath"><xsl:value-of select="(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]"/></value>
             <value key="level">WRN</value>
@@ -138,7 +138,7 @@
               <xsl:when test="$number = 'NaN'">
                 <xsl:call-template name="signal-error">
                   <xsl:with-param name="error-code" select="'W2D_601'"/>
-                  <xsl:with-param name="exit" select="'no'"/>
+                  <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
                   <xsl:with-param name="hash">
                     <value key="xpath"><xsl:value-of select="$context/(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]"/></value>
                     <value key="level">WRN</value>
@@ -158,7 +158,7 @@
           <xsl:otherwise>
             <xsl:call-template name="signal-error">
               <xsl:with-param name="error-code" select="'W2D_601'"/>
-              <xsl:with-param name="exit" select="'no'"/>
+              <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
               <xsl:with-param name="hash">
                 <value key="xpath"><xsl:value-of select="$context/(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]"/></value>
                 <value key="level">WRN</value>
@@ -175,7 +175,7 @@
       <xsl:otherwise>
         <xsl:call-template name="signal-error">
           <xsl:with-param name="error-code" select="'W2D_602'"/>
-          <xsl:with-param name="exit" select="'no'"/>
+          <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
           <xsl:with-param name="hash">
             <value key="xpath"><xsl:value-of select="$context/(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]"/></value>
             <value key="level">WRN</value>

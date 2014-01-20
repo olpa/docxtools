@@ -1849,7 +1849,7 @@
           <xsl:template match="*" mode="omml2mml">
             <xsl:call-template name="signal-error">
               <xsl:with-param name="error-code" select="'W2D_020'"/>
-              <xsl:with-param name="exit" select="'no'"/>
+              <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
               <xsl:with-param name="hash">
                 <value key="xpath"><xsl:value-of select="@xpath"/></value>
                 <value key="level">INT</value>
@@ -1866,7 +1866,7 @@
   <xsl:template match="@*" mode="omml2mml">
     <xsl:call-template name="signal-error">
       <xsl:with-param name="error-code" select="'W2D_021'"/>
-      <xsl:with-param name="exit" select="'no'"/>
+      <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
       <xsl:with-param name="hash">
         <value key="xpath"><xsl:value-of select="../@xpath"/></value>
         <value key="level">INT</value>
@@ -1880,7 +1880,7 @@
   <xsl:template match="comment()" mode="omml2mml">
     <xsl:call-template name="signal-error">
       <xsl:with-param name="error-code" select="'W2D_022'"/>
-      <xsl:with-param name="exit" select="'no'"/>
+      <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
       <xsl:with-param name="hash">
         <value key="xpath"><xsl:value-of select="preceding::*[1]/@xpath"/></value>
         <value key="level">INT</value>
@@ -1894,7 +1894,7 @@
   <xsl:template match="processing-instruction()" mode="omml2mml">
     <xsl:call-template name="signal-error">
       <xsl:with-param name="error-code" select="'W2D_023'"/>
-      <xsl:with-param name="exit" select="'no'"/>
+      <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
       <xsl:with-param name="hash">
         <value key="xpath"><xsl:value-of select="preceding::*[1]/@xpath"/></value>
         <value key="level">INT</value>

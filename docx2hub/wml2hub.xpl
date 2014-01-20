@@ -38,7 +38,7 @@
   <p:option name="srcpaths" required="false" select="'no'"/>
   <p:option name="unwrap-tooltip-links" required="false" select="'no'"/>
   <p:option name="hub-version" required="false" select="'1.1'"/>
-
+  <p:option name="fail-on-error" select="'no'"/>
   <p:serialization port="result" omit-xml-declaration="false"/>
 
   <!-- import libs with extension steps -->
@@ -102,6 +102,7 @@
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
     <p:with-param name="srcpaths" select="$srcpaths"/>
+    <p:with-param name="fail-on-error" select="$fail-on-error"/>
   </letex:xslt-mode>
 
   <p:identity name="insert-xpath" />
@@ -113,6 +114,7 @@
     <p:with-option name="prefix" select="concat('docx2hub/', $basename, '/03')"/>
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+    <p:with-param name="fail-on-error" select="$fail-on-error"/>
   </letex:xslt-mode>
   
   <letex:xslt-mode msg="yes" mode="docx2hub:props2atts">
@@ -122,6 +124,7 @@
     <p:with-option name="prefix" select="concat('docx2hub/', $basename, '/04')"/>
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+    <p:with-param name="fail-on-error" select="$fail-on-error"/>
   </letex:xslt-mode>
   
   <letex:xslt-mode msg="yes" mode="docx2hub:remove-redundant-run-atts">
@@ -131,6 +134,7 @@
     <p:with-option name="prefix" select="concat('docx2hub/', $basename, '/05')"/>
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+    <p:with-param name="fail-on-error" select="$fail-on-error"/>
   </letex:xslt-mode>
   
   <letex:xslt-mode msg="yes" mode="docx2hub:separate-field-functions">
@@ -140,6 +144,7 @@
     <p:with-option name="prefix" select="concat('docx2hub/', $basename, '/11')"/>
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
+    <p:with-param name="fail-on-error" select="$fail-on-error"/>
   </letex:xslt-mode>
   
   <letex:xslt-mode msg="yes" mode="wml-to-dbk">
@@ -151,6 +156,7 @@
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
     <p:with-option name="hub-version" select="$hub-version"/>
     <p:with-param name="srcpaths" select="$srcpaths"/>
+    <p:with-param name="fail-on-error" select="$fail-on-error"/>
   </letex:xslt-mode>
   
   <letex:xslt-mode msg="yes" mode="docx2hub:join-runs">
@@ -161,6 +167,7 @@
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
     <p:with-option name="hub-version" select="$hub-version"/>
+    <p:with-param name="fail-on-error" select="$fail-on-error"/>
   </letex:xslt-mode>
 
   <p:add-attribute match="/*" attribute-name="xml:base" name="rebase">
