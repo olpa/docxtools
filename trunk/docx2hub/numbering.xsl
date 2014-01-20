@@ -22,7 +22,7 @@
         <xsl:if test="not($lvl/w:lvlText)">
           <xsl:call-template name="signal-error">
             <xsl:with-param name="error-code" select="'W2D_061'"/>
-            <xsl:with-param name="exit" select="'yes'"/>
+            <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
             <xsl:with-param name="hash">
               <value key="xpath">
                 <xsl:value-of select="$lvl/@srcpath"/>
@@ -370,7 +370,7 @@
       <xsl:otherwise>
         <xsl:call-template name="signal-error">
           <xsl:with-param name="error-code" select="'W2D_062'"/>
-          <xsl:with-param name="exit" select="'yes'"/>
+          <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
           <xsl:with-param name="hash">
             <value key="level">INT</value>
             <value key="info-text"><xsl:value-of select="$format"/>INT</value>

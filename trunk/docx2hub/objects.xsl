@@ -268,7 +268,7 @@
   <xsl:template match="v:path" mode="vml">
     <xsl:call-template name="signal-error">
       <xsl:with-param name="error-code" select="'W2D_501'"/>
-      <xsl:with-param name="exit" select="'no'"/>
+      <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
       <xsl:with-param name="hash">
         <value key="xpath"><xsl:value-of select="@srcpath"/></value>
         <value key="level">WRN</value>
@@ -280,7 +280,7 @@
   <xsl:template match="v:oval" mode="vml">
     <xsl:call-template name="signal-error">
       <xsl:with-param name="error-code" select="'W2D_501'"/>
-      <xsl:with-param name="exit" select="'no'"/>
+      <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
       <xsl:with-param name="hash">
         <value key="xpath"><xsl:value-of select="@srcpath"/></value>
         <value key="level">WRN</value>
@@ -297,7 +297,7 @@
   <xsl:template match="*" mode="vml">
     <xsl:call-template name="signal-error">
       <xsl:with-param name="error-code" select="'W2D_020'"/>
-      <xsl:with-param name="exit" select="'no'"/>
+      <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
       <xsl:with-param name="hash">
         <value key="xpath"><xsl:value-of select="@srcpath"/></value>
         <value key="level">INT</value>
@@ -310,7 +310,7 @@
   <xsl:template match="@*" mode="vml">
     <xsl:call-template name="signal-error">
       <xsl:with-param name="error-code" select="'W2D_021'"/>
-      <xsl:with-param name="exit" select="'no'"/>
+      <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
       <xsl:with-param name="hash">
         <value key="xpath"><xsl:value-of select="../@srcpath"/></value>
         <value key="level">INT</value>
@@ -323,7 +323,7 @@
   <xsl:template match="processing-instruction()" mode="vml">
     <xsl:call-template name="signal-error">
       <xsl:with-param name="error-code" select="'W2D_023'"/>
-      <xsl:with-param name="exit" select="'no'"/>
+      <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
       <xsl:with-param name="hash">
         <value key="xpath"><xsl:value-of select="preceding::*[1]/@srcpath"/></value>
         <value key="level">INT</value>
@@ -336,7 +336,7 @@
   <xsl:template match="comment()" mode="vml">
     <xsl:call-template name="signal-error">
       <xsl:with-param name="error-code" select="'W2D_022'"/>
-      <xsl:with-param name="exit" select="'no'"/>
+      <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
       <xsl:with-param name="hash">
         <value key="xpath"><xsl:value-of select="preceding::*[1]/@srcpath"/></value>
         <value key="level">INT</value>

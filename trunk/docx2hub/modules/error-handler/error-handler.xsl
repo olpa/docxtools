@@ -21,15 +21,10 @@
 >
 
   <xsl:param name="error-mode" select="'debug'"/>
-  
   <xsl:param name="language-localization" select="'de'"/>
-
   <xsl:param name="error-msg-file" select="'xslt_error-de.yml'"/>
-  
   <xsl:param name="error-msg-file-path" select="replace(static-base-uri(), '/[^/]+$', '')"/>
-
   <xsl:param name="create-pis" select="'yes'"/>
-
 
   <xsl:variable name="error-info">
     <xsl:choose>
@@ -50,7 +45,7 @@
 
   <xsl:template name="signal-error">
     <xsl:param name="error-code" select="'W2D_999'"/>
-    <xsl:param name="exit" select="'yes'"/>
+    <xsl:param name="fail-on-error"/>
     <xsl:param name="hash" select="()" as="document-node()?"/>
     <xsl:choose>
       <xsl:when test="$error-mode = 'debug'">
@@ -103,8 +98,8 @@
         </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
-    <xsl:if test="$exit = 'yes'">
-      <xsl:message terminate="{$exit}"/>
+    <xsl:if test="$fail-on-error eq 'yes'">
+      <xsl:message terminate="{$fail-on-error}"/>
     </xsl:if>
   </xsl:template>
 

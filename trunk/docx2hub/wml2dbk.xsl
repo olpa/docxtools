@@ -27,6 +27,7 @@
   <xsl:import href="modules/error-handler/error-handler.xsl"/>
 
   <xsl:param name="debug" select="'yes'" as="xs:string?"/>
+  <xsl:param name="fail-on-error" select="'no'" as="xs:string?"/>
   <xsl:param name="srcpaths" select="'no'" as="xs:string?"/>
   <xsl:param name="base-dir" select="replace(base-uri(), '[^/]+$', '')"/>
   <xsl:variable name="debug-dir" select="concat(replace($base-dir, '^(.+/)(.+?/)$', '$1'), 'debug')"/>
@@ -84,7 +85,7 @@
             <xsl:if test="not($nodes[last()][self::w:p[count(w:r/w:fldChar) = 1 and w:r/w:fldChar[@w:fldCharType = 'end']]])">
               <xsl:call-template name="signal-error" xmlns="">
                 <xsl:with-param name="error-code" select="'W2D_010'"/>
-                <xsl:with-param name="exit" select="'yes'"/>
+                <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
                 <xsl:with-param name="hash">
                   <value key="xpath"><xsl:value-of select="$nodes[last()]/@srcpath"/></value>
                   <value key="level">INT</value>
@@ -132,7 +133,7 @@
         <xsl:if test="count($nodes/w:fldChar[@w:fldCharType = 'begin']) - count($nodes/w:fldChar[@w:fldCharType = 'end']) gt 0">
           <xsl:call-template name="signal-error" xmlns="">
             <xsl:with-param name="error-code" select="'W2D_011'"/>
-            <xsl:with-param name="exit" select="'yes'"/>
+            <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
             <xsl:with-param name="hash">
               <value key="xpath"><xsl:value-of select="$nodes[1]/@srcpath"/></value>
               <value key="level">INT</value>
@@ -167,7 +168,7 @@
               <xsl:otherwise>
                 <xsl:call-template name="signal-error" xmlns="">
                   <xsl:with-param name="error-code" select="'W2D_012'"/>
-                  <xsl:with-param name="exit" select="'yes'"/>
+                  <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
                   <xsl:with-param name="hash">
                     <value key="xpath"><xsl:value-of select="$nodes[1]/@srcpath"/></value>
                     <value key="level">INT</value>
@@ -192,7 +193,7 @@
               <xsl:otherwise>
                 <xsl:call-template name="signal-error" xmlns="">
                   <xsl:with-param name="error-code" select="'W2D_012'"/>
-                  <xsl:with-param name="exit" select="'yes'"/>
+                  <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
                   <xsl:with-param name="hash">
                     <value key="xpath"><xsl:value-of select="$nodes[1]/@srcpath"/></value>
                     <value key="level">INT</value>
@@ -204,7 +205,7 @@
           <xsl:otherwise>
             <xsl:call-template name="signal-error" xmlns="">
               <xsl:with-param name="error-code" select="'W2D_013'"/>
-              <xsl:with-param name="exit" select="'yes'"/>
+              <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
               <xsl:with-param name="hash">
                 <value key="xpath"><xsl:value-of select="$nodes[1]/@srcpath"/></value>
                 <value key="level">INT</value>
@@ -339,7 +340,7 @@
   <xsl:template match="*" mode="wml-to-dbk" priority="-1">
     <xsl:call-template name="signal-error" xmlns="">
       <xsl:with-param name="error-code" select="'W2D_020'"/>
-      <xsl:with-param name="exit" select="'no'"/>
+      <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
       <xsl:with-param name="hash">
         <value key="xpath"><xsl:value-of select="@srcpath"/></value>
         <value key="level">INT</value>
@@ -399,7 +400,7 @@
   <xsl:template match="@*" mode="wml-to-dbk">
     <xsl:call-template name="signal-error" xmlns="">
       <xsl:with-param name="error-code" select="'W2D_021'"/>
-      <xsl:with-param name="exit" select="'no'"/>
+      <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
       <xsl:with-param name="hash">
         <value key="xpath"><xsl:value-of select="../@srcpath"/></value>
         <value key="level">INT</value>
@@ -413,7 +414,7 @@
   <xsl:template match="comment()" mode="wml-to-dbk">
     <xsl:call-template name="signal-error" xmlns="">
       <xsl:with-param name="error-code" select="'W2D_022'"/>
-      <xsl:with-param name="exit" select="'no'"/>
+      <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
       <xsl:with-param name="hash">
         <value key="xpath"><xsl:value-of select="preceding::*[1]/@srcpath"/></value>
         <value key="level">INT</value>
@@ -430,7 +431,7 @@
   <xsl:template match="processing-instruction()" mode="wml-to-dbk">
     <xsl:call-template name="signal-error" xmlns="">
       <xsl:with-param name="error-code" select="'W2D_023'"/>
-      <xsl:with-param name="exit" select="'no'"/>
+      <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
       <xsl:with-param name="hash">
         <value key="xpath"><xsl:value-of select="preceding::*[1]/@srcpath"/></value>
         <value key="level">INT</value>
@@ -472,7 +473,7 @@
                     (some $x in * satisfies not($x/name() = $docx2hub:allowed-para-element-names))">
         <xsl:call-template name="signal-error" xmlns="">
           <xsl:with-param name="error-code" select="'W2D_030'"/>
-          <xsl:with-param name="exit" select="'yes'"/>
+          <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
           <xsl:with-param name="hash">
             <value key="xpath"><xsl:value-of select="@srcpath"/></value>
             <value key="level">INT</value>
@@ -502,7 +503,7 @@
     <xsl:if test="$starts lt $ends">
       <xsl:call-template name="signal-error" xmlns="">
         <xsl:with-param name="error-code" select="'W2D_014'"/>
-        <xsl:with-param name="exit" select="'yes'"/>
+        <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
         <xsl:with-param name="hash">
           <value key="xpath"><xsl:value-of select="@srcpath"/></value>
           <value key="level">INT</value>
@@ -697,7 +698,7 @@
           <xsl:when test="$tokens[1] = ('EQ','eq','FORMCHECKBOX')">
             <xsl:call-template name="signal-error" xmlns="">
               <xsl:with-param name="error-code" select="'W2D_045'"/>
-              <xsl:with-param name="exit"/>
+              <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
               <xsl:with-param name="hash">
                 <value key="xpath"><xsl:value-of select="@srcpath"/></value>
                 <value key="level">WRN</value>
@@ -729,7 +730,7 @@
           <xsl:when test="$tokens[1] = 'AUTOTEXT'">
             <xsl:call-template name="signal-error" xmlns="">
               <xsl:with-param name="error-code" select="'W2D_045'"/>
-              <xsl:with-param name="exit"/>
+              <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
               <xsl:with-param name="hash">
                 <value key="xpath"><xsl:value-of select="@srcpath"/></value>
                 <value key="level">WRN</value>
@@ -740,7 +741,7 @@
           <xsl:otherwise>
             <xsl:call-template name="signal-error" xmlns="">
               <xsl:with-param name="error-code" select="'W2D_040'"/>
-              <xsl:with-param name="exit" select="'yes'"/>
+              <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
               <xsl:with-param name="hash">
                 <value key="xpath"><xsl:value-of select="@srcpath"/></value>
                 <value key="level">INT</value>
