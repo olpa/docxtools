@@ -84,6 +84,7 @@
         <prop name="w:outlineLvl" type="docx-hierarchy-level"/>
         <prop name="w:overflowPunct"/>
         <prop name="w:pageBreakBefore" type="docx-boolean-prop" target-name="css:page-break-before" default="auto" active="always"/>
+        <prop name="w:lastRenderedPageBreak" type="docx-boolean-prop" target-name="css:page-break-before" default="auto" active="always"/>
         <prop name="w:pBdr/w:bottom" type="docx-border" />
         <prop name="w:pBdr/w:left" type="docx-border" />
         <prop name="w:pBdr/w:right" type="docx-border" />
