@@ -11,7 +11,7 @@ MODIFY_XPL="$( readlink -f "$3" )"
 XPL="$DIR"/lib/xpl/docx_modify.xpl
 
 if [ -z $XSL ]; then
-    echo "Usage: [DEBUG=yes|no] [HEAP=xxxxm] docx_modifiy XSL DOCX [XPL]";
+    echo "Usage: [DEBUG=yes|no] [HEAP=xxxxm] docx_modify XSL DOCX [XPL]";
     echo "(The prefixed DEBUG=yes or HEAP=2048m work only if your shell is bash-compatible.)";
     echo "";
     echo "Sample invocation (identity with debug): ";
@@ -82,4 +82,4 @@ if [ ! -z $MODIFY_XPL ]; then
   MODIFY_XPL="-i xpl=$MODIFY_XPL"
 fi
 
-$DIR/calabash/calabash.sh -i xslt="$XSL" $MODIFY_XPL "$XPL" file="$DOCX" debug=$DEBUG debug-dir-uri=$DEBUGDIR
+HEAP=$HEAP $DIR/calabash/calabash.sh -i xslt="$XSL" $MODIFY_XPL "$XPL" file="$DOCX" debug=$DEBUG debug-dir-uri=$DEBUGDIR
