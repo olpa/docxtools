@@ -27,8 +27,9 @@ usage:
 	-$(UMASK); \
 	$(CALABASH) \
 	-o result=$*.hub.xml \
-	$(MAKEFILEDIR)/docx2hub/wml2hub.xpl \
-	docx=$*.docx \
+	-o insert-xpath=$(call win_path,/dev/null) \
+	$(call uri,$(MAKEFILEDIR)/docx2hub/wml2hub.xpl) \
+	docx=$(call win_path,$*).docx \
 	debug=$(DEBUG) \
 	debug-dir-uri=$(call uri,$(DEBUGDIR))
 
