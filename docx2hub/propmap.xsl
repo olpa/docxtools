@@ -145,7 +145,7 @@
         <prop name="w:tblInd/@w:w" type="docx-length-attr-negated" target-name="css:margin-left">
           <!-- postprocess it; should be margin-right if the table is rtl (§ 17.4.51) --> 
         </prop> 
-        <prop name="w:tblLayout" />
+        <prop name="w:tblLayout" type="passthru"/>
         <prop name="w:tblLook" />
         <prop name="w:tblPrEx" type="passthru"/>
         <prop name="w:tblStyle" type="docx-parastyle"/>
