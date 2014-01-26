@@ -806,6 +806,9 @@
  
   <xsl:template match="w:tcPr" mode="wml-to-dbk"/>
 
+  <!-- Umbruchshilfe zur exakten Reproduktion des Umbruchs -->
+  <xsl:template match="w:lastRenderedPageBreak" mode="wml-to-dbk"/>
+
   <!-- Background -->
   <xsl:template match="w:background[parent::w:document]" mode="wml-to-dbk"/>
 
@@ -849,7 +852,7 @@
       <xsl:value-of select="'&#x2011;'"/>
   </xsl:template>
 
-  <xsl:template match="w:pageBreakBefore | w:lastRenderedPageBreak" mode="wml-to-dbk">
+  <xsl:template match="w:pageBreakBefore" mode="wml-to-dbk">
     <xsl:if test="@w:val = ('true', '1', 'on') or not(@w:val)">
       <phrase role="pageBreakBefore"/>
     </xsl:if>
