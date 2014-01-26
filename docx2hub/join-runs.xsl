@@ -128,7 +128,7 @@
   </xsl:template>
   
   <!-- collateral. Can we safely assume that such a break does not occur in the middle of a para? -->
-  <xsl:template match="dbk:br[@role]" mode="docx2hub:join-runs"/>
+  <!--<xsl:template match="dbk:br[@role]" mode="docx2hub:join-runs"/>-->
   
   <!-- @type = ('column', 'page') --> 
   <xsl:template match="dbk:br[@role[not(. eq 'textWrapping')]]" mode="docx2hub:join-runs-br-attr">

@@ -268,7 +268,6 @@
                        | w:tblPrEx/*
                        | w:tblCellMar/*
                        | w:tcMar/*
-                       | w:lastRenderedPageBreak
                        | w:ind/@* 
                        | w:tab/@*[local-name() ne 'srcpath']
                        | w:tcW/@* 
