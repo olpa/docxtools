@@ -26,15 +26,13 @@
 
   <xsl:template match="w:tbl" mode="wml-to-dbk">
     <informaltable>
-      <xsl:apply-templates select="w:tblPr/@role|w:tblPr/@css:*[matches(name(.),'border(\-.+)?\-style')]" mode="#current" />
-<!--      <xsl:attribute name="frame" select="if (some $i in (w:tblPr/@css:*[matches(name(.),'border\-.+\-style')]) satisfies (exists($i) and not($i=('nil','none')))) then 'all' else 'none'"/>-->
+      <xsl:apply-templates select="  w:tblPr/@role
+                                   | w:tblPr/@css:*[matches(name(.),'(border(\-.+)?\-style|background-color)')]
+                                   | w:tblPr/w:tblW" mode="#current" />
       <tgroup>
         <xsl:attribute name="cols">
           <xsl:value-of select="count(w:tblGrid/w:gridCol)"/>
         </xsl:attribute>
-        <xsl:if test="w:tblPr/w:tblW/@w:w">
-<!--           <xsl:attribute name="width" select="w:tblPr/w:tblW/@w:w"/> -->
-        </xsl:if>
         <xsl:apply-templates select="w:tblGrid" mode="colspec">
           <xsl:with-param name="width" 
             select="if (not(w:tblPr/w:tblW) or w:tblPr/w:tblW/@w:type = 'pct') then 0 else w:tblPr/w:tblW/@w:w" tunnel="yes"/>
@@ -61,6 +59,10 @@
 
   <xsl:template match="w:tblGridChange" mode="colspec"/>
 
+  <xsl:template match="w:tblPr/@css:background-color" priority="10" mode="wml-to-dbk">
+    <xsl:copy-of select="."/>
+  </xsl:template>
+  
   <xsl:template match="w:tblGrid" mode="colspec">
     <xsl:param name="width" tunnel="yes" as="xs:integer"/>
     <xsl:if test="not(sum(w:gridCol/@w:w) = $width) and not($width = 0)">
@@ -77,7 +79,25 @@
     </xsl:if>
     <xsl:apply-templates mode="colspec"/>
   </xsl:template>
-     
+  
+  <xsl:template match="w:tblPr/w:tblW[@w:type eq 'auto']" mode="wml-to-dbk" priority="2"/>
+
+  <xsl:template match="w:tblPr/w:tblW[@w:type eq 'auto'][../w:tblLayout[@w:type eq 'fixed']]" mode="wml-to-dbk" priority="2.5">
+      <!-- this will give a hint to the hub2docx converter that it is a auto-but-fixed-width table,
+      i.e. that the cells’ widths will be preserved 
+    --> 
+    <xsl:attribute name="css:width" select="'auto'"/>
+  </xsl:template>
+  
+  <xsl:template match="w:tblPr/w:tblW[@w:type eq 'dxa']" mode="wml-to-dbk" priority="2">
+    <xsl:attribute name="css:width" select="docx2hub:pt-length(@w:w)"/>
+  </xsl:template>
+  
+  <xsl:template match="w:tblPr/w:tblW" mode="wml-to-dbk">
+    <!-- validation will complain about a unitless value --> 
+    <xsl:attribute name="css:width" select="@w:w"/>
+  </xsl:template>
+  
   <xsl:template match="w:tblGrid/w:gridCol" mode="colspec">
     <xsl:variable name="pos" select="index-of(for $elt in ../* return generate-id($elt), generate-id())" as="xs:integer"/>
     <colspec>
@@ -202,7 +222,7 @@
     <xsl:param name="col-widths" tunnel="yes" as="xs:integer*"/>
     <xsl:param name="row-overrides" as="attribute(*)*"/>
     <xsl:element name="entry">
-      <xsl:copy-of select="ancestor::w:tbl/w:tblPr/@css:* except ancestor::w:tbl/w:tblPr/@css:width"/>
+      <xsl:copy-of select="ancestor::w:tbl/w:tblPr/(@css:* except (@css:width | @css:background-color))"/>
       <xsl:copy-of select="ancestor::w:tr/(@css:* except (@css:width | @css:background-color | @css:height))"/>
       <xsl:apply-templates select="$row-overrides" mode="wml-to-dbk">
         <xsl:with-param name="is-first-cell" select="letex:node-index-of(../w:tc, .) = 1"/>

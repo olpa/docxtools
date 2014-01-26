@@ -543,10 +543,21 @@
         <xsl:variable name="pt-length" select="docx2hub:pt-length($val/@w:val)" as="xs:string"/>
         <xsl:choose>
           <xsl:when test="$val/@w:hRule = 'auto'"/>
-          <xsl:when test="$val/@w:hRule = 'atLeast'">
+          <xsl:when test="$val/@w:hRule = 'atLeast' or (not($val/@w:hRule))">
             <docx2hub:attribute name="css:min-height"><xsl:value-of select="$pt-length" /></docx2hub:attribute>    
           </xsl:when>
-          <xsl:when test="$val/@w:hRule = 'exact'">
+          <xsl:when test="$val/@w:hRule = 'exact' 
+                          (:or 
+                          (
+                            not($val/@w:hRule)
+                            and
+                            $val/ancestor::w:tbl[1]/w:tblPr/w:tblLayout/@w:type = 'fixed'
+                          ) :)">
+            <!-- not sure about the last condition. § 17.4.81 says:
+              “If [@w:hRule] is omitted, then its value shall be assumed to be auto.”
+              But there were table rows with a trHeight that lacked @w:hRule, and their height was fixed.
+              They were in a fixed-layout table, so we assume that row heights should be respected (at least) in
+              fixed tables even if their @w:hRule is missing. -->
             <docx2hub:attribute name="css:height"><xsl:value-of select="$pt-length" /></docx2hub:attribute>    
           </xsl:when>
         </xsl:choose>
