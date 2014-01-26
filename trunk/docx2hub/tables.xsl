@@ -25,9 +25,9 @@
   >
 
   <xsl:template match="w:tbl" mode="wml-to-dbk">
-    <informaltable>
+    <informaltable css:border-collapse="collapse">
       <xsl:apply-templates select="  w:tblPr/@role
-                                   | w:tblPr/@css:*[matches(name(.),'(border(\-.+)?\-style|background-color)')]
+                                   | w:tblPr/@css:*[matches(name(.),'(border-(top|right|bottom|left)-(style|color|width)|background-color)')]
                                    | w:tblPr/w:tblW" mode="#current" />
       <tgroup>
         <xsl:attribute name="cols">
@@ -178,7 +178,9 @@
       <xsl:apply-templates select="@css:*, w:tblPrEx/@css:background-color, @xml:lang, @srcpath" mode="wml-to-dbk"/>
       <xsl:apply-templates select="@w:fill-cells-before" mode="wml-to-dbk"/>
       <xsl:apply-templates select="w:tc" mode="#current">
-        <xsl:with-param name="row-overrides" as="attribute(*)*" select="w:tblPrEx/(@* except @css:background-color)"/>
+        <!-- Despite its name, row-overrides will also contain the un-overridden insideV and insideH settings of tblPr, if available.-->
+        <xsl:with-param name="row-overrides" as="attribute(*)*" 
+          select="ancestor::w:tbl[1]/w:tblPr/@css:*[matches(local-name(), 'inside[HV]')], w:tblPrEx/(@* except @css:background-color)"/>
         <xsl:with-param name="is-first-row-in-group" select="letex:node-index-of(../w:tr, .) = 1"  tunnel="yes"/>
         <xsl:with-param name="is-last-row-in-group" select="letex:node-index-of(../w:tr, .) = count(../w:tr)"  tunnel="yes"/>
       </xsl:apply-templates>
@@ -222,11 +224,11 @@
     <xsl:param name="col-widths" tunnel="yes" as="xs:integer*"/>
     <xsl:param name="row-overrides" as="attribute(*)*"/>
     <xsl:element name="entry">
-      <xsl:copy-of select="ancestor::w:tbl/w:tblPr/(@css:* except (@css:width | @css:background-color))"/>
-      <xsl:copy-of select="ancestor::w:tr/(@css:* except (@css:width | @css:background-color | @css:height))"/>
+<!--      <xsl:copy-of select="ancestor::w:tbl[1]/w:tblPr/@css:*[not(matches(local-name(), '^(border|background-color|width)'))]"/>-->
+      <xsl:copy-of select="ancestor::w:tr[1]/@css:*[not(matches(local-name(), '^(background-color|(min-)?height|width)'))]"/>
       <xsl:apply-templates select="$row-overrides" mode="wml-to-dbk">
-        <xsl:with-param name="is-first-cell" select="letex:node-index-of(../w:tc, .) = 1"/>
-        <xsl:with-param name="is-last-cell" select="letex:node-index-of(../w:tc, .) = count(../w:tc)"/>
+        <xsl:with-param name="is-first-cell" select="letex:node-index-of(../w:tc, .) = 1" tunnel="yes"/>
+        <xsl:with-param name="is-last-cell" select="letex:node-index-of(../w:tc, .) = count(../w:tc)" tunnel="yes"/>
       </xsl:apply-templates>
       <xsl:copy-of select="@*" />
       <!-- Process any spans -->
@@ -242,25 +244,25 @@
     </xsl:element>
   </xsl:template>
 
-  <xsl:template match="@css:border-insideV-style | @css:border-insideV-width | @css:border-insideV-color" mode="wml-to-dbk" priority="10">
+  <xsl:template match="@css:border-insideH-style | @css:border-insideH-width | @css:border-insideH-color" mode="wml-to-dbk" priority="10">
     <xsl:param name="is-first-row-in-group" as="xs:boolean?" tunnel="yes"/>
     <xsl:param name="is-last-row-in-group" as="xs:boolean?" tunnel="yes"/>
     <xsl:if test="not($is-first-row-in-group)">
-      <xsl:attribute name="{replace(name(), 'insideV', 'top')}" select="."/>
+      <xsl:attribute name="{replace(name(), 'insideH', 'top')}" select="."/>
     </xsl:if>
     <xsl:if test="not($is-last-row-in-group)">
-      <xsl:attribute name="{replace(name(), 'insideV', 'bottom')}" select="."/>
+      <xsl:attribute name="{replace(name(), 'insideH', 'bottom')}" select="."/>
     </xsl:if>
   </xsl:template>
   
-  <xsl:template match="@css:border-insideH-style | @css:border-insideH-width | @css:border-insideH-color" mode="wml-to-dbk" priority="10">
+  <xsl:template match="@css:border-insideV-style | @css:border-insideV-width | @css:border-insideV-color" mode="wml-to-dbk" priority="10">
     <xsl:param name="is-first-cell" as="xs:boolean?" tunnel="yes"/>
     <xsl:param name="is-last-cell" as="xs:boolean?" tunnel="yes"/>
     <xsl:if test="not($is-first-cell)">
-      <xsl:attribute name="{replace(name(), 'insideH', 'left')}" select="."/>
+      <xsl:attribute name="{replace(name(), 'insideV', 'left')}" select="."/>
     </xsl:if>
     <xsl:if test="not($is-last-cell)">
-      <xsl:attribute name="{replace(name(), 'insideH', 'right')}" select="."/>
+      <xsl:attribute name="{replace(name(), 'insideV', 'right')}" select="."/>
     </xsl:if>
   </xsl:template>
 
