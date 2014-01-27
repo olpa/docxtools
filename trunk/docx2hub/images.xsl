@@ -17,7 +17,19 @@
   <xsl:template match="w:drawing" mode="wml-to-dbk">
     <mediaobject>
       <xsl:apply-templates select="@srcpath" mode="#current"/>
+      <xsl:if test=".//wp:docPr/@descr ne ''">
+        <alt>
+          <xsl:value-of select=".//wp:docPr/@descr"/>
+        </alt>
+      </xsl:if>
       <xsl:apply-templates select="descendant::a:blip" mode="wml-to-dbk"/>
+      <xsl:if test=".//wp:docPr/@title ne ''">
+        <caption>
+          <para>
+            <xsl:value-of select=".//wp:docPr/@title"/>
+          </para>
+        </caption>
+      </xsl:if>
     </mediaobject>
   </xsl:template>
 
