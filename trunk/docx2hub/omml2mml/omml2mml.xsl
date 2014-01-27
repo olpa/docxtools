@@ -10,6 +10,7 @@
  -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 		xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+		xmlns:xs		= "http://www.w3.org/2001/XMLSchema"
 		xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math"
                 xmlns:mml="http://www.w3.org/1998/Math/MathML"
 		version="2.0"
@@ -214,6 +215,7 @@
 				        </xsl:choose>
 			      </xsl:variable>
 			      <xsl:call-template name="ParseMt">
+			        <xsl:with-param name="context" select="."/>
 				        <xsl:with-param name="sToParse" select="$chAcc"/>
 				        <xsl:with-param name="scr" select="m:e[1]/*/m:rPr[last()]/m:scr/@m:val"/>
 				        <xsl:with-param name="sty" select="m:e[1]/*/m:rPr[last()]/m:sty/@m:val"/>
@@ -922,39 +924,45 @@
 						            <mml:maction actiontype="lit">
 							              <mml:mtext>
 									<xsl:call-template name="checkDirectFormatting"/>
-								                <xsl:value-of select=".//*:t"/>
+								                <xsl:apply-templates select=".//*:t/text() | w:sym" mode="wml-to-dbk"/>
 							              </mml:mtext>
 						            </mml:maction>
 					          </xsl:when>
 					          <xsl:otherwise>
 						            <mml:mtext>
 									<xsl:call-template name="checkDirectFormatting"/>
-							              <xsl:value-of select=".//*:t"/>
+							              <xsl:apply-templates select=".//*:t/text() | w:sym" mode="wml-to-dbk"/>
 						            </mml:mtext>
 					          </xsl:otherwise>
 				        </xsl:choose>
 			      </xsl:when>
 			      <xsl:otherwise>
+			        <xsl:variable name="text-nodes" as="xs:string*">
+			          <xsl:apply-templates select=".//*:t/text() | .//w:sym" mode="wml-to-dbk"/>
+			        </xsl:variable>
+			        <xsl:variable name="context" as="element(*)" select="(.//*:t | .//w:sym)[1]/.."/>
 				        <xsl:choose>
 					          <xsl:when test="$fLit=1">
 						            <mml:maction actiontype="lit">
-							              <xsl:for-each select=".//*:t">
+							              <xsl:for-each select="$text-nodes">
 								                <xsl:call-template name="ParseMt">
-									                  <xsl:with-param name="sToParse" select="text()"/>
-									                  <xsl:with-param name="scr" select="../m:rPr[last()]/m:scr/@m:val"/>
-									                  <xsl:with-param name="sty" select="../m:rPr[last()]/m:sty/@m:val"/>
-									                  <xsl:with-param name="nor" select="../m:rPr[last()]/m:nor/@m:val"/>
+								                  <xsl:with-param name="context" select="$context"/>
+									                  <xsl:with-param name="sToParse" select="."/>
+									                  <xsl:with-param name="scr" select="$context/m:rPr[last()]/m:scr/@m:val"/>
+								                  <xsl:with-param name="sty" select="$context/m:rPr[last()]/m:sty/@m:val"/>
+								                  <xsl:with-param name="nor" select="$context/m:rPr[last()]/m:nor/@m:val"/>
 								                </xsl:call-template>
 							              </xsl:for-each>
 						            </mml:maction>
 					          </xsl:when>
 					          <xsl:otherwise>
-						            <xsl:for-each select=".//*:t">
+						            <xsl:for-each select="$text-nodes">
 							              <xsl:call-template name="ParseMt">
-								                <xsl:with-param name="sToParse" select="text()"/>
-								                <xsl:with-param name="scr" select="../m:rPr[last()]/m:scr/@m:val"/>
-								                <xsl:with-param name="sty" select="../m:rPr[last()]/m:sty/@m:val"/>
-								                <xsl:with-param name="nor" select="../m:rPr[last()]/m:nor/@m:val"/>
+							                <xsl:with-param name="context" select="$context"/>
+								                <xsl:with-param name="sToParse" select="."/>
+							                <xsl:with-param name="scr" select="$context/m:rPr[last()]/m:scr/@m:val"/>
+							                <xsl:with-param name="sty" select="$context/m:rPr[last()]/m:sty/@m:val"/>
+							                <xsl:with-param name="nor" select="$context/m:rPr[last()]/m:nor/@m:val"/>
 							              </xsl:call-template>
 						            </xsl:for-each>
 					          </xsl:otherwise>
@@ -1289,6 +1297,7 @@
 			See also ParseEqArrMr
 	-->
 	<xsl:template name="ParseMt">
+	  <xsl:param name="context" as="element(*)"/>
 		    <xsl:param name="sToParse"/>
 		    <xsl:param name="sty"/>
 		    <xsl:param name="scr"/>
@@ -1328,7 +1337,7 @@
 				<xsl:when test="$fOperAtPos1='0' and $fNumAtPos1='0'">
 					          <xsl:variable name="nCharToPrint">
 						            <xsl:choose>
-							              <xsl:when test="ancestor::m:fName">
+							              <xsl:when test="$context/ancestor::m:fName">
 								                <xsl:choose>
 									                  <xsl:when test="($iFirstOper=$iFirstNum) and             ($iFirstOper=string-length($sToParse)) and                        (substring($sRepOperWith-, string-length($sRepOperWith-))!='0') and                         (substring($sRepOperWith-, string-length($sRepOperWith-))!='-')">
 										                    <xsl:value-of select="string-length($sToParse)"/>
@@ -1356,6 +1365,7 @@
 						            <xsl:value-of select="substring($sToParse, 1, $nCharToPrint)"/>
 					          </mml:mi>
 					          <xsl:call-template name="ParseMt">
+					            <xsl:with-param name="context" select="$context"/>
 						            <xsl:with-param name="sToParse" select="substring($sToParse, $nCharToPrint+1)"/>
 						            <xsl:with-param name="scr" select="$scr"/>
 						            <xsl:with-param name="sty" select="$sty"/>
@@ -1375,6 +1385,7 @@
 						            <xsl:value-of select="substring($sToParse,1,1)"/>
 					          </mml:mo>
 					          <xsl:call-template name="ParseMt">
+					            <xsl:with-param name="context" select="$context"/>
 						            <xsl:with-param name="sToParse" select="substring($sToParse, 2)"/>
 						            <xsl:with-param name="scr" select="$scr"/>
 						            <xsl:with-param name="sty" select="$sty"/>
@@ -1400,6 +1411,7 @@
 						            <xsl:value-of select="$sConsecNum"/>
 					          </mml:mn>
 					          <xsl:call-template name="ParseMt">
+					            <xsl:with-param name="context" select="$context"/>
 						            <xsl:with-param name="sToParse" select="substring-after($sToParse, $sConsecNum)"/>
 						            <xsl:with-param name="scr" select="$scr"/>
 						            <xsl:with-param name="sty" select="$sty"/>
