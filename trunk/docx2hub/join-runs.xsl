@@ -127,20 +127,23 @@
     </xsl:copy>
   </xsl:template>
   
-  <!-- collateral. Can we safely assume that such a break does not occur in the middle of a para? -->
-  <!--<xsl:template match="dbk:br[@role]" mode="docx2hub:join-runs"/>-->
-  
   <!-- @type = ('column', 'page') --> 
   <xsl:template match="dbk:br[@role[not(. eq 'textWrapping')]]" mode="docx2hub:join-runs-br-attr">
     <xsl:choose>
       <xsl:when test=". is ancestor::dbk:para[1]/node()[1]">
         <xsl:attribute name="css:page-break-before" select="'always'"/>
       </xsl:when>
-      <xsl:otherwise>
+      <xsl:when test=". is (ancestor::dbk:para[1][count(node()) gt 1]/node())[last()]">
         <xsl:attribute name="css:page-break-after" select="'always'"/>
-      </xsl:otherwise>
+      </xsl:when>
+      <xsl:otherwise/>
     </xsl:choose>
   </xsl:template>
+
+  <xsl:template match="dbk:br[@role][
+                         . is ancestor::dbk:para[1]/node()[1] or
+                         . is (ancestor::dbk:para[1][count(node()) gt 1]/node())[last()]
+                       ]" mode="docx2hub:join-runs"/>
 
   <!-- sidebar -->
   <xsl:template match="dbk:sidebar" mode="docx2hub:join-runs">
