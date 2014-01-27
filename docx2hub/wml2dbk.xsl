@@ -873,6 +873,10 @@
     </inlineequation>
   </xsl:template>
 
+  <xsl:template match="w:sym" mode="omml2mml" priority="120">
+    <xsl:message select="'hurz'"/>
+    <xsl:apply-templates select="." mode="wml-to-dbk"/>
+  </xsl:template>
 
   <!-- attribute section -->
 

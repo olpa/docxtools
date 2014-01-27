@@ -6,6 +6,7 @@
   xmlns:exsl = 'http://exslt.org/common'
   xmlns:fn = "http://www.w3.org/2005/xpath-functions"
   xmlns:letex = "http://www.le-tex.de/namespace"
+  xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math"
   xmlns:mml = "http://www.w3.org/Math/DTD/mathml2/mathml2.dtd"
   xmlns:o = "urn:schemas-microsoft-com:office:office"
   xmlns:pkg	= "http://schemas.microsoft.com/office/2006/xmlPackage"
@@ -21,7 +22,7 @@
   xmlns:xsl	= "http://www.w3.org/1999/XSL/Transform"
   xmlns="http://docbook.org/ns/docbook"
 
-  exclude-result-prefixes = "w o v wx xs dbk pkg r rel word200x exsl saxon fn letex mml docx2hub"
+  exclude-result-prefixes = "w m o v wx xs dbk pkg r rel word200x exsl saxon fn letex mml docx2hub"
 >
 
   <xsl:import href="propmap.xsl"/>
@@ -200,7 +201,7 @@
     </xsl:if>
   </xsl:template>
   
-  <xsl:template match="w:rPr | w:pPr" mode="docx2hub:add-props" priority="2">
+  <xsl:template match="w:rPr[not(ancestor::m:oMath)] | w:pPr" mode="docx2hub:add-props" priority="2">
     <xsl:apply-templates mode="#current" />
   </xsl:template>
 
@@ -257,7 +258,7 @@
   </xsl:template>
 
   <xsl:template match="  w:style/*
-                       | w:rPr/* 
+                       | w:rPr[not(ancestor::m:oMath)]/* 
                        | w:pBdr/* 
                        | w:pPr/* 
                        | w:tblPr/*
