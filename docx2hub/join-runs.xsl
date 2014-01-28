@@ -122,7 +122,9 @@
     </xsl:for-each>
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:apply-templates select="dbk:br[@role]" mode="docx2hub:join-runs-br-attr"/>
+      <xsl:apply-templates select=".//dbk:br[@role[not(. eq 'textWrapping')]]
+                                            [dbk:same-scope(., current())]" 
+                           mode="docx2hub:join-runs-br-attr"/>
       <xsl:apply-templates mode="#current"/>
     </xsl:copy>
   </xsl:template>
@@ -130,20 +132,52 @@
   <!-- @type = ('column', 'page') --> 
   <xsl:template match="dbk:br[@role[not(. eq 'textWrapping')]]" mode="docx2hub:join-runs-br-attr">
     <xsl:choose>
-      <xsl:when test=". is ancestor::dbk:para[1]/node()[1]">
+      <xsl:when test="dbk:before-text-in-para(., ancestor::dbk:para[1])">
         <xsl:attribute name="css:page-break-before" select="'always'"/>
       </xsl:when>
-      <xsl:when test=". is (ancestor::dbk:para[1][count(node()) gt 1]/node())[last()]">
+      <xsl:when test="dbk:after-text-in-para(., ancestor::dbk:para[1])">
         <xsl:attribute name="css:page-break-after" select="'always'"/>
       </xsl:when>
       <xsl:otherwise/>
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="dbk:br[@role][
-                         . is ancestor::dbk:para[1]/node()[1] or
-                         . is (ancestor::dbk:para[1][count(node()) gt 1]/node())[last()]
-                       ]" mode="docx2hub:join-runs"/>
+  <xsl:function name="dbk:same-scope" as="xs:boolean">
+    <xsl:param name="node" as="node()" />
+    <xsl:param name="ancestor-elt" as="element(*)*" />
+    <xsl:sequence select="not($node/ancestor::*[self::entry 
+                                                or self::footnote
+                                                or self::annotation
+                                                or self::figure
+                                                or self::listitem]
+                                               [some $a in ancestor::* satisfies (some $b in $ancestor-elt satisfies ($a is $b))])" />
+  </xsl:function>
+  
+  <xsl:function name="dbk:before-text-in-para" as="xs:boolean">
+    <xsl:param name="elt" as="element(*)"/><!-- typically dbk:br[@role = 'page'] -->
+    <xsl:param name="para" as="element(dbk:para)"/>
+    <xsl:sequence select="dbk:same-scope($elt, $para)
+                          and
+                          not( some $text in $para//text()[dbk:same-scope(., $para)] 
+                               satisfies ($text &lt;&lt; $elt) 
+                          )"/>
+  </xsl:function>
+
+  <xsl:function name="dbk:after-text-in-para" as="xs:boolean">
+    <xsl:param name="elt" as="element(*)"/><!-- typically dbk:br[@role = 'page'] -->
+    <xsl:param name="para" as="element(dbk:para)"/>
+    <xsl:sequence select="dbk:same-scope($elt, $para)
+                          and
+                          not( some $text in $para//text()[dbk:same-scope(., $para)] 
+                               satisfies ($text &gt;&gt; $elt) 
+                          )"/>
+  </xsl:function>
+
+  <xsl:template match="dbk:br[@role[not(. eq 'textWrapping')]]
+                             [
+                               dbk:before-text-in-para(., ancestor::dbk:para[1])
+                               or dbk:after-text-in-para(., ancestor::dbk:para[1])
+                             ]" mode="docx2hub:join-runs"/>
 
   <!-- sidebar -->
   <xsl:template match="dbk:sidebar" mode="docx2hub:join-runs">
