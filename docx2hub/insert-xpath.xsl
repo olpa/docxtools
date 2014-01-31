@@ -149,7 +149,7 @@
   <xsl:template match="w:document | w:numbering | w:endnotes | w:footnotes | w:settings | w:fonts | rel:Relationships | w:comments | ct:Types | w:hdr | w:ftr" mode="insert-xpath">
     <xsl:copy copy-namespaces="no">
       <xsl:attribute name="xml:base" select="base-uri()" />
-      <xsl:apply-templates select="@*, node()" mode="#current"/>      
+      <xsl:apply-templates select="@*, *" mode="#current"/>      
     </xsl:copy>
   </xsl:template>
 
@@ -187,7 +187,7 @@
         select="if ($normal/w:rPr/w:sz/@w:val)
                 then $normal/w:rPr/w:sz/@w:val
                 else '20'" />
-      <xsl:apply-templates select="@*, node() except w:latentStyles" mode="#current" >
+      <xsl:apply-templates select="@*, * except w:latentStyles" mode="#current" >
         <xsl:with-param name="default-font" select="$default-font" tunnel="yes"/>
         <xsl:with-param name="default-font-size" select="$default-font-size" tunnel="yes"/>
       </xsl:apply-templates>
@@ -198,7 +198,7 @@
     <xsl:param name="default-font" as="xs:string?" tunnel="yes"/>
     <xsl:param name="default-font-size" as="xs:string" tunnel="yes"/>
     <xsl:copy copy-namespaces="no">
-      <xsl:apply-templates select="@* | node()" mode="#current"/>
+      <xsl:apply-templates select="@*, *" mode="#current"/>
       <xsl:if test="not(w:sz)">
         <w:sz w:val="{$default-font-size}"/>
       </xsl:if>

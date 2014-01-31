@@ -180,7 +180,7 @@
       <xsl:apply-templates select="w:tc" mode="#current">
         <!-- Despite its name, row-overrides will also contain the un-overridden insideV and insideH settings of tblPr, if available.-->
         <xsl:with-param name="row-overrides" as="attribute(*)*" 
-          select="ancestor::w:tbl[1]/w:tblPr/@css:*[matches(local-name(), 'inside[HV]')], w:tblPrEx/(@* except @css:background-color)"/>
+          select="ancestor::w:tbl[1]/w:tblPr/@css:*[matches(local-name(), '(inside[HV]|padding)')], w:tblPrEx/(@* except @css:background-color)"/>
         <xsl:with-param name="is-first-row-in-group" select="letex:node-index-of(../w:tr, .) = 1"  tunnel="yes"/>
         <xsl:with-param name="is-last-row-in-group" select="letex:node-index-of(../w:tr, .) = count(../w:tr)"  tunnel="yes"/>
       </xsl:apply-templates>
@@ -239,7 +239,7 @@
       <xsl:call-template name="cell.align"/>
       -->
       <xsl:call-template name="check-field-functions">
-        <xsl:with-param name="nodes" select="node()"/>
+        <xsl:with-param name="nodes" select="*"/>
       </xsl:call-template>
     </xsl:element>
   </xsl:template>

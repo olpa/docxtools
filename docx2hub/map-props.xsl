@@ -145,7 +145,7 @@
                                    else ()" mode="#current">
         <xsl:with-param name="wrap-in-style-element" select="false()"/>
       </xsl:apply-templates>
-      <xsl:variable name="mergeable-atts" as="node()*"> <!-- docx2hub:attribute, ... -->
+      <xsl:variable name="mergeable-atts" as="element(*)*"> <!-- docx2hub:attribute, ... -->
         <xsl:apply-templates select="* except w:basedOn" mode="#current" />
       </xsl:variable>
       <xsl:for-each-group select="$mergeable-atts[self::docx2hub:attribute]" group-by="@name">
@@ -181,7 +181,7 @@
   <xsl:template match="w:lvl" mode="docx2hub:add-props">
     <xsl:copy>
       <xsl:apply-templates mode="#current" select="@*"/>
-      <xsl:apply-templates mode="#current"/>
+      <xsl:apply-templates mode="#current" select="*"/>
     </xsl:copy>
   </xsl:template>
 
@@ -202,12 +202,12 @@
   </xsl:template>
   
   <xsl:template match="w:rPr[not(ancestor::m:oMath)] | w:pPr" mode="docx2hub:add-props" priority="2">
-    <xsl:apply-templates mode="#current" />
+    <xsl:apply-templates select="*" mode="#current" />
   </xsl:template>
 
   <xsl:template match="w:lvl/w:rPr | w:lvl/w:pPr" mode="docx2hub:add-props" priority="3">
     <xsl:copy copy-namespaces="no">
-      <xsl:apply-templates mode="#current" />
+      <xsl:apply-templates select="*" mode="#current" />
       <!-- in order for subsequent (numbering.xsl) symbol mappings, the original rFonts must also be preserved -->
       <xsl:copy-of select="*"/>
     </xsl:copy>
@@ -218,20 +218,20 @@
 
   <xsl:template match="w:tblPr | w:tblPrEx" mode="docx2hub:add-props" priority="2">
     <xsl:copy copy-namespaces="no">
-      <xsl:apply-templates mode="#current" />
+      <xsl:apply-templates select="*" mode="#current" />
     </xsl:copy>
   </xsl:template>
   
   <xsl:template match="w:tblPrEx" mode="docx2hub:add-props">
-    <xsl:apply-templates select="node() except w:tblW" mode="#current"/>
+    <xsl:apply-templates select="* except w:tblW" mode="#current"/>
   </xsl:template>
   
   <xsl:template match="w:trPr" mode="docx2hub:add-props">
-    <xsl:apply-templates mode="#current"/>
+    <xsl:apply-templates select="*" mode="#current"/>
   </xsl:template>
 
   <xsl:template match="w:tcPr" mode="docx2hub:add-props" priority="2">
-    <xsl:apply-templates mode="#current" />
+    <xsl:apply-templates select="*" mode="#current" />
     <!-- for cellspan etc. processing as defined in tables.xsl: -->
     <xsl:copy-of select="." />
   </xsl:template>

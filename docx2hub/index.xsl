@@ -25,8 +25,8 @@
 
   <xsl:template name="handle-index">
     <xsl:param name="instr" as="xs:string?"/>
-    <xsl:param name="text" as="node()*"/>
-    <xsl:param name="nodes" as="node()*"/>
+    <xsl:param name="text" as="element(*)*"/>
+    <xsl:param name="nodes" as="element(*)*"/>
 
     <!-- §§§ switch to xsl:analyze-string eventually -->
     

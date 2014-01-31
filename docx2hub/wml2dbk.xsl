@@ -76,7 +76,7 @@
   <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
   <xsl:template name="handle-field-function">
-    <xsl:param name="nodes" as="node()*"/>
+    <xsl:param name="nodes" as="element(*)*"/>
     <xsl:param name="is-multi-para" as="xs:boolean" select="false()"/>
     <xsl:choose>
       <xsl:when test="$is-multi-para">
@@ -185,9 +185,9 @@
 <!--                 <xsl:message select="string-join($nodes[.//text()[parent::w:t]], '')"/> -->
 <!--                 <xsl:message select="($nodes[w:instrText])[1]"/> -->
                 <xsl:apply-templates select="($nodes[w:instrText])[1]" mode="wml-to-dbk">
-                  <xsl:with-param name="instrText" select="string-join($nodes//text()[parent::w:instrText], '')" tunnel="yes"/>
-                  <xsl:with-param name="nodes" select="$nodes[descendant::w:instrText]" tunnel="yes"/>
-                  <xsl:with-param name="text" select="$nodes[.//text()[parent::w:t] or .//w:tab or .//w:br]" tunnel="yes"/>
+                  <xsl:with-param name="instrText" select="string-join($nodes//text()[parent::w:instrText], '')" tunnel="yes" as="xs:string?"/>
+                  <xsl:with-param name="nodes" select="$nodes[descendant::w:instrText]" tunnel="yes" as="element(*)*"/>
+                  <xsl:with-param name="text" select="$nodes[.//text()[parent::w:t] or .//w:tab or .//w:br]" tunnel="yes" as="element(*)*"/>
                 </xsl:apply-templates>
               </xsl:when>
               <xsl:otherwise>
@@ -219,8 +219,8 @@
   </xsl:template>
 
   <xsl:template name="check-field-functions">
-    <xsl:param name="nodes" as="node()*"/>
-    <xsl:for-each-group select="node()"
+    <xsl:param name="nodes" as="element(*)*"/>
+    <xsl:for-each-group select="*"
       group-adjacent="count(preceding::w:fldChar[@w:fldCharType = 'begin'])
                       - count(preceding::w:fldChar[@w:fldCharType = 'end'])
                       + (if (w:r/w:fldChar[@w:fldCharType = 'begin'])
@@ -234,7 +234,7 @@
               <xsl:with-param name="nodes" select="current-group()"/>
               <xsl:with-param name="is-multi-para" select="true()"/>
             </xsl:call-template>
-            <xsl:if test="current-group()[last()]/w:r[w:fldChar[@w:fldCharType = 'end']][last()]/following-sibling::node()">
+            <xsl:if test="current-group()[last()]/w:r[w:fldChar[@w:fldCharType = 'end']][last()]/following-sibling::*">
               <!-- verlorengegangenen Knoten ohne @w:fldChar reproduzieren -->
               <xsl:variable name="saved-last-node">
                 <xsl:apply-templates select="current-group()[position() = last()]" mode="rescue-node"/>
@@ -263,7 +263,7 @@
   </xsl:template>
 
   <xsl:template match="w:ins" mode="docx2hub:separate-field-functions">
-    <xsl:apply-templates select="node()" mode="#current"/>
+    <xsl:apply-templates select="*" mode="#current"/>
   </xsl:template>
 
   <!-- Ende von Feldfunktionen ueber mehrere Absaetze in einzelnen Absatz packen -->
@@ -285,7 +285,7 @@
     <xsl:variable name="pPr" as="node() *">
       <xsl:apply-templates select="w:pPr" mode="#current"/>
     </xsl:variable>
-    <xsl:for-each-group select="node()" group-ending-with="w:r[w:fldChar][1]">
+    <xsl:for-each-group select="*" group-ending-with="w:r[w:fldChar][1]">
       <w:p>
         <xsl:for-each select="$attribute-names">
           <xsl:variable name="pos" select="position()"/>
@@ -320,7 +320,7 @@
     <xsl:variable name="pPr" as="node() *">
       <xsl:apply-templates select="w:pPr" mode="#current"/>
     </xsl:variable>
-    <xsl:for-each-group select="node()" group-ending-with="w:r[position() lt last()][w:fldChar][last()]">
+    <xsl:for-each-group select="*" group-ending-with="w:r[position() lt last()][w:fldChar][last()]">
       <w:p>
         <xsl:for-each select="$attribute-names">
           <xsl:variable name="pos" select="position()"/>
@@ -380,8 +380,7 @@
         <xsl:variable name="lvl-properties" select="key('abstract-numbering-by-id',key('numbering-by-id',w:numPr/w:numId/@w:val)/w:abstractNumId/@w:val)/w:lvl[@w:ilvl=$ilvl]"/>
         <xsl:apply-templates select="$lvl-properties/@* except $lvl-properties/@w:ilvl" mode="#current"/>
       </xsl:if>
-      <xsl:apply-templates select="@*" mode="#current" />
-      <xsl:apply-templates select="node()" mode="#current" />
+      <xsl:apply-templates select="@*, *" mode="#current" />
     </xsl:copy>   
   </xsl:template>
 
@@ -446,7 +445,7 @@
   <!-- element section -->
 
   <xsl:template match="w:document" mode="wml-to-dbk">
-    <xsl:apply-templates select="@* except @srcpath | node()" mode="wml-to-dbk"/>
+    <xsl:apply-templates select="@* except @srcpath, *" mode="wml-to-dbk"/>
   </xsl:template>
 
   <xsl:template match="@mc:Ignorable" mode="wml-to-dbk"/>
@@ -455,7 +454,7 @@
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*" mode="wml-to-dbk"/>
       <xsl:call-template name="check-field-functions">
-        <xsl:with-param name="nodes" select="node()"/>
+        <xsl:with-param name="nodes" select="*"/>
       </xsl:call-template>
     </xsl:copy>
   </xsl:template>
@@ -511,7 +510,7 @@
         </xsl:with-param>
       </xsl:call-template>
     </xsl:if>
-    <xsl:for-each-group select="node() except dbk:tabs" 
+    <xsl:for-each-group select="* except dbk:tabs" 
       group-adjacent="if (count(self::w:r[w:fldChar/@w:fldCharType='begin'])
                       + count(preceding-sibling::w:r[w:fldChar/@w:fldCharType='begin'])
                       (: - count(self::w:r[w:fldChar/@w:fldCharType='end']) :)
@@ -589,14 +588,14 @@
           <xsl:call-template name="inline-field-function"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:apply-templates select="node()" mode="#current"/>
+          <xsl:apply-templates select="*" mode="#current"/>
         </xsl:otherwise>
       </xsl:choose>
     </link>
   </xsl:template>
 
   <xsl:template match="w:hyperlink[@w:tooltip][$unwrap-tooltip-links = 'yes']" mode="wml-to-dbk">
-    <xsl:apply-templates mode="#current"/>
+    <xsl:apply-templates select="*" mode="#current"/>
   </xsl:template>
 
   <xsl:template match="@w:anchor[parent::w:hyperlink]" mode="wml-to-dbk" priority="1.5">
@@ -642,14 +641,14 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="@w:history[parent::w:hyperlink]" mode="wml-to-dbk" priority="1.5"/>
+  <xsl:template match="w:hyperlink/@w:history" mode="wml-to-dbk" priority="1.5"/>
  
   <xsl:template match="w:smartTagPr" mode="wml-to-dbk"/>
 
   <!-- textbox -->
   <xsl:template match="w:txbxContent" mode="wml-to-dbk">
     <xsl:apply-templates select="@* except @srcpath" mode="#current"/>
-    <xsl:apply-templates mode="#current"/>
+    <xsl:apply-templates select="*" mode="#current"/>
   </xsl:template>
 
 
@@ -657,12 +656,12 @@
   <xsl:template match="w:r[@* except (@srcpath,@xml:lang[matches(.,'^$')])][not(count(*)=count(w:instrText))]" mode="wml-to-dbk">
     <xsl:element name="phrase">
       <xsl:apply-templates select="@* except @*[matches(name(),'^w:rsid')]" mode="#current"/>
-      <xsl:apply-templates mode="#current"/>
+      <xsl:apply-templates select="*" mode="#current"/>
     </xsl:element>
   </xsl:template>
 
   <xsl:template match="w:r" mode="wml-to-dbk">
-    <xsl:apply-templates mode="#current"/>
+    <xsl:apply-templates select="*" mode="#current"/>
   </xsl:template>
 
   <!-- text (w:t) -->
@@ -673,11 +672,11 @@
   <!-- instrText (w:instrText)  [not(../preceding-sibling::*[w:instrText])] -->
   <xsl:template match="w:instrText" mode="wml-to-dbk" priority="20">
     <xsl:param name="instrText" as="xs:string?" tunnel="yes"/>
-    <xsl:param name="text" as="node()*" tunnel="yes"/>
-    <xsl:param name="nodes" as="node()*" tunnel="yes"/>
+    <xsl:param name="text" as="element(*)*" tunnel="yes"/>
+    <xsl:param name="nodes" as="element(*)*" tunnel="yes"/>
     
-    <xsl:variable name="tokens" select="tokenize(normalize-space($instrText), ' ')"/>
-    <xsl:variable name="func" select="doc('')//letex:field-functions/letex:field-function[@name = $tokens[1]]"/>
+    <xsl:variable name="tokens" select="tokenize(normalize-space($instrText), ' ')" as="xs:string*"/>
+    <xsl:variable name="func" select="doc('')//letex:field-functions/letex:field-function[@name = $tokens[1]]" as="element(letex:field-function)?"/>
     <xsl:choose>
       <xsl:when test="not($func)">
         <xsl:choose>
@@ -790,8 +789,8 @@
   <xsl:template name="handle-figures">
     <xsl:param name="inline" select="false()" as="xs:boolean" tunnel="yes"/>
     <xsl:param name="instr" as="xs:string?"/>
-    <xsl:param name="text" as="node()*"/>
-    <xsl:param name="nodes" as="node()*"/>
+    <xsl:param name="text" as="element(*)*"/>
+    <xsl:param name="nodes" as="element(*)*"/>
     <xsl:variable name="text-tokens" select="for $x in $nodes//text() return $x"/>
     <xsl:element name="mediaobject">
       <xsl:apply-templates select="($nodes//@srcpath)[1]" mode="#current"/>
