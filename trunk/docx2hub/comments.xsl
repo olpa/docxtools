@@ -29,7 +29,7 @@
       <xsl:when test="exists($comment)">
         <!-- GI 2012-08-16: changed note into annotation because note is a block-level element -->
         <annotation>
-          <xsl:apply-templates select="$comment/node()" mode="#current"/>
+          <xsl:apply-templates select="$comment/*" mode="#current"/>
         </annotation>
       </xsl:when>
       <xsl:otherwise>
