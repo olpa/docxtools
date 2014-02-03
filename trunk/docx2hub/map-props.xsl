@@ -882,6 +882,22 @@
   </xsl:template>
 
   <xsl:template match="docx2hub:attribute[@name = ('fill-tint')]" mode="docx2hub:props2atts"/>
+  
+  <xsl:template match="docx2hub:attribute[@name = 'css:text-decoration-line']" mode="docx2hub:props2atts">
+    <xsl:variable name="all-atts" select="preceding-sibling::docx2hub:attribute[@name = current()/@name], ."
+      as="element(docx2hub:attribute)+"/>
+    <xsl:variable name="tokenized" select="for $a in $all-atts return tokenize($a, '\s+')" as="xs:string+"/>
+    <xsl:variable name="line-through" select="$tokenized[starts-with(., 'line-through')][last()]"/>
+    <xsl:variable name="underline" select="$tokenized[starts-with(., 'underline')][last()]"/>
+    <xsl:choose>
+      <xsl:when test="every $t in ($line-through, $underline) satisfies (ends-with($t, 'none'))">
+        <xsl:attribute name="{@name}" select="'none'"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name="{@name}" select="($line-through, $underline)[not(ends-with(., 'none'))]"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
 
   <xsl:template match="docx2hub:color-percentage" mode="docx2hub:props2atts">
     <xsl:variable name="color" select="(../docx2hub:attribute[@name eq 'css:color'][last()], '#000000')[1]" as="xs:string" />

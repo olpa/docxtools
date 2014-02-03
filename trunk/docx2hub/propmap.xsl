@@ -50,6 +50,14 @@
         <prop name="w:cantSplit" type="docx-boolean-prop" target-name="css:break-inside" active="avoid"/>
         <prop name="w:color" type="docx-color" target-name="css:color"/>
         <prop name="w:contextualSpacing" implement="maybe later"/><!-- collapsible spacing between same-style paras, boolean prop. §17.3.1.9 -->
+        <prop name="w:dstrike">
+          <val eq="false" />
+          <val eq="true" target-name="css:text-decoration-line" default="none" active="line-through"/>
+          <val eq="true" target-name="css:text-decoration-style" default="solid" active="double"/>
+        </prop>
+        <prop name="w:em">
+          <val eq="none"/>
+        </prop>
         <prop name="w:gridSpan" /><!-- will be calculated by tables.xsl -->
         <prop name="w:highlight" type="docx-color" target-name="css:background-color"/>
         <prop name="w:i" type="docx-boolean-prop" target-name="css:font-style" default="normal" active="italic"/>
@@ -113,6 +121,11 @@
         <prop name="w:spacing/@w:beforeLines" implement="maybe later" />
         <prop name="w:spacing/@w:line" type="docx-length-attr" target-name="css:line-height" />
         <prop name="w:spacing/@w:val" implement="maybe later (letter spacing, a run property)" />
+        <prop name="w:strike" target-name="css:text-decoration-line">
+          <val eq="true" target-value="line-through"/>
+          <val eq="false" />
+        </prop>
+        <!--<prop name="w:stri-->
         <prop name="w:suppressAutoHyphens" type="docx-boolean-prop" target-name="css:hyphens" default="auto" active="manual"/>
         <prop name="w:sz" type="docx-font-size" target-name="css:font-size" />
         <prop name="w:szCs" />
@@ -166,11 +179,32 @@
         <prop name="w:wBefore/@w:w" type="docx-length-attr" target-name="w:fill-width-before"/>
         <prop name="w:gridAfter" type="linear" target-name="w:fill-cells-after"/>
         <prop name="w:wAfter/@w:w" type="docx-length-attr" target-name="w:fill-width-after"/>
-        
-        <prop name="w:u" type="docx-underline" />
+        <prop name="w:u">
+          <val match="none"/>
+          <val match="dash" target-name="css:text-decoration-style" target-value="dashed"/>
+          <val match="dash" target-name="css:text-decoration-line" target-value="underline"/>
+          <val match="dotted" target-name="css:text-decoration-style" target-value="dotted"/>
+          <val match="dotted" target-name="css:text-decoration-line" target-value="underline"/>
+          <val match="double" target-name="css:text-decoration-style" target-value="double"/>
+          <val match="double" target-name="css:text-decoration-line" target-value="underline"/>
+          <val match="thick" target-name="css:text-decoration-style" target-value="solid"/>
+          <val match="thick" target-name="css:text-decoration-line" target-value="underline"/>
+          <val match="single" target-name="css:text-decoration-style" target-value="solid"/>
+          <val match="single" target-name="css:text-decoration-line" target-value="underline"/>
+          <val match="wav" target-name="css:text-decoration-style" target-value="wavy"/>
+          <val match="wav" target-name="css:text-decoration-line" target-value="underline"/>
+        </prop>
+     
         <prop name="w:uiPriority" />
         <prop name="w:unhideWhenUsed" />
         <prop name="w:vAlign">
+          <val match="auto" target-name="css:vertical-align" target-value="auto"/>
+          <val match="bottom" target-name="css:vertical-align" target-value="bottom"/>
+          <val match="baseline" target-name="css:vertical-align" target-value="bottom"/>
+          <val match="center" target-name="css:vertical-align" target-value="middle"/>
+          <val match="top" target-name="css:vertical-align" target-value="top"/>
+        </prop>
+        <prop name="w:textAlignment">
           <val match="both" target-name="css:vertical-align" target-value="middle"/>
           <val match="bottom" target-name="css:vertical-align" target-value="bottom"/>
           <val match="center" target-name="css:vertical-align" target-value="middle"/>
