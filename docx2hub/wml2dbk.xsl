@@ -541,14 +541,14 @@
   <!-- bookmarks -->
 
   <xsl:template match="w:bookmarkStart" mode="wml-to-dbk">
-    <anchor role="start" xml:id="{@w:name}" xreflabel="{@w:id}"/>
+    <anchor role="start" xml:id="{replace(@w:name, '^(\I)', '_$1')}" xreflabel="{@w:id}"/>
   </xsl:template>
 
   <xsl:key name="docx2hub:bookmarkStart" match="w:bookmarkStart" use="@w:id"/>
 
   <xsl:template match="w:bookmarkEnd" mode="wml-to-dbk">
     <!--<anchor role="end" xml:id="{concat(preceding::w:bookmarkStart[@w:id = current()/@w:id]/@w:name, '_end')}"/>-->
-    <anchor role="end" xml:id="{concat(key('docx2hub:bookmarkStart', @w:id)/@w:name, '_end')}"/>
+    <anchor role="end" xml:id="{replace(concat(key('docx2hub:bookmarkStart', @w:id)/@w:name, '_end'), '^(\I)', '_$1')}"/>
   </xsl:template>
 
   <xsl:template match="w:bookmarkStart[@w:name eq '_GoBack']" mode="wml-to-dbk"/>
