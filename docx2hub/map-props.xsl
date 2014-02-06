@@ -69,11 +69,13 @@
           <xsl:when test="$hub-version eq '1.0'">
             <xsl:call-template name="docx2hub:hub-1.0-styles">
               <xsl:with-param name="version" select="$hub-version" tunnel="yes"/>
+              <xsl:with-param name="contexts" select="., /w:root/w:footnotes, /w:root/w:endnotes"/>
             </xsl:call-template>
           </xsl:when>
           <xsl:when test="$hub-version eq '1.1'">
             <xsl:call-template name="docx2hub:hub-1.1-styles">
               <xsl:with-param name="version" select="$hub-version" tunnel="yes"/>
+              <xsl:with-param name="contexts" select="., /w:root/w:footnotes, /w:root/w:endnotes"/>
             </xsl:call-template>
           </xsl:when>
         </xsl:choose>
@@ -93,25 +95,26 @@
   </xsl:template>
 
   <xsl:template name="docx2hub:hub-1.0-styles">
+    <xsl:param name="contexts" as="element(*)+"/>
     <styles>
       <parastyles>
-        <xsl:apply-templates select="key('docx2hub:style', distinct-values(.//w:pStyle/@w:val))
+        <xsl:apply-templates select="key('docx2hub:style', distinct-values($contexts//w:pStyle/@w:val))
           union
           (: Resolve linked char styles as their respective para styles :)
           key(
            'docx2hub:style',
-            key('docx2hub:style', distinct-values(.//w:rStyle/@w:val))/w:link/@w:val
+            key('docx2hub:style', distinct-values($contexts//w:rStyle/@w:val))/w:link/@w:val
           )" mode="#current">
           <xsl:sort select="@w:styleId" />
         </xsl:apply-templates>
       </parastyles>
       <inlinestyles>
-        <xsl:apply-templates select="key('docx2hub:style', distinct-values(.//w:rStyle/@w:val))[not(w:link)]" mode="#current">
+        <xsl:apply-templates select="key('docx2hub:style', distinct-values($contexts//w:rStyle/@w:val))[not(w:link)]" mode="#current">
           <xsl:sort select="@w:styleId" />
         </xsl:apply-templates>
       </inlinestyles>
       <tablestyles>
-        <xsl:apply-templates select="key('docx2hub:style', distinct-values(.//w:tblStyle/@w:val))" mode="#current">
+        <xsl:apply-templates select="key('docx2hub:style', distinct-values($contexts//w:tblStyle/@w:val))" mode="#current">
           <xsl:sort select="@w:styleId" />
         </xsl:apply-templates>
       </tablestyles>
@@ -120,22 +123,24 @@
   </xsl:template>    
 
   <xsl:template name="docx2hub:hub-1.1-styles">
+    <xsl:param name="contexts" as="element(*)+"/>
     <css:rules>
-      <xsl:apply-templates select="key('docx2hub:style', distinct-values(.//w:pStyle/@w:val))
+      <xsl:apply-templates select="key('docx2hub:style', distinct-values($contexts//w:pStyle/@w:val))
         union
-        key('docx2hub:style', key('docx2hub:style', distinct-values(.//w:rStyle/@w:val))/w:link/@w:val)" 
+        key('docx2hub:style', key('docx2hub:style', distinct-values($contexts//w:rStyle/@w:val))/w:link/@w:val)" 
         mode="#current">
         <xsl:sort select="@w:styleId" />
       </xsl:apply-templates>
-      <xsl:apply-templates select="key('docx2hub:style', distinct-values(.//w:rStyle/@w:val))" mode="#current">
+      <xsl:apply-templates select="key('docx2hub:style', distinct-values($contexts//w:rStyle/@w:val))" mode="#current">
         <xsl:sort select="@w:styleId" />
       </xsl:apply-templates>
-      <xsl:apply-templates select="key('docx2hub:style', distinct-values(.//w:tblStyle/@w:val))" mode="#current">
+      <xsl:apply-templates select="key('docx2hub:style', distinct-values($contexts//w:tblStyle/@w:val))" mode="#current">
         <xsl:sort select="@w:styleId" />
       </xsl:apply-templates>
     </css:rules>
   </xsl:template>
   
+    
   <xsl:template match="w:style" mode="docx2hub:add-props">
     <xsl:param name="wrap-in-style-element" select="true()" as="xs:boolean"/>
     <xsl:param name="version" as="xs:string" tunnel="yes"/>
