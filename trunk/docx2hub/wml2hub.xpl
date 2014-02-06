@@ -50,7 +50,7 @@
   <p:import href="wml2hub.lib.xpl" />
 
 
-  <p:variable name="basename" select="replace($docx, '^(.+?)([^/\\]+)\.docx$', '$2')"/>
+  <p:variable name="basename" select="replace($docx, '^(.+?)([^/\\]+)\.do[ct][mx]$', '$2')"/>
 
   <!-- unzip or print out error message -->
     
