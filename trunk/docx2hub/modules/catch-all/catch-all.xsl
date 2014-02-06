@@ -2,6 +2,8 @@
 <xsl:stylesheet version="2.0" 
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+  xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+  xmlns:wp14="http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing"
   xmlns:docx2hub = "http://www.le-tex.de/namespace/docx2hub"
   exclude-result-prefixes="docx2hub w">
 
@@ -22,7 +24,12 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="w:t | *[@xml:space eq 'preserve']" mode="wml-to-dbk docx2hub:add-props" priority="-0.8">
+  <xsl:template match="  w:t 
+                       | *[@xml:space eq 'preserve']
+                       | w:instrText
+                       | wp:posOffset
+                       | wp14:pctWidth
+                       | wp14:pctHeight" mode="wml-to-dbk docx2hub:add-props" priority="-0.8">
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*, node()" mode="#current"/>
     </xsl:copy>
