@@ -5,6 +5,7 @@
   xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
   xmlns:wp14="http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing"
   xmlns:docx2hub = "http://www.le-tex.de/namespace/docx2hub"
+  xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math"
   exclude-result-prefixes="docx2hub w">
 
   <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -25,6 +26,7 @@
   </xsl:template>
 
   <xsl:template match="  w:t 
+                       | m:t
                        | *[@xml:space eq 'preserve']
                        | w:instrText
                        | wp:posOffset
