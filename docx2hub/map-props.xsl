@@ -3,8 +3,6 @@
   xmlns:css = "http://www.w3.org/1996/css"
   xmlns:dbk	= "http://docbook.org/ns/docbook"
   xmlns:docx2hub = "http://www.le-tex.de/namespace/docx2hub"
-  xmlns:exsl = 'http://exslt.org/common'
-  xmlns:fn = "http://www.w3.org/2005/xpath-functions"
   xmlns:letex = "http://www.le-tex.de/namespace"
   xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math"
   xmlns:mml = "http://www.w3.org/Math/DTD/mathml2/mathml2.dtd"
@@ -12,18 +10,18 @@
   xmlns:pkg	= "http://schemas.microsoft.com/office/2006/xmlPackage"
   xmlns:r	= "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:rel	= "http://schemas.openxmlformats.org/package/2006/relationships"
-  xmlns:saxon	= "http://saxon.sf.net/"
   xmlns:v	= "urn:schemas-microsoft-com:vml" 
   xmlns:w	= "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:word200x = "http://schemas.microsoft.com/office/word/2003/wordml"
   xmlns:wx = "http://schemas.microsoft.com/office/word/2003/auxHint"
   xmlns:w14 = "http://schemas.microsoft.com/office/word/2010/wordml"
+  xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties"
+  xmlns:extendedProps = "http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"
+  xmlns:customProps = "http://schemas.openxmlformats.org/officeDocument/2006/custom-properties"
   xmlns:xs = "http://www.w3.org/2001/XMLSchema"
   xmlns:xsl	= "http://www.w3.org/1999/XSL/Transform"
   xmlns="http://docbook.org/ns/docbook"
-
-  exclude-result-prefixes = "w m o v wx xs dbk pkg r rel word200x exsl saxon fn letex mml docx2hub"
->
+  exclude-result-prefixes = "#all">
 
   <xsl:import href="propmap.xsl"/>
   <xsl:import href="http://transpect.le-tex.de/xslt-util/colors/colors.xsl"/>
@@ -59,10 +57,16 @@
         <xsl:if test="exists(../../w:settings/w:docVars/w:docVar)">
           <keywordset role="docVars">
             <xsl:for-each select="../../w:settings/w:docVars/w:docVar">
-              <keyword role="{./@w:name}">
-                <xsl:value-of select="./@w:val"/>
+              <keyword role="{@w:name}">
+                <xsl:value-of select="@w:val"/>
               </keyword>
             </xsl:for-each>
+          </keywordset>
+        </xsl:if>
+        <xsl:if test="exists(/w:root/w:containerProps/customProps:Properties/customProps:property)">
+          <keywordset role="custom-meta">
+            <xsl:apply-templates mode="#current" 
+              select="/w:root/w:containerProps/customProps:Properties/customProps:property"/>
           </keywordset>
         </xsl:if>
         <xsl:choose>
@@ -85,6 +89,12 @@
       <xsl:apply-templates select="../../w:comments, ../../w:footnotes, ../../w:endnotes" mode="#current"/>
       <xsl:apply-templates mode="#current"/>
     </xsl:element>
+  </xsl:template>
+  
+  <xsl:template match="customProps:property" mode="docx2hub:add-props">
+    <keyword role="{@name}">
+      <xsl:value-of select="*"/>
+    </keyword>
   </xsl:template>
   
   <xsl:template match="*[ancestor-or-self::w:numbering]" mode="docx2hub:add-props" priority="-1">
