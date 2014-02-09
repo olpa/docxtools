@@ -19,8 +19,9 @@
   xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math"
   xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape"
   xmlns:ct="http://schemas.openxmlformats.org/package/2006/content-types"
+  xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties"
   xmlns:docx2hub = "http://www.le-tex.de/namespace/docx2hub"
-  exclude-result-prefixes="xs docx2hub mml letex dbk"
+  exclude-result-prefixes="xs docx2hub mml letex dbk cp"
               
   >
   
@@ -65,76 +66,98 @@
   </xsl:template>
 
   <xsl:template match="/w:document" mode="insert-xpath" as="document-node(element(w:root))" priority="2">
-  <xsl:variable name="base-uri" select="base-uri()" as="xs:anyURI?"/>
+    <xsl:variable name="container-base-uri" select="replace($base-dir, 'word/$', '')" as="xs:string"/>
     <xsl:document>
       <w:root>
-        <xsl:attribute name="xml:base" select="replace($base-dir, 'word/$', '')" />
-        <xsl:variable name="rels" as="document-node(element(rel:Relationships))"
+        <xsl:attribute name="xml:base" select="$container-base-uri"/>
+        <xsl:variable name="containerRels" as="document-node(element(rel:Relationships))"
+          select="document(resolve-uri(replace($base-dir, '[^/]+/?$', '_rels/.rels')))"/>
+        <xsl:variable name="docRels" as="document-node(element(rel:Relationships))"
           select="document(resolve-uri(concat($base-dir,'_rels/document.xml.rels')))"/>
         <!-- At the moment, we only need themes for default font resolution that takes place
              in the current mode. Therefore, we don’t include the theme documents below  
              /w:root yet. We rather pass them as a tunneled variable. -->
         <xsl:variable name="themes" as="document-node(element(a:theme))*"
-          select="for $t in $rels/rel:Relationships/rel:Relationship[@Type eq 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme']/@Target
-                  return document(resolve-uri($t, $base-uri))"/>
-        <xsl:apply-templates select="document(resolve-uri('styles.xml', $base-uri))/w:styles" mode="#current">
+          select="for $t in $docRels/rel:Relationships/rel:Relationship[@Type eq 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme']/@Target
+                  return document(resolve-uri($t, $base-dir))"/>
+        <xsl:apply-templates select="document(resolve-uri('styles.xml', $base-dir))/w:styles" mode="#current">
           <xsl:with-param name="themes" select="$themes" tunnel="yes"/>
         </xsl:apply-templates>
-        <xsl:if test="doc-available(resolve-uri('numbering.xml', $base-uri))">
-          <xsl:apply-templates select="document(resolve-uri('numbering.xml', $base-uri))/w:numbering" mode="#current"/>
+        <xsl:if test="doc-available(resolve-uri('numbering.xml', $base-dir))">
+          <xsl:apply-templates select="document(resolve-uri('numbering.xml', $base-dir))/w:numbering" mode="#current"/>
         </xsl:if>
-        <xsl:if test="doc-available(resolve-uri('footnotes.xml', $base-uri))">
-          <xsl:apply-templates select="document(resolve-uri('footnotes.xml', $base-uri))/w:footnotes" mode="#current" />
+        <xsl:if test="doc-available(resolve-uri('footnotes.xml', $base-dir))">
+          <xsl:apply-templates select="document(resolve-uri('footnotes.xml', $base-dir))/w:footnotes" mode="#current"/>
         </xsl:if>
-        <xsl:if test="doc-available(resolve-uri('endnotes.xml', $base-uri))">
-          <xsl:apply-templates select="document(resolve-uri('endnotes.xml', $base-uri))/w:endnotes" mode="#current" />
+        <xsl:if test="doc-available(resolve-uri('endnotes.xml', $base-dir))">
+          <xsl:apply-templates select="document(resolve-uri('endnotes.xml', $base-dir))/w:endnotes" mode="#current"/>
         </xsl:if>
-        <xsl:apply-templates select="document(resolve-uri('settings.xml', $base-uri))/w:settings" mode="#current"/>
-        <xsl:if test="doc-available(resolve-uri('comments.xml', $base-uri))">
-          <xsl:apply-templates select="document(resolve-uri('comments.xml', $base-uri))/w:comments" mode="#current" />
+        <xsl:apply-templates select="document(resolve-uri('settings.xml', $base-dir))/w:settings" mode="#current"/>
+        <xsl:if test="doc-available(resolve-uri('comments.xml', $base-dir))">
+          <xsl:apply-templates select="document(resolve-uri('comments.xml', $base-dir))/w:comments" mode="#current"/>
         </xsl:if>
-        <xsl:apply-templates select="document(resolve-uri('fontTable.xml', $base-uri))/w:fonts" mode="#current"/>
+        <xsl:apply-templates select="document(resolve-uri('fontTable.xml', $base-dir))/w:fonts" mode="#current"/>
         <w:docTypes>
-          <xsl:apply-templates select="document(resolve-uri('../%5BContent_Types%5D.xml', $base-uri))/ct:Types" mode="#current"/>
+          <xsl:apply-templates select="document(resolve-uri('../%5BContent_Types%5D.xml', $base-dir))/ct:Types" mode="#current"
+          />
         </w:docTypes>
+        <w:containerRels>
+          <xsl:apply-templates select="$containerRels/*" mode="#current"/>
+        </w:containerRels>
+        <w:containerProps>
+          <!-- custom file properties (§ 15.2.12.2) that are found in, e.g., 
+            <Relationship Id="rId4" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/custom-properties" Target="docProps/custom.xml"/>
+            will later be converted to keywordset[@role = 'hub:custom-meta'] -->
+          <xsl:apply-templates mode="#current"
+            select="for $t in $containerRels/rel:Relationships/rel:Relationship[ends-with(@Type, 'properties')]/@Target
+                    return document(resolve-uri($t, $container-base-uri))"/>
+        </w:containerProps>
         <w:docRels>
-          <xsl:apply-templates select="document(resolve-uri('_rels/document.xml.rels', $base-uri))/rel:Relationships" mode="#current"/>
+          <xsl:apply-templates select="document(resolve-uri('_rels/document.xml.rels', $base-dir))/rel:Relationships"
+            mode="#current"/>
         </w:docRels>
-        <xsl:if test="doc-available(resolve-uri('_rels/footnotes.xml.rels', $base-uri))">
+        <xsl:if test="doc-available(resolve-uri('_rels/footnotes.xml.rels', $base-dir))">
           <w:footnoteRels>
-            <xsl:apply-templates select="document(resolve-uri('_rels/footnotes.xml.rels', $base-uri))/rel:Relationships" mode="#current"/>
+            <xsl:apply-templates select="document(resolve-uri('_rels/footnotes.xml.rels', $base-dir))/rel:Relationships"
+              mode="#current"/>
           </w:footnoteRels>
         </xsl:if>
-        <xsl:if test="doc-available(resolve-uri('_rels/comments.xml.rels', $base-uri))">
+        <xsl:if test="doc-available(resolve-uri('_rels/comments.xml.rels', $base-dir))">
           <w:commentRels>
-            <xsl:apply-templates select="document(resolve-uri('_rels/comments.xml.rels', $base-uri))/rel:Relationships" mode="#current"/>
+            <xsl:apply-templates select="document(resolve-uri('_rels/comments.xml.rels', $base-dir))/rel:Relationships"
+              mode="#current"/>
           </w:commentRels>
         </xsl:if>
 
         <!-- apply header and footer content and relations -->
         <xsl:for-each select="('header', 'footer')">
           <xsl:variable name="type" select="current()" as="xs:string"/>
-          <xsl:if test="some $rel-file
-                        in document(resolve-uri('_rels/document.xml.rels', $base-uri))/rel:Relationships/rel:Relationship[
+          <xsl:if
+            test="some $rel-file
+                        in document(resolve-uri('_rels/document.xml.rels', $base-dir))/rel:Relationships/rel:Relationship[
                           @Type eq concat('http://schemas.openxmlformats.org/officeDocument/2006/relationships/', $type)
                         ]/@Target
-                        satisfies doc-available(resolve-uri(concat('_rels/', $rel-file, '.rels'), $base-uri))">
+                        satisfies doc-available(resolve-uri(concat('_rels/', $rel-file, '.rels'), $base-dir))">
             <xsl:element name="w:{$type}Rels">
-              <xsl:for-each select="document(resolve-uri('_rels/document.xml.rels', $base-uri))/rel:Relationships/rel:Relationship[
+              <xsl:for-each
+                select="document(resolve-uri('_rels/document.xml.rels', $base-dir))/rel:Relationships/rel:Relationship[
                                       @Type eq concat('http://schemas.openxmlformats.org/officeDocument/2006/relationships/', $type)
                                     ]">
-                <xsl:if test="doc-available(resolve-uri(concat('_rels/', @Target, '.rels'), $base-uri))">
-                  <xsl:apply-templates select="document(resolve-uri(concat('_rels/', @Target, '.rels'), $base-uri))/rel:Relationships" mode="#current"/>
+                <xsl:if test="doc-available(resolve-uri(concat('_rels/', @Target, '.rels')))">
+                  <xsl:apply-templates
+                    select="document(resolve-uri(concat('_rels/', @Target, '.rels')))/rel:Relationships"
+                    mode="#current"/>
                 </xsl:if>
               </xsl:for-each>
             </xsl:element>
           </xsl:if>
           <xsl:element name="w:{$type}">
-            <xsl:for-each select="document(resolve-uri('_rels/document.xml.rels', $base-uri))/rel:Relationships/rel:Relationship[
+            <xsl:for-each
+              select="document(resolve-uri('_rels/document.xml.rels', $base-dir))/rel:Relationships/rel:Relationship[
                                   @Type eq concat('http://schemas.openxmlformats.org/officeDocument/2006/relationships/', $type)
                                 ]">
-              <xsl:if test="doc-available(resolve-uri(@Target, $base-uri))">
-                <xsl:apply-templates select="document(resolve-uri(@Target, $base-uri))" mode="#current" />
+              <xsl:if test="doc-available(resolve-uri(@Target))">
+                <xsl:apply-templates select="document(resolve-uri(@Target))" mode="#current"/>
               </xsl:if>
             </xsl:for-each>
           </xsl:element>
@@ -146,7 +169,9 @@
     </xsl:document>
   </xsl:template>
 
-  <xsl:template match="w:document | w:numbering | w:endnotes | w:footnotes | w:settings | w:fonts | rel:Relationships | w:comments | ct:Types | w:hdr | w:ftr" mode="insert-xpath">
+  <xsl:template match="  w:document | w:numbering | w:endnotes | w:footnotes 
+                       | w:settings | w:fonts | rel:Relationships | w:comments 
+                       | ct:Types | w:hdr | w:ftr | *:Properties | cp:coreProperties" mode="insert-xpath">
     <xsl:copy copy-namespaces="no">
       <xsl:attribute name="xml:base" select="base-uri()" />
       <xsl:apply-templates select="@*, *" mode="#current"/>      
