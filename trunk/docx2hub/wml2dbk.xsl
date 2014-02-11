@@ -13,8 +13,6 @@
   xmlns:docx2hub = "http://www.le-tex.de/namespace/docx2hub"
   xmlns:css="http://www.w3.org/1996/css"
   xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
-  xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
-  xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns="http://docbook.org/ns/docbook"
   exclude-result-prefixes = "w xs dbk r rel letex m mc xlink docx2hub wp"
 >
@@ -178,29 +176,32 @@
             </xsl:choose>
           </xsl:when>
           <xsl:when test="count($nodes/w:fldChar[@w:fldCharType = 'begin']) gt 1">
-            <xsl:choose>
-              <xsl:when test="$nodes[1][self::w:r[w:fldChar[@w:fldCharType = 'begin']]]">
-<!--                 <xsl:message>=====================================================</xsl:message> -->
-<!--                 <xsl:message select="string-join($nodes//text()[parent::w:instrText], '')"/> -->
-<!--                 <xsl:message select="string-join($nodes[.//text()[parent::w:t]], '')"/> -->
-<!--                 <xsl:message select="($nodes[w:instrText])[1]"/> -->
-                <xsl:apply-templates select="($nodes[w:instrText])[1]" mode="wml-to-dbk">
-                  <xsl:with-param name="instrText" select="string-join($nodes//text()[parent::w:instrText], '')" tunnel="yes" as="xs:string?"/>
-                  <xsl:with-param name="nodes" select="$nodes[descendant::w:instrText]" tunnel="yes" as="element(*)*"/>
-                  <xsl:with-param name="text" select="$nodes[.//text()[parent::w:t] or .//w:tab or .//w:br]" tunnel="yes" as="element(*)*"/>
-                </xsl:apply-templates>
-              </xsl:when>
-              <xsl:otherwise>
-                <xsl:call-template name="signal-error" xmlns="">
-                  <xsl:with-param name="error-code" select="'W2D_012'"/>
-                  <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
-                  <xsl:with-param name="hash">
-                    <value key="xpath"><xsl:value-of select="$nodes[1]/@srcpath"/></value>
-                    <value key="level">INT</value>
-                  </xsl:with-param>
-                </xsl:call-template>
-              </xsl:otherwise>
-            </xsl:choose>
+            <xsl:for-each-group select="$nodes" group-starting-with="w:r[w:fldChar[@w:fldCharType = 'begin']]">
+              <xsl:choose>
+                <xsl:when test="current-group()[1][self::w:r[w:fldChar[@w:fldCharType = 'begin']]]">
+                  <!--<xsl:message>=====================================================</xsl:message> 
+                  <xsl:message select="current-group()"/>
+                  <xsl:message select="string-join(current-group()//text()[parent::w:instrText], '')"/> 
+                  <xsl:message select="string-join(current-group()[.//text()[parent::w:t]], '')"/> 
+                  <xsl:message select="(current-group()[w:instrText])[1]"/> -->
+                  <xsl:apply-templates select="(current-group()[w:instrText])[1]" mode="wml-to-dbk">
+                    <xsl:with-param name="instrText" select="string-join(current-group()//text()[parent::w:instrText], '')" tunnel="yes" as="xs:string?"/>
+                    <xsl:with-param name="nodes" select="current-group()[descendant::w:instrText]" tunnel="yes" as="element(*)*"/>
+                    <xsl:with-param name="text" select="current-group()[.//text()[parent::w:t] or .//w:tab or .//w:br]" tunnel="yes" as="element(*)*"/>
+                  </xsl:apply-templates>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:call-template name="signal-error" xmlns="">
+                    <xsl:with-param name="error-code" select="'W2D_012'"/>
+                    <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
+                    <xsl:with-param name="hash">
+                      <value key="xpath"><xsl:value-of select="current-group()[1]/@srcpath"/></value>
+                      <value key="level">INT</value>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each-group>
           </xsl:when>
           <xsl:otherwise>
             <xsl:call-template name="signal-error" xmlns="">
@@ -769,6 +770,7 @@
     </xsl:choose>
   </xsl:template>
 
+
   <letex:field-functions>
     <letex:field-function name="INDEX" destroy="yes"/>
     <letex:field-function name="NOTEREF" element="link" attrib="linkend" value="2"/>
@@ -815,6 +817,26 @@
   <xsl:template match="w:fldSimple" mode="wml-to-dbk">
     <!-- p1592 gehört zu Feldfunktionen. Wenn w:t darunter, muss der geschrieben werden -->
     <xsl:apply-templates mode="#current"/>
+  </xsl:template>
+
+  <!-- drawing -->
+  <xsl:template match="w:drawing" mode="wml-to-dbk">
+    <xsl:choose>
+      <xsl:when test="exists(wp:inline/wp:docPr[@descr and matches(@descr,'\.([Jj][pP][gG]|[gG][iI][fF]|[pP][nN][gG]|[tT][iI][fF][fF]?)$')])">
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="{wp:inline/wp:docPr/@descr}"/>
+          </imageobject>
+        </mediaobject>
+      </xsl:when>
+      <xsl:when test="exists(wp:inline/wp:docPr/@name)">
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="{wp:inline/wp:docPr/@name}"/>
+          </imageobject>
+        </mediaobject>
+      </xsl:when>
+    </xsl:choose>
   </xsl:template>
 
   <!-- whitespace elements, etc. -->
@@ -872,7 +894,7 @@
     </inlineequation>
   </xsl:template>
 
-  <xsl:template match="w:sym" mode="omml2mml" priority="120">
+ <xsl:template match="w:sym" mode="omml2mml" priority="120">
     <xsl:message select="'hurz'"/>
     <xsl:apply-templates select="." mode="wml-to-dbk"/>
   </xsl:template>
