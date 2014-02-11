@@ -936,12 +936,13 @@
 					          </xsl:otherwise>
 				        </xsl:choose>
 			      </xsl:when>
-			      <xsl:otherwise>
+		      <xsl:otherwise>
 			        <xsl:variable name="text-nodes" as="xs:string*">
 			          <xsl:apply-templates select=".//*:t/text() | .//w:sym" mode="wml-to-dbk"/>
 			        </xsl:variable>
-			        <xsl:variable name="context" as="element(*)" select="(.//*:t | .//w:sym)[1]/.."/>
+		        <xsl:variable name="context" as="element(*)?" select="(.//*:t | .//w:sym)[1]/.."/>
 				        <xsl:choose>
+				          <xsl:when test="not($context)"></xsl:when>
 					          <xsl:when test="$fLit=1">
 						            <mml:maction actiontype="lit">
 							              <xsl:for-each select="$text-nodes">
