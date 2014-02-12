@@ -822,26 +822,6 @@
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
-  <!-- drawing -->
-  <xsl:template match="w:drawing" mode="wml-to-dbk">
-    <xsl:choose>
-      <xsl:when test="exists(wp:inline/wp:docPr[@descr and matches(@descr,'\.([Jj][pP][gG]|[gG][iI][fF]|[pP][nN][gG]|[tT][iI][fF][fF]?)$')])">
-        <mediaobject>
-          <imageobject>
-            <imagedata fileref="{wp:inline/wp:docPr/@descr}"/>
-          </imageobject>
-        </mediaobject>
-      </xsl:when>
-      <xsl:when test="exists(wp:inline/wp:docPr/@name)">
-        <mediaobject>
-          <imageobject>
-            <imagedata fileref="{wp:inline/wp:docPr/@name}"/>
-          </imageobject>
-        </mediaobject>
-      </xsl:when>
-    </xsl:choose>
-  </xsl:template>
-
   <!-- whitespace elements, etc. -->
   <xsl:template match="w:tab" mode="wml-to-dbk">
     <xsl:choose>
