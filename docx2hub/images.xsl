@@ -15,24 +15,43 @@
   version="2.0">
   
   <xsl:template match="w:drawing" mode="wml-to-dbk">
-    <mediaobject>
-      <xsl:apply-templates select="@srcpath" mode="#current"/>
-      <xsl:if test=".//wp:docPr/@descr ne ''">
-        <alt>
-          <xsl:value-of select=".//wp:docPr/@descr"/>
-        </alt>
-      </xsl:if>
-      <xsl:apply-templates select="descendant::a:blip" mode="wml-to-dbk"/>
-      <xsl:if test=".//wp:docPr/@title ne ''">
-        <caption>
-          <para>
-            <xsl:value-of select=".//wp:docPr/@title"/>
-          </para>
-        </caption>
-      </xsl:if>
-    </mediaobject>
+    <xsl:choose>
+      <xsl:when test="exists(wp:inline/wp:docPr[@descr and matches(@descr,'\.([Jj][pP][gG]|[gG][iI][fF]|[pP][nN][gG]|[tT][iI][fF][fF]?)$')])">
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="{wp:inline/wp:docPr/@descr}"/>
+          </imageobject>
+        </mediaobject>
+      </xsl:when>
+      <xsl:when test="exists(wp:inline/wp:docPr/@name)">
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="{wp:inline/wp:docPr/@name}"/>
+          </imageobject>
+        </mediaobject>
+      </xsl:when>
+      <xsl:otherwise>
+      <mediaobject>
+        <xsl:apply-templates select="@srcpath" mode="#current"/>
+        <xsl:if test=".//wp:docPr/@descr ne ''">
+          <alt>
+            <xsl:value-of select=".//wp:docPr/@descr"/>
+          </alt>
+        </xsl:if>
+        <xsl:apply-templates select="descendant::a:blip" mode="wml-to-dbk"/>
+        <xsl:if test=".//wp:docPr/@title ne ''">
+          <caption>
+            <para>
+              <xsl:value-of select=".//wp:docPr/@title"/>
+            </para>
+          </caption>
+        </xsl:if>
+      </mediaobject>
+    </xsl:otherwise>
+   </xsl:choose>
   </xsl:template>
-
+  
+  
   <!-- images embedded in word zip container, usually stored in {docx}/word/media/ -->
   <xsl:template match="a:blip[@r:embed]" mode="wml-to-dbk">
     <xsl:call-template name="create-imageobject">
