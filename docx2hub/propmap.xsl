@@ -89,6 +89,10 @@
         <prop name="w:noProof" />
         <prop name="w:noWrap" type="docx-boolean-prop" target-name="css:white-space" default="normal" active="nowrap"/>
         <prop name="w:numPr" type="passthru" />
+        <prop name="w:outline">
+          <val eq="true" target-name="css:border-bottom-width" target-value="1px 0px"/>
+          <val eq="false" />
+        </prop>
         <prop name="w:outlineLvl" type="docx-hierarchy-level"/>
         <prop name="w:overflowPunct"/>
         <prop name="w:pageBreakBefore" type="docx-boolean-prop" target-name="css:page-break-before" default="auto" active="always"/>
