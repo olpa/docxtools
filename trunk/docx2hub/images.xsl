@@ -23,7 +23,9 @@
           </imageobject>
         </mediaobject>
       </xsl:when>
-      <xsl:when test="exists(wp:inline/wp:docPr/@name)">
+      <xsl:when test="exists(wp:inline/wp:docPr/@name)
+                      and (: don't destroy ref to the embedded file name :)
+                      not(descendant::a:blip[@r:embed])">
         <mediaobject>
           <imageobject>
             <imagedata fileref="{wp:inline/wp:docPr/@name}"/>
