@@ -251,6 +251,11 @@
     <xsl:copy-of select="." />
   </xsl:template>
 
+  <xsl:template match="w:u" mode="docx2hub:add-props" priority="2">
+    <xsl:next-match/>
+    <xsl:apply-templates select="@w:color" mode="#current"/>
+  </xsl:template>
+  
   <xsl:template match="w:ind" mode="docx2hub:add-props" priority="2">
     <!-- Precedence as per § 17.3.1.12.
          Ignore the ..Chars variants and start/end for the time being. -->
@@ -287,6 +292,7 @@
                        | w:ind/@* 
                        | w:tab/@*[local-name() ne 'srcpath']
                        | w:tcW/@* 
+                       | w:u/@w:color
                        | w:spacing/@* 
                        | v:shape/@* 
                        " 
