@@ -198,7 +198,8 @@
           <val match="wav" target-name="css:text-decoration-style" target-value="wavy"/>
           <val match="wav" target-name="css:text-decoration-line" target-value="underline"/>
         </prop>
-     
+        <prop name="w:u/@w:color" type="docx-color" target-name="css:text-decoration-color"/>
+          
         <prop name="w:uiPriority" />
         <prop name="w:unhideWhenUsed" />
         <prop name="w:vAlign">
