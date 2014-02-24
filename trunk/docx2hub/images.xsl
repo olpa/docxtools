@@ -64,11 +64,15 @@
   
   <!-- parent v:shape is processed in vml mode, see objects.xsl -->
   <xsl:template match="v:imagedata" mode="vml">
-    <xsl:variable name="image-dimensions" select="tokenize(parent::v:shape/@style, ';')" as="xs:string+"/>
+    <xsl:variable name="image-dimensions" select="tokenize(parent::v:shape/@style, ';')" as="xs:string*"/>
     <mediaobject>
-      <xsl:apply-templates select="@srcpath" mode="#current"/>      
-      <xsl:attribute name="css:width" select="replace($image-dimensions[1], '^width:', '')"/>
-      <xsl:attribute name="css:height" select="replace($image-dimensions[2], '^height:', '')"/>
+      <xsl:apply-templates select="@srcpath" mode="#current"/>
+      <xsl:for-each select="$image-dimensions[1]">
+        <xsl:attribute name="css:width" select="replace(., '^width:', '')"/>  
+      </xsl:for-each>
+      <xsl:for-each select="$image-dimensions[2]">
+        <xsl:attribute name="css:height" select="replace(., '^height:', '')"/>
+      </xsl:for-each>
       <xsl:call-template name="create-imageobject">
         <xsl:with-param name="image-id" select="@r:id"/>
         <xsl:with-param name="embedded" select="true()"/>
@@ -88,10 +92,9 @@
     <xsl:param name="image-id" as="xs:string"/>
     <xsl:param name="embedded" as="xs:boolean"/>
     <!-- the file reference of an image object is stored in {docx}/_rels/document.xml.rels -->
-    <xsl:variable name="relationships-uri" select="concat($base-dir, '_rels/document.xml.rels' )" as="xs:string"/>
     <xsl:variable name="relationships" 
-      select="document($relationships-uri)/rel:Relationships/rel:Relationship[@Type eq 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image']" 
-      as="element(rel:Relationship)*"/>
+      select="//w:docRels/rel:Relationships/rel:Relationship[@Type eq 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image']" 
+      as="element(rel:Relationship)+"/>
     <xsl:variable name="file-uri" select="$relationships[@Id eq $image-id]/@Target" as="xs:string"/>
     <!-- include container prefix for files embedded in docx -->
     <xsl:variable name="patched-file-uri" select="
