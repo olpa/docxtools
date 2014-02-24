@@ -70,9 +70,9 @@
           <xsl:message select="concat('##  Level: ', $hash/*:value[@key = 'level'])"/>
         </xsl:if>
         <xsl:if test="$hash/*:value[@key = 'comment']">
-          <letex:comment srcpath="{$hash/*:value[@key = 'xpath']}">
-            <xsl:value-of select="$msg-text"/>
-          </letex:comment>
+          <xsl:comment>
+            <xsl:value-of select="$hash/*:value[@key = 'xpath'], $msg-text"></xsl:value-of>
+          </xsl:comment>
         </xsl:if>
         <xsl:if test="$hash/*:value[@key = 'xpath']">
           <xsl:message select="concat('##  XPath: ', $hash/*:value[@key = 'xpath'])"/>
