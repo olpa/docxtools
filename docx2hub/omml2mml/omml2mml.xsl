@@ -16,6 +16,7 @@
 		version="2.0"
                 exclude-result-prefixes="m w mml">
 	<!-- %% Global Definitions -->
+  <xsl:param name="fail-on-error" select="'no'"/>
 
 	<!-- Every single unicode character that is recognized by OMML as an operator -->
 	<xsl:variable name="sOperators"
@@ -1859,64 +1860,12 @@
             <!-- argument properties ignored -->
           </xsl:template>
 
-          <xsl:template match="*" mode="omml2mml">
-            <xsl:call-template name="signal-error">
-              <xsl:with-param name="error-code" select="'W2D_020'"/>
-              <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
-              <xsl:with-param name="hash">
-                <value key="xpath"><xsl:value-of select="@xpath"/></value>
-                <value key="level">INT</value>
-                <value key="mode">omml2mml</value>
-                <value key="info-text"><xsl:value-of select="concat('Element: ', name(), '     Parent: ', ../name())"/></value>
-              </xsl:with-param>
-            </xsl:call-template>
-          </xsl:template>
-
-
-
-
-  <!-- default for attributes -->
-  <xsl:template match="@*" mode="omml2mml">
-    <xsl:call-template name="signal-error">
-      <xsl:with-param name="error-code" select="'W2D_021'"/>
-      <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
-      <xsl:with-param name="hash">
-        <value key="xpath"><xsl:value-of select="../@xpath"/></value>
-        <value key="level">INT</value>
-        <value key="mode">omml2mml</value>
-        <value key="info-text"><xsl:value-of select="concat('Attribut: ', name(), '     Parent: ', ../name())"/></value>
-      </xsl:with-param>
-    </xsl:call-template>
+  <!-- unprocessed content is commented -->
+  <xsl:template match="@*|comment()|processing-instruction()|*" mode="omml2mml">
+    <xsl:comment>
+      <xsl:text>Attribute found: </xsl:text><xsl:value-of select="if(name()) then name() else '', ."/>
+    </xsl:comment>
   </xsl:template>
-
-  <!-- default for comments -->
-  <xsl:template match="comment()" mode="omml2mml">
-    <xsl:call-template name="signal-error">
-      <xsl:with-param name="error-code" select="'W2D_022'"/>
-      <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
-      <xsl:with-param name="hash">
-        <value key="xpath"><xsl:value-of select="preceding::*[1]/@xpath"/></value>
-        <value key="level">INT</value>
-        <value key="mode">omml2mml</value>
-        <value key="info-text"><xsl:value-of select="."/></value>
-      </xsl:with-param>
-    </xsl:call-template>
-  </xsl:template>
-
-  <!-- default for PIs -->
-  <xsl:template match="processing-instruction()" mode="omml2mml">
-    <xsl:call-template name="signal-error">
-      <xsl:with-param name="error-code" select="'W2D_023'"/>
-      <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
-      <xsl:with-param name="hash">
-        <value key="xpath"><xsl:value-of select="preceding::*[1]/@xpath"/></value>
-        <value key="level">INT</value>
-        <value key="mode">omml2mml</value>
-        <value key="info-text"><xsl:value-of select="."/></value>
-      </xsl:with-param>
-    </xsl:call-template>
-  </xsl:template>
-
 
   <xsl:template match="m:oMath" mode="omml2mml">
     <mml:math>
