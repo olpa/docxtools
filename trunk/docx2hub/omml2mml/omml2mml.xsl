@@ -16,7 +16,6 @@
 		version="2.0"
                 exclude-result-prefixes="m w mml">
 	<!-- %% Global Definitions -->
-  <xsl:param name="fail-on-error" select="'no'"/>
 
 	<!-- Every single unicode character that is recognized by OMML as an operator -->
 	<xsl:variable name="sOperators"
@@ -1861,7 +1860,7 @@
           </xsl:template>
 
   <!-- unprocessed content is commented -->
-  <xsl:template match="@*|comment()|processing-instruction()|*" mode="omml2mml">
+  <xsl:template match="@*|comment()|processing-instruction()|*" mode="omml2mml" priority="-10">
     <xsl:comment>
       <xsl:text>Attribute found: </xsl:text><xsl:value-of select="if(name()) then name() else '', ."/>
     </xsl:comment>
