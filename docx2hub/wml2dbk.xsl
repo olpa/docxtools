@@ -482,6 +482,9 @@
           </xsl:with-param>
         </xsl:call-template>
       </xsl:if>
+      <!-- Only necessary in tables? They'll get lost otherwise. -->
+      <xsl:apply-templates select="preceding-sibling::*[1]/self::w:bookmarkStart
+                                   | parent::w:tc[current() is w:p[1]]/preceding-sibling::*[1]/self::w:bookmarkStart" mode="#current"/>
       <xsl:if test=".//w:r">
         <xsl:sequence select="letex:insert-numbering(.)"/>
       </xsl:if>
