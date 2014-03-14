@@ -483,8 +483,11 @@
         </xsl:call-template>
       </xsl:if>
       <!-- Only necessary in tables? They'll get lost otherwise. -->
-      <xsl:apply-templates select="preceding-sibling::*[1]/self::w:bookmarkStart
-                                   | parent::w:tc[current() is w:p[1]]/preceding-sibling::*[1]/self::w:bookmarkStart" mode="#current"/>
+      <xsl:variable name="bookmarkstart-before-p" as="element(w:bookmarkStart)*"
+        select="preceding-sibling::w:bookmarkStart[. &gt;&gt; current()/preceding-sibling::*[not(self::w:bookmarkStart)][1]]"/>
+      <xsl:variable name="bookmarkstart-before-tc" as="element(w:bookmarkStart)*"
+        select="parent::w:tc[current() is w:p[1]]/preceding-sibling::w:bookmarkStart[. &gt;&gt; current()/parent::w:tc/preceding-sibling::*[not(self::w:bookmarkStart)][1]]"/>
+      <xsl:apply-templates select="$bookmarkstart-before-p | $bookmarkstart-before-tc" mode="#current"/>
       <xsl:if test=".//w:r">
         <xsl:sequence select="letex:insert-numbering(.)"/>
       </xsl:if>
