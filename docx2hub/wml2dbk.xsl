@@ -487,7 +487,9 @@
         select="preceding-sibling::w:bookmarkStart[. &gt;&gt; current()/preceding-sibling::*[not(self::w:bookmarkStart)][1]]"/>
       <xsl:variable name="bookmarkstart-before-tc" as="element(w:bookmarkStart)*"
         select="parent::w:tc[current() is w:p[1]]/preceding-sibling::w:bookmarkStart[. &gt;&gt; current()/parent::w:tc/preceding-sibling::*[not(self::w:bookmarkStart)][1]]"/>
-      <xsl:apply-templates select="$bookmarkstart-before-p | $bookmarkstart-before-tc" mode="#current"/>
+      <xsl:variable name="bookmarkstart-before-tr" as="element(w:bookmarkStart)*"
+        select="parent::w:tc/parent::w:tr[current() is (w:tc/w:p)[1]]/preceding-sibling::w:bookmarkStart[. &gt;&gt; current()/parent::w:tc/parent::w:tr/preceding-sibling::*[not(self::w:bookmarkStart)][1]]"/>
+      <xsl:apply-templates select="$bookmarkstart-before-p | $bookmarkstart-before-tc | $bookmarkstart-before-tr" mode="#current"/>
       <xsl:if test=".//w:r">
         <xsl:sequence select="letex:insert-numbering(.)"/>
       </xsl:if>
