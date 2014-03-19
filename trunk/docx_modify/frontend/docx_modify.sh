@@ -72,6 +72,7 @@ fi
 if $cygwin; then
   XSL=file:/$(cygpath -ma $XSL)
   DOCX=$(cygpath -ma $DOCX)
+  DEBUGDIR=file:/$(cygpath -ma $DEBUGDIR)
   XPL=file:/$(cygpath -ma $XPL)
   if [ ! -z $MODIFY_XPL ]; then
     MODIFY_XPL=file:/$(cygpath -ma $MODIFY_XPL)
@@ -82,4 +83,4 @@ if [ ! -z $MODIFY_XPL ]; then
   MODIFY_XPL="-i xpl=$MODIFY_XPL"
 fi
 
-HEAP=$HEAP $DIR/calabash/calabash.sh -i xslt="$XSL" $MODIFY_XPL "$XPL" file="$DOCX" debug=$DEBUG debug-dir-uri=$DEBUGDIR
+HEAP=$HEAP $DIR/calabash/calabash.sh -D -i xslt="$XSL" $MODIFY_XPL "$XPL" file="$DOCX" debug=$DEBUG debug-dir-uri=$DEBUGDIR
