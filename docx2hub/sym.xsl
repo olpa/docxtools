@@ -15,22 +15,26 @@
   xmlns:rel		= "http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:exsl		= 'http://exslt.org/common'
   xmlns:saxon		= "http://saxon.sf.net/"
+  xmlns:docx2hub = "http://www.le-tex.de/namespace/docx2hub"
   xmlns:letex		= "http://www.le-tex.de/namespace"
   xmlns:mml             = "http://www.w3.org/Math/DTD/mathml2/mathml2.dtd"
   xmlns:css="http://www.w3.org/1996/css"
 
-  exclude-result-prefixes = "w o v wx xs dbk pkg r rel word200x exsl saxon fn letex mml"
+  exclude-result-prefixes = "w o v wx xs dbk pkg r rel word200x docx2hub exsl saxon fn letex mml"
   >
+
+  <xsl:variable name="docx2hub:symbol-font-names" as="xs:string+" 
+    select="('Math1', 'Symbol', 'Wingdings')"/>
 
   <xsl:template match="w:sym
                        |
-                       w:t[string-length(.)=1 and ../w:rPr/w:rFonts/@w:ascii=('Symbol', 'Wingdings')]
+                       w:t[string-length(.)=1 and ../w:rPr/w:rFonts/@w:ascii=$docx2hub:symbol-font-names]
                        |
-                       w:lvlText[../w:rPr/w:rFonts/@w:ascii=('Symbol', 'Wingdings')]/@w:val
+                       w:lvlText[../w:rPr/w:rFonts/@w:ascii=$docx2hub:symbol-font-names]/@w:val
                        |
-                       w:t[string-length(.)=1 and ../@css:font-family = ('Symbol', 'Wingdings')]
+                       w:t[string-length(.)=1 and ../@css:font-family = $docx2hub:symbol-font-names]
                        |
-                       w:lvlText[../@css:font-family = ('Symbol', 'Wingdings')]/@w:val
+                       w:lvlText[../@css:font-family = $docx2hub:symbol-font-names]/@w:val
                        " mode="wml-to-dbk" priority="1.5">
     <!-- priority = 1.5 because of priority = 1 ("default for attributes") in wml2dbk.xsl -->
     <xsl:variable name="font" select="if (self::w:sym) 
@@ -38,10 +42,12 @@
                                       else
                                         if (self::attribute(w:val)) (: in w:lvlText :)
                                         then 
-                                          if (parent::w:lvlText[../w:rPr/w:rFonts/@w:ascii=('Symbol', 'Wingdings')])
+                                          if (parent::w:lvlText[../w:rPr/w:rFonts/@w:ascii=$docx2hub:symbol-font-names])
                                           then ../../w:rPr/w:rFonts/@w:ascii
                                           else parent::w:lvlText/../@css:font-family
                                         else (../w:rPr/w:rFonts/@w:ascii, ../@css:font-family)[1]" as="xs:string?"/>
+    <!-- fonts with the same mappings as Symbol: --> 
+    <xsl:variable name="font" select="if ($font = ('Math1')) then 'Symbol' else $font" as="xs:string?"/>
     <xsl:if test="empty($font)">
       <xsl:call-template name="signal-error">
         <xsl:with-param name="error-code" select="'W2D_080'"/>
@@ -132,7 +138,7 @@
         <xsl:variable name="font" select="replace($tokens[4], '&quot;', '')"/>
         <xsl:variable name="sym" select="$tokens[2]"/>
         <xsl:choose>
-          <xsl:when test="$font = ('Symbol', 'Wingdings')">
+          <xsl:when test="$font = $docx2hub:symbol-font-names">
             <xsl:variable name="number" select="if (matches($tokens[2], '^[0-9]+$')) then letex:dec-to-hex(xs:integer($tokens[2])) else 'NaN'"/>
             <xsl:choose>
               <xsl:when test="$number = 'NaN'">
