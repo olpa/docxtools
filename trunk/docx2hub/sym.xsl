@@ -46,8 +46,6 @@
                                           then ../../w:rPr/w:rFonts/@w:ascii
                                           else parent::w:lvlText/../@css:font-family
                                         else (../w:rPr/w:rFonts/@w:ascii, ../@css:font-family)[1]" as="xs:string?"/>
-    <!-- fonts with the same mappings as Symbol: --> 
-    <xsl:variable name="font" select="if ($font = ('Math1')) then 'Symbol' else $font" as="xs:string?"/>
     <xsl:if test="empty($font)">
       <xsl:call-template name="signal-error">
         <xsl:with-param name="error-code" select="'W2D_080'"/>
