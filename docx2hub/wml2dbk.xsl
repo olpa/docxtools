@@ -468,20 +468,6 @@
   <xsl:template match="w:p" mode="wml-to-dbk">
     <xsl:element name="para">
       <xsl:apply-templates select="@* except @*[matches(name(),'^w:rsid')]" mode="#current"/>
-      <xsl:if test="false() (: §§§ :)
-                    and
-                    (some $x in * satisfies not($x/name() = $docx2hub:allowed-para-element-names))">
-        <xsl:call-template name="signal-error" xmlns="">
-          <xsl:with-param name="error-code" select="'W2D_030'"/>
-          <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
-          <xsl:with-param name="hash">
-            <value key="xpath"><xsl:value-of select="@srcpath"/></value>
-            <value key="level">INT</value>
-            <value key="mode">wml-to-dbk</value>
-            <value key="info-text"><xsl:value-of select="string-join(*[not(name() = $docx2hub:allowed-para-element-names)]/name(), ' ')"/></value>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:if>
       <!-- Only necessary in tables? They'll get lost otherwise. -->
       <xsl:variable name="bookmarkstart-before-p" as="element(w:bookmarkStart)*"
         select="preceding-sibling::w:bookmarkStart[. &gt;&gt; current()/preceding-sibling::*[not(self::w:bookmarkStart)][1]]"/>
@@ -489,7 +475,7 @@
         select="parent::w:tc[current() is w:p[1]]/preceding-sibling::w:bookmarkStart[. &gt;&gt; current()/parent::w:tc/preceding-sibling::*[not(self::w:bookmarkStart)][1]]"/>
       <xsl:variable name="bookmarkstart-before-tr" as="element(w:bookmarkStart)*"
         select="parent::w:tc/parent::w:tr[current() is (w:tc/w:p)[1]]/preceding-sibling::w:bookmarkStart[. &gt;&gt; current()/parent::w:tc/parent::w:tr/preceding-sibling::*[not(self::w:bookmarkStart)][1]]"/>
-      <xsl:apply-templates select="$bookmarkstart-before-p | $bookmarkstart-before-tc | $bookmarkstart-before-tr" mode="#current"/>
+      <xsl:apply-templates select="$bookmarkstart-before-p | $bookmarkstart-before-tc | $bookmarkstart-before-tr" mode="wml-to-dbk-bookmarkStart"/>
       <xsl:if test=".//w:r">
         <xsl:sequence select="letex:insert-numbering(.)"/>
       </xsl:if>
@@ -549,11 +535,16 @@
 
   <!-- bookmarks -->
 
-  <xsl:template match="w:bookmarkStart" mode="wml-to-dbk">
+  <!-- mode wml-to-dbk-bookmarkStart is for transforming bookmarkStarts that used to be in between w:ps 
+    within the paras where they belong -->
+  <xsl:template match="w:bookmarkStart" mode="wml-to-dbk wml-to-dbk-bookmarkStart">
     <xsl:variable name="anchor-id" select="replace(concat(@w:name, '_', @w:id), '%20', '_')" as="xs:string"/>
     <anchor role="start" xml:id="{replace($anchor-id, '^(\I)', '_$1')}" xreflabel="{@w:id}"/>
   </xsl:template>
 
+  <!-- remove $bookmarkstart-before-p (see template for w:p above) outside of tables --> 
+  <xsl:template match="w:bookmarkStart[following-sibling::w:p]" mode="wml-to-dbk"/>
+  
   <xsl:key name="docx2hub:bookmarkStart" match="w:bookmarkStart" use="@w:id"/>
 
   <xsl:template match="w:bookmarkEnd" mode="wml-to-dbk">
@@ -563,7 +554,7 @@
     <anchor role="end" xml:id="{replace($anchor-id, '^(\I)', '_$1')}"/>
   </xsl:template>
 
-  <xsl:template match="w:bookmarkStart[@w:name eq '_GoBack']" mode="wml-to-dbk"/>
+  <xsl:template match="w:bookmarkStart[@w:name eq '_GoBack']" mode="wml-to-dbk wml-to-dbk-bookmarkStart"/>
   
   <xsl:template match="w:bookmarkEnd[key('docx2hub:bookmarkStart', @w:id)/@w:name eq '_GoBack']" mode="wml-to-dbk"/>
   
@@ -687,7 +678,17 @@
     <xsl:param name="text" as="element(*)*" tunnel="yes"/>
     <xsl:param name="nodes" as="element(*)*" tunnel="yes"/>
     
-    <xsl:variable name="tokens" select="tokenize(normalize-space($instrText), ' ')" as="xs:string*"/>
+    <xsl:variable name="tokens" as="xs:string*">
+      <xsl:analyze-string select="$instrText" regex="&quot;(.*?)&quot;">
+        <xsl:matching-substring>
+          <xsl:sequence select="regex-group(1)"/>
+        </xsl:matching-substring>
+        <xsl:non-matching-substring>
+          <xsl:sequence select="tokenize(., '\s+')[normalize-space(.)]"/>
+        </xsl:non-matching-substring>
+      </xsl:analyze-string>
+    </xsl:variable>
+    <!--<xsl:variable name="tokens" select="tokenize(normalize-space($instrText), ' ')" as="xs:string*"/>-->
     <xsl:variable name="func" select="doc('')//letex:field-functions/letex:field-function[@name = $tokens[1]]" as="element(letex:field-function)?"/>
     <xsl:choose>
       <xsl:when test="not($func)">
