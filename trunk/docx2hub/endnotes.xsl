@@ -35,7 +35,6 @@
   </xsl:template>
 
   <xsl:template match="w:endnoteRef" mode="wml-to-dbk">
-    <xsl:attribute name="role" select="'endnote'"/>
     <!-- setzt die Nummer der Fußnote. Prüfen!! -->
     <xsl:variable name="endnote-num-format" select="/*/w:settings/w:endnotePr/w:numFmt/@w:val" as="xs:string?"/>
     <phrase role="hub:identifier">
