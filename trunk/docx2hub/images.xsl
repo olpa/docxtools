@@ -15,7 +15,27 @@
   version="2.0">
   
   <xsl:template match="w:drawing" mode="wml-to-dbk">
-    <xsl:choose>
+    <mediaobject>
+      <xsl:apply-templates select="@srcpath" mode="#current"/>
+      <xsl:if test=".//wp:docPr/@descr ne ''">
+        <alt>
+          <xsl:value-of select=".//wp:docPr/@descr"/>
+        </alt>
+      </xsl:if>
+      <xsl:apply-templates select="descendant::a:blip" mode="wml-to-dbk"/>
+    </mediaobject>
+    <!-- 
+      I have it on good authority that Word stores file paths in {container}/word/document.xml.rels
+      and NOT in wp:inline/wp:docPr/@descr. As the spelling indicates, @descr is used for 
+      description. Word stores only the former os system path of the image in this attribute, if no 
+      description is assigned. From the Office Open XML Spec:
+      
+      @descr: Specifies alternative text for the current DrawingML object, for use by assistive
+              technologies or applications which do not display the current object.
+              
+      The code below is commented, as it derives image paths from @descr instead of document.xml.rels.  
+    -->
+    <!--<xsl:choose>
       <xsl:when test="exists(wp:inline/wp:docPr[@descr and matches(@descr,'\.([Jj][pP][gG]|[gG][iI][fF]|[pP][nN][gG]|[tT][iI][fF][fF]?)$')])">
         <mediaobject>
           <imageobject>
@@ -50,7 +70,7 @@
         </xsl:if>
       </mediaobject>
     </xsl:otherwise>
-   </xsl:choose>
+   </xsl:choose>-->
   </xsl:template>
   
   
