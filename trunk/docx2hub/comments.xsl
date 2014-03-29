@@ -24,20 +24,45 @@
   >
 
   <xsl:template match="w:commentReference" mode="wml-to-dbk">
-    <xsl:variable name="comment" select="key('comment-by-id', @w:id)" as="element(w:comment)?" />
-    <xsl:choose>
-      <xsl:when test="exists($comment)">
-        <!-- GI 2012-08-16: changed note into annotation because note is a block-level element -->
-        <annotation>
-          <xsl:apply-templates select="$comment/*" mode="#current"/>
-        </annotation>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:message>WARNING: Unable to find comment with id <xsl:value-of select="@w:id"/></xsl:message>
-      </xsl:otherwise>
-    </xsl:choose>
+    <xsl:apply-templates select="key('comment-by-id', @w:id)" mode="comment"/>
   </xsl:template>
 
+  <xsl:template match="w:comment" mode="comment">
+    <annotation>
+      <xsl:if test="@w:author | @w:date | @w:initials">
+        <info>
+          <xsl:if test="@w:author | @w:initials">
+            <author>
+              <personname>
+                <xsl:apply-templates select="@w:author | @w:initials" mode="#current"/>
+              </personname>
+            </author>
+          </xsl:if>
+          <xsl:apply-templates select="@w:date" mode="#current"/>
+        </info>
+      </xsl:if>
+      <xsl:apply-templates select="*" mode="wml-to-dbk"/>
+    </annotation>
+  </xsl:template>
+
+  <xsl:template match="@w:author" mode="comment">
+    <othername role="display-name">
+      <xsl:value-of select="."/>
+    </othername>
+  </xsl:template>
+
+  <xsl:template match="@w:initials" mode="comment">
+    <othername role="initials">
+      <xsl:value-of select="."/>
+    </othername>
+  </xsl:template>
+
+  <xsl:template match="@w:date" mode="comment">
+    <date>
+      <xsl:value-of select="."/>
+    </date>
+  </xsl:template>
+  
   <xsl:template match="w:annotationRef" mode="wml-to-dbk"/>
 
 </xsl:stylesheet>
