@@ -69,6 +69,10 @@ if [ -z $HEAP ]; then
     HEAP=1024m
 fi
 
+if [ -z $ADAPTIONS_DIR ]; then
+    ADAPTIONS_DIR=.
+fi
+
 if $cygwin; then
   XSL=file:/$(cygpath -ma $XSL)
   DOCX=$(cygpath -ma $DOCX)
@@ -83,4 +87,4 @@ if [ ! -z $MODIFY_XPL ]; then
   MODIFY_XPL="-i xpl=$MODIFY_XPL"
 fi
 
-HEAP=$HEAP $DIR/calabash/calabash.sh -D -i xslt="$XSL" $MODIFY_XPL "$XPL" file="$DOCX" debug=$DEBUG debug-dir-uri=$DEBUGDIR
+ADAPTIONS_DIR=$ADAPTIONS_DIR HEAP=$HEAP $DIR/calabash/calabash.sh -D -i xslt="$XSL" $MODIFY_XPL "$XPL" file="$DOCX" debug=$DEBUG debug-dir-uri=$DEBUGDIR
