@@ -14,7 +14,7 @@
   exclude-result-prefixes = "w v xs r rel letex"
   version="2.0">
   
-  <xsl:template match="w:drawing" mode="wml-to-dbk">
+  <xsl:template match="w:drawing[descendant::a:blip]" mode="wml-to-dbk">
     <mediaobject>
       <xsl:apply-templates select="@srcpath" mode="#current"/>
       <xsl:if test=".//wp:docPr/@descr ne ''">
@@ -73,6 +73,11 @@
    </xsl:choose>-->
   </xsl:template>
   
+  <xsl:template match="w:drawing[not(descendant::a:blip)]" mode="wml-to-dbk">
+    <phrase role="hub:foreign">
+      <xsl:apply-templates select="." mode="foreign"/>
+    </phrase>
+  </xsl:template>
   
   <!-- images embedded in word zip container, usually stored in {docx}/word/media/ -->
   <xsl:template match="a:blip[@r:embed]" mode="wml-to-dbk">
