@@ -20,6 +20,7 @@
   xmlns:w10		= "urn:schemas-microsoft-com:office:word"
   xmlns:mml             = "http://www.w3.org/Math/DTD/mathml2/mathml2.dtd"
   xmlns:css="http://www.w3.org/1996/css"
+  xmlns:docx2hub = "http://www.le-tex.de/namespace/docx2hub"
   xmlns="http://docbook.org/ns/docbook"
 
   exclude-result-prefixes = "w o v wx xs dbk pkg r rel word200x exsl saxon fn letex w10 mml"
@@ -55,15 +56,25 @@
     <xsl:apply-templates select="." mode="wml-to-dbk"/>
   </xsl:template>
 
+  <!--  OOXML spec 17.3.3.19 object (Embedded Object) -->
+  <!--  This element specifies that an embedded object is located at this position in the run’s contents. The layout
+        properties of this embedded object, as well as an optional static representation, are specified using the drawing
+        element (§17.3.3.9). -->
+  <!--  translation: objections can include all or nothing, VML, images, ActiveX, equations -->
   
-  <!-- Grundlegendes Problem: wie können displayed und inline voneinander unterschieden werden?
-       Da Word nur malt, und hier keine explizite Unterscheidung vornimmt, geht es wohl nur mit Heuristik -->
   <xsl:template match="w:object" mode="wml-to-dbk">
-    <inlineequation>
-      <xsl:apply-templates mode="vml">
-        <xsl:with-param name="inline" select="true()" tunnel="yes"/>
-      </xsl:apply-templates>
-    </inlineequation>
+    <xsl:apply-templates mode="#current"/>
+  </xsl:template>
+  
+  <!--  M.5.2 Shape Element
+        The Shape element is the basic building block of VML. A shape can exist on its own or within a Group
+        element. Shape defines many attributes and sub-elements that control the look and behavior of the
+        shape. A shape must define at least a Path and size (Width, Height). VML also uses properties of the
+        CSS2 style attribute to specify positioning and sizing. -->
+  
+  <xsl:template match="v:shape" mode="wml-to-dbk">
+    <!--  VML also uses properties of the CSS2 style attribute to specify positioning and sizing. -->
+    <xsl:apply-templates mode="vml"/>
   </xsl:template>
 
   <xsl:template match="w:pict" mode="wml-to-dbk">
@@ -134,12 +145,6 @@
   </xsl:template>
 
   <xsl:template match="@Type[parent::o:OLEObject]" mode="vml">
-  </xsl:template>
-
-  <!-- see in images.xsl for v:shape with child v:imagedata -->
-  <xsl:template match="v:shape" mode="vml">
-    <!-- process attributes at child -->
-    <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
   <xsl:template match="@css:*" mode="vml">
