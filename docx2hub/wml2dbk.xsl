@@ -679,7 +679,7 @@
     <xsl:param name="nodes" as="element(*)*" tunnel="yes"/>
     
     <xsl:variable name="tokens" as="xs:string*">
-      <xsl:analyze-string select="($instrText, ' ')[1]" regex="&quot;(.*?)&quot;">
+      <xsl:analyze-string select="($instrText, ' ')[ . ne ''][1]" regex="&quot;(.*?)&quot;">
         <xsl:matching-substring>
           <xsl:sequence select="regex-group(1)"/>
         </xsl:matching-substring>
