@@ -31,10 +31,12 @@
                        w:t[string-length(.)=1 and ../w:rPr/w:rFonts/@w:ascii=$docx2hub:symbol-font-names]
                        |
                        w:lvlText[../w:rPr/w:rFonts/@w:ascii=$docx2hub:symbol-font-names]/@w:val
+                         [if (matches(., '%\d')) then not(../../w:numFmt/@w:val = 'decimal') else true()]
                        |
                        w:t[string-length(.)=1 and ../@css:font-family = $docx2hub:symbol-font-names]
                        |
                        w:lvlText[../@css:font-family = $docx2hub:symbol-font-names]/@w:val
+                         [if (matches(., '%\d')) then not(../../w:numFmt/@w:val = 'decimal') else true()]
                        " mode="wml-to-dbk" priority="1.5">
     <!-- priority = 1.5 because of priority = 1 ("default for attributes") in wml2dbk.xsl -->
     <xsl:variable name="font" select="if (self::w:sym) 
@@ -80,6 +82,7 @@
                 srcpath="{(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]}"/>
             </xsl:when>
             <xsl:otherwise>
+              <xsl:message select="'ffffffffff ', ., ' ', $number, ' ', count($number)"/>
               <text>
                 <xsl:value-of select="$number"/>
                 <xsl:call-template name="signal-error">
