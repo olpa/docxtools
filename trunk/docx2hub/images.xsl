@@ -89,8 +89,12 @@
   
   <!-- parent v:shape is processed in vml mode, see objects.xsl -->
   <xsl:template match="v:imagedata" mode="vml">
+    <xsl:param name="inline" select="false()" tunnel="yes"/>
     <xsl:variable name="image-dimensions" select="tokenize(parent::v:shape/@style, ';')" as="xs:string*"/>
-    <mediaobject>
+    <xsl:element name="{if ($inline) then 'inlinemediaobject' else 'mediaobject'}">
+      <xsl:if test="ancestor::w:object">
+        <xsl:attribute name="annotations" select="concat('object_',generate-id(ancestor::w:object[1]))"/>  
+      </xsl:if>
       <xsl:apply-templates select="@srcpath" mode="#current"/>
       <xsl:for-each select="$image-dimensions[1]">
         <xsl:attribute name="css:width" select="replace(., '^width:', '')"/>  
@@ -102,7 +106,7 @@
         <xsl:with-param name="image-id" select="@r:id"/>
         <xsl:with-param name="embedded" select="true()"/>
       </xsl:call-template>
-    </mediaobject>
+    </xsl:element>
   </xsl:template>
   
   <!-- externally referenced images -->

@@ -75,8 +75,11 @@
         CSS2 style attribute to specify positioning and sizing. -->
   
   <xsl:template match="v:shape" mode="vml">
+    <xsl:param name="inline" select="false()" tunnel="yes"/>
     <!--  VML also uses properties of the CSS2 style attribute to specify positioning and sizing. -->
-    <xsl:apply-templates mode="vml"/>
+    <xsl:apply-templates mode="vml">
+      <xsl:with-param name="inline" select="$inline" tunnel="yes"/>
+    </xsl:apply-templates>
   </xsl:template>
 
   <xsl:template match="w:pict" mode="wml-to-dbk">
@@ -125,7 +128,7 @@
       select="if (ancestor::w:footnote)
               then 'footnote-rel-by-id'
               else 'doc-rel-by-id'" />
-    <inlinemediaobject role="OLEObject">
+    <inlinemediaobject role="OLEObject" annotations="{concat('object_',generate-id(parent::w:object))}">
       <imageobject>
         <xsl:apply-templates select="@* except @r:id" mode="#current"/>
         <imagedata fileref="{key($key-name, current()/@r:id)/@Target}"/>
