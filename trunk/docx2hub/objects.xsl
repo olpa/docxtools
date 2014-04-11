@@ -63,7 +63,7 @@
   <!--  translation: objections can include all or nothing, VML, images, ActiveX, equations -->
   
   <xsl:template match="w:object" mode="wml-to-dbk">
-    <xsl:apply-templates mode="#current"/>
+    <xsl:apply-templates mode="vml"/>
   </xsl:template>
   
   <!--  M.5.2 Shape Element
@@ -72,7 +72,7 @@
         shape. A shape must define at least a Path and size (Width, Height). VML also uses properties of the
         CSS2 style attribute to specify positioning and sizing. -->
   
-  <xsl:template match="v:shape" mode="wml-to-dbk">
+  <xsl:template match="v:shape" mode="vml">
     <!--  VML also uses properties of the CSS2 style attribute to specify positioning and sizing. -->
     <xsl:apply-templates mode="vml"/>
   </xsl:template>
