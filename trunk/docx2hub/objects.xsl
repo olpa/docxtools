@@ -63,7 +63,9 @@
   <!--  translation: objections can include all or nothing, VML, images, ActiveX, equations -->
   
   <xsl:template match="w:object" mode="wml-to-dbk">
-    <xsl:apply-templates mode="vml"/>
+    <xsl:apply-templates mode="vml">
+      <xsl:with-param name="inline" select="true()" tunnel="yes"/>
+    </xsl:apply-templates>
   </xsl:template>
   
   <!--  M.5.2 Shape Element
