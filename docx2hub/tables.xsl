@@ -191,22 +191,22 @@
   <xsl:template match="@w:fill-width-before | @w:fill-width-after" mode="wml-to-dbk" priority="10"/>
   
   <xsl:template match="@w:fill-cells-before" mode="wml-to-dbk" priority="10">
-    <xsl:param name="col-widths" as="xs:integer+" tunnel="yes"/>
+    <!--<xsl:param name="col-widths" as="xs:integer+" tunnel="yes"/>
     <xsl:for-each select="1 to xs:integer(.)">
       <entry role="hub:fill-grid" css:width="{docx2hub:twips2mm($col-widths[current()])}">
         <para/>
       </entry>
-    </xsl:for-each>  
+    </xsl:for-each>  -->
   </xsl:template>
   
   <xsl:template match="@w:fill-cells-after" mode="wml-to-dbk" priority="10">
-    <xsl:param name="col-widths" as="xs:integer+" tunnel="yes"/>
+    <!--<xsl:param name="col-widths" as="xs:integer+" tunnel="yes"/>
     <xsl:param name="cols" as="xs:integer" tunnel="yes"/>
     <xsl:for-each select="($cols - xs:integer(.) + 1) to $cols">
       <entry role="hub:fill-grid" css:width="{docx2hub:twips2mm($col-widths[current()])}">
         <para/>
       </entry>
-    </xsl:for-each>
+    </xsl:for-each>-->
   </xsl:template>
 
   <xsl:template match="w:trPr" mode="tables"/>
@@ -372,10 +372,10 @@
   <xsl:template match="w:tc[docx2hub:is-blind-vmerged-cell(.)]" mode="tables"/>
 
   <xsl:template name="cell.span">
-    <xsl:variable name="span" select="0 + w:tcPr/w:gridSpan/@w:val
-                                      + (if (not(following-sibling::w:tc) and ../w:trPr/w:gridAfter/@w:val) then ../w:trPr/w:gridAfter/@w:val else 0)
-                                      + (if (not(preceding-sibling::w:tc) and ../w:trPr/w:gridBefore/@w:val) then ../w:trPr/w:gridBefore/@w:val else 0)"/>
-    <xsl:variable name="colstart" select="letex:colcount(1, .) + (if (preceding-sibling::w:tc and ../w:trPr/w:gridBefore/@w:val) then ../w:trPr/w:gridBefore/@w:val else 0)" />
+    <xsl:variable name="span" select="0 + (if (w:tcPr/w:gridSpan/@w:val) then w:tcPr/w:gridSpan/@w:val - 1 else 0)
+                                      + (if (not(following-sibling::w:tc) and ../@w:fill-cells-after) then ../@w:fill-cells-after else 0) 
+                                      + (if (not(preceding-sibling::w:tc) and ../@w:fill-cells-before) then ../@w:fill-cells-before else 0)"/>
+    <xsl:variable name="colstart" select="letex:colcount(1, .) + (if (preceding-sibling::w:tc and ../@w:fill-cells-before) then ../@w:fill-cells-before else 0)" />
     <xsl:choose>
       <xsl:when test="$span &gt; 0">
         <!-- Get the current cell number -->
@@ -383,7 +383,7 @@
           <xsl:value-of  select="concat('col', $colstart)"/>
         </xsl:attribute>
         <xsl:attribute name="nameend">
-          <xsl:value-of  select="concat('col', $colstart + $span - 1)"/>
+          <xsl:value-of  select="concat('col', $colstart + $span)"/>
         </xsl:attribute>
       </xsl:when>
       <xsl:otherwise>
