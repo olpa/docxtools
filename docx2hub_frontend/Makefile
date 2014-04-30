@@ -26,7 +26,7 @@ usage:
 %.hub.xml: %.docx.tmp/word/document.xml 
 	-$(UMASK); \
 	$(CALABASH) \
-	-o result=$*.hub.xml \
+	-o result=$(call win_path,$*.hub.xml) \
 	-o insert-xpath=$(call win_path,/dev/null) \
 	$(call uri,$(MAKEFILEDIR)/docx2hub/wml2hub.xpl) \
 	docx=$(call win_path,$*).docx \
