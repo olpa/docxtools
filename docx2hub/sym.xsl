@@ -78,11 +78,12 @@
         <xsl:otherwise>
           <xsl:choose>
             <xsl:when test="self::w:sym">
-              <phrase xmlns="http://docbook.org/ns/docbook" role="hub:ooxml-symbol" css:font-family="{$font}" annotations="{$number}"
-                srcpath="{(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]}"/>
+              <xsl:call-template name="create-replacement">
+                <xsl:with-param name="font" select="$font"/>
+                <xsl:with-param name="number" select="$number"/>
+              </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:message select="'ffffffffff ', ., ' ', $number, ' ', count($number)"/>
               <text>
                 <xsl:value-of select="$number"/>
                 <xsl:call-template name="signal-error">
@@ -92,7 +93,7 @@
                     <value key="xpath"><xsl:value-of select="(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]"/></value>
                     <value key="level">WRN</value>
                     <value key="info-text"><xsl:value-of select="$font"/> (0x<xsl:value-of select="letex:dec-to-hex(string-to-codepoints($number))"/>)</value>
-                    <value key="pi">Zeichen <xsl:value-of select="string-to-codepoints($number)"/> aus Font <xsl:value-of select="$font"/> konnte nicht gemappt werden</value>
+                    <value key="pi">Could not map char <xsl:value-of select="string-to-codepoints($number)"/> in font <xsl:value-of select="$font"/> (message c)</value>
                   </xsl:with-param>
                 </xsl:call-template>              
               </text>
@@ -104,20 +105,17 @@
 
     <xsl:choose>
       <xsl:when test="$text[self::text]">
-        <xsl:value-of select="$text"/>
+        <xsl:sequence select="$text/node()"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:message>
-          <xsl:copy-of select="$text"/>
-        </xsl:message>
         <xsl:call-template name="signal-error">
           <xsl:with-param name="error-code" select="'W2D_601'"/>
           <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
           <xsl:with-param name="hash">
             <value key="xpath"><xsl:value-of select="(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]"/></value>
             <value key="level">WRN</value>
-            <value key="info-text"><xsl:value-of select="$font"/> (0x<xsl:value-of select="$text"/>)</value>
-            <value key="pi">Zeichen <xsl:value-of select="string-to-codepoints($text)"/> aus Font <xsl:value-of select="$font"/> konnte nicht gemappt werden</value>
+            <value key="info-text"><xsl:value-of select="$font"/> (0x<xsl:value-of select="($text[normalize-space(.)], $number)[1]"/>)</value>
+            <value key="pi">Could not map char <xsl:value-of select="(string-to-codepoints($text), $number)[1]"/> in font <xsl:value-of select="$font"/> (message d)</value>
             <value key="comment"/>
           </xsl:with-param>
         </xsl:call-template>
@@ -127,6 +125,21 @@
             <xsl:value-of select="."/>
           </xsl:copy>
         </xsl:for-each>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="create-replacement">
+    <xsl:param name="font" as="xs:string"/><!-- e.g., Wingdings -->
+    <xsl:param name="number" as="xs:string"/><!-- hex number, e.g., F064 -->
+    <xsl:param name="leave-unmappable-symbols-unchanged" as="xs:boolean?" select="false()" tunnel="yes"/>
+    <xsl:choose>
+      <xsl:when test="$leave-unmappable-symbols-unchanged">
+        <xsl:copy-of select="."/>
+      </xsl:when>
+      <xsl:otherwise>
+        <phrase xmlns="http://docbook.org/ns/docbook" role="hub:ooxml-symbol" css:font-family="{$font}" annotations="{$number}"
+          srcpath="{(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]}"/>    
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -150,12 +163,14 @@
                     <value key="xpath"><xsl:value-of select="$context/(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]"/></value>
                     <value key="level">WRN</value>
                     <value key="info-text"><xsl:value-of select="concat($font, ': ', $tokens[2])"/></value>
-                    <value key="pi">Zeichen <xsl:value-of select="string-to-codepoints($tokens[2])"/> aus Font <xsl:value-of select="$font"/> konnte nicht gemappt werden</value>
+                    <value key="pi">Could not map char <xsl:value-of select="string-to-codepoints($tokens[2])"/> in font <xsl:value-of select="$font"/> (message b)</value>
                     <value key="comment"/>
                   </xsl:with-param>
                 </xsl:call-template>
-                <phrase xmlns="http://docbook.org/ns/docbook" role="hub:ooxml-symbol" css:font-family="{$font}" annotations="{$tokens[2]}"
-                  srcpath="{(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]}"/>
+                <xsl:call-template name="create-replacement">
+                  <xsl:with-param name="font" select="$font"/>
+                  <xsl:with-param name="number" select="$tokens[2]"/>
+                </xsl:call-template>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:value-of select="key('symbol-by-number', upper-case($number), $symbol-font-map)/@char"/>
@@ -170,12 +185,14 @@
                 <value key="xpath"><xsl:value-of select="$context/(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]"/></value>
                 <value key="level">WRN</value>
                 <value key="info-text"><xsl:value-of select="concat($font, ': ', $tokens[2])"/></value>
-                <value key="pi">Zeichen <xsl:value-of select="string-to-codepoints($tokens[2])"/> aus Font <xsl:value-of select="$font"/> konnte nicht gemappt werden</value>
+                <value key="pi">Could not map char <xsl:value-of select="string-to-codepoints($tokens[2])"/> in font <xsl:value-of select="$font"/> (message a)</value>
                 <value key="comment"/>
               </xsl:with-param>
             </xsl:call-template>
-            <phrase xmlns="http://docbook.org/ns/docbook" role="hub:ooxml-symbol" css:font-family="{$font}" annotations="{$tokens[2]}" 
-              srcpath="{(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]}"/>
+            <xsl:call-template name="create-replacement">
+              <xsl:with-param name="font" select="$font"/>
+              <xsl:with-param name="number" select="$tokens[2]"/>
+            </xsl:call-template>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
