@@ -49,6 +49,10 @@ if [ -z $XSL ]; then
     echo "the java command.";
     echo "Please note that this tool requires a Calabash extension (calabash/lib/ltx/ltx-unzip/)";
     echo "that is included here but not in a vanilla XML Calabash distribution.";
+    echo "";
+    echo "Apart from DEBUG, you may prepend LOCALDEFS=/path/to/localdefs.sh for overriding calabash ";
+    echo "settings (see calabash/localdefs.sample.sh). You may also supply the minimum heap space";
+    echo "(java option -Xmx) in a prepended HEAP declaration, e.g., HEAP=2048m";
     exit 1;
 fi
 
@@ -70,7 +74,11 @@ if [ -z $HEAP ]; then
 fi
 
 if [ -z $ADAPTIONS_DIR ]; then
-    ADAPTIONS_DIR=.
+    ADAPTIONS_DIR=$DIR/adaptions
+fi
+
+if [ -z $LOCALDEFS ]; then
+    LOCALDEFS=$ADAPTIONS_DIR/common/calabash/localdefs.sh
 fi
 
 if $cygwin; then
@@ -87,4 +95,4 @@ if [ ! -z $MODIFY_XPL ]; then
   MODIFY_XPL="-i xpl=$MODIFY_XPL"
 fi
 
-ADAPTIONS_DIR=$ADAPTIONS_DIR HEAP=$HEAP $DIR/calabash/calabash.sh -D -i xslt="$XSL" $MODIFY_XPL "$XPL" file="$DOCX" debug=$DEBUG debug-dir-uri=$DEBUGDIR
+LOCALDEFS=$LOCALDEFS HEAP=$HEAP $DIR/calabash/calabash.sh -D -i xslt="$XSL" $MODIFY_XPL "$XPL" file="$DOCX" debug=$DEBUG debug-dir-uri=$DEBUGDIR
