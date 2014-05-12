@@ -53,6 +53,10 @@
               <xsl:value-of select="/w:root/@xml:base" />
             </keyword>
           </xsl:if>
+          <keyword role="source-basename">
+            <!-- /w:root/@xml:base example: file:/data/docx/M_001.docx.tmp/ -->
+            <xsl:value-of select="replace(/w:root/@xml:base, '^.*/(.+)\.docx(\.tmp/?)?$', '$1')"/>
+          </keyword>
         </keywordset>
         <xsl:if test="exists(../../w:settings/w:docVars/w:docVar)">
           <keywordset role="docVars">
