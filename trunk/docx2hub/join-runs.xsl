@@ -31,15 +31,9 @@
        dbk:anchors between identically formatted phrases will be merged into
        with the phrases' content into a consolidated phrase. -->
   <xsl:template match="*[w:r or dbk:phrase]" mode="docx2hub:join-runs" priority="3">
-    <!-- move sidebars to para level -->
+    <!-- move sidebars to para level --><xsl:variable name="context" select="."/>
     <xsl:if test="self::dbk:para and .//dbk:sidebar">
-      <xsl:for-each select=".//dbk:sidebar">
-        <xsl:copy>
-          <xsl:apply-templates select="@*" mode="#current"/>
-          <xsl:attribute name="linkend" select="concat('side_', generate-id(.))"/>
-          <xsl:apply-templates select="node()" mode="#current"/>
-        </xsl:copy>
-      </xsl:for-each>
+      <xsl:call-template name="docx2hub_move-invalid-sidebar-elements"/>
     </xsl:if>
     <xsl:copy copy-namespaces="no">
       <xsl:copy-of select="@*" />
@@ -49,6 +43,7 @@
             <xsl:sequence select="current-group()" />
           </xsl:when>
           <xsl:otherwise>
+            <xsl:call-template name="docx2hub_pagebreak-elements-to-attributes"/>
             <xsl:copy copy-namespaces="no">
               <xsl:copy-of select="@* except @srcpath" />
               <xsl:copy-of select="current-group()/@srcpath"/>
@@ -59,6 +54,31 @@
         </xsl:choose>
       </xsl:for-each-group>
     </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="dbk:para" mode="docx2hub:join-runs">
+    <xsl:call-template name="docx2hub_move-invalid-sidebar-elements"/>
+    <xsl:copy>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:call-template name="docx2hub_pagebreak-elements-to-attributes"/>
+      <xsl:apply-templates mode="#current"/>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template name="docx2hub_move-invalid-sidebar-elements">
+    <xsl:for-each select=".//dbk:sidebar">
+      <xsl:copy>
+        <xsl:apply-templates select="@*" mode="#current"/>
+        <xsl:attribute name="linkend" select="concat('id_', generate-id(.))"/>
+        <xsl:apply-templates select="node()" mode="#current"/>
+      </xsl:copy>
+    </xsl:for-each>
+  </xsl:template>
+
+  <xsl:template name="docx2hub_pagebreak-elements-to-attributes">
+    <xsl:apply-templates select=".//dbk:br[@role[not(. eq 'textWrapping')]]
+                                          [dbk:same-scope(., current())]" 
+      mode="docx2hub:join-runs-br-attr"/>
   </xsl:template>
 
   <xsl:function name="letex:signature" as="xs:string?">
@@ -111,23 +131,6 @@
     <xsl:param name="hash" as="xs:string" />
     <xsl:value-of select="replace($hash, '^.+__=__', '')" />
   </xsl:function>
-
-  <xsl:template match="dbk:para" mode="docx2hub:join-runs">  
-    <xsl:for-each select=".//dbk:sidebar">
-      <xsl:copy>
-        <xsl:apply-templates select="@*" mode="#current"/>
-        <xsl:attribute name="linkend" select="concat('id_', generate-id(.))"/>
-        <xsl:apply-templates select="node()" mode="#current"/>
-      </xsl:copy>
-    </xsl:for-each>
-    <xsl:copy>
-      <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:apply-templates select=".//dbk:br[@role[not(. eq 'textWrapping')]]
-                                            [dbk:same-scope(., current())]" 
-                           mode="docx2hub:join-runs-br-attr"/>
-      <xsl:apply-templates mode="#current"/>
-    </xsl:copy>
-  </xsl:template>
   
   <!-- @type = ('column', 'page') --> 
   <xsl:template match="dbk:br[@role[not(. eq 'textWrapping')]]" mode="docx2hub:join-runs-br-attr">
@@ -156,10 +159,14 @@
   <xsl:function name="dbk:before-text-in-para" as="xs:boolean">
     <xsl:param name="elt" as="element(*)"/><!-- typically dbk:br[@role = 'page'] -->
     <xsl:param name="para" as="element(dbk:para)"/>
-    <xsl:sequence select="dbk:same-scope($elt, $para)
-                          and
-                          not( some $text in $para//text()[dbk:same-scope(., $para)] 
-                               satisfies ($text &lt;&lt; $elt) 
+    <xsl:sequence select="not($para//text())
+                          or
+                          (
+                            dbk:same-scope($elt, $para)
+                            and
+                            not( some $text in $para//text()[dbk:same-scope(., $para)] 
+                                 satisfies ($text &lt;&lt; $elt) 
+                            )
                           )"/>
   </xsl:function>
 
