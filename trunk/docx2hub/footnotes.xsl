@@ -67,7 +67,7 @@
   </xsl:template>
 
   <xsl:template match="*[*]
-                        [self::superscript or self::w:r[@role eq 'Funotenzeichen']]
+                        [self::dbk:superscript or self::w:r[@role eq 'Funotenzeichen']]
                         [every $n in node() satisfies $n/self::w:footnoteReference]" mode="wml-to-dbk" priority="3">
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
