@@ -37,13 +37,13 @@
     </xsl:if>
     <xsl:copy copy-namespaces="no">
       <xsl:copy-of select="@*" />
+      <xsl:call-template name="docx2hub_pagebreak-elements-to-attributes"/>
       <xsl:for-each-group select="node()" group-adjacent="letex:signature(.)">
         <xsl:choose>
           <xsl:when test="current-grouping-key() eq ''">
             <xsl:sequence select="current-group()" />
           </xsl:when>
           <xsl:otherwise>
-            <xsl:call-template name="docx2hub_pagebreak-elements-to-attributes"/>
             <xsl:copy copy-namespaces="no">
               <xsl:copy-of select="@* except @srcpath" />
               <xsl:copy-of select="current-group()/@srcpath"/>
