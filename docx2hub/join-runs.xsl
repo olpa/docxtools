@@ -45,7 +45,7 @@
           </xsl:when>
           <xsl:otherwise>
             <xsl:copy copy-namespaces="no">
-              <xsl:copy-of select="@* except @srcpath" />
+              <xsl:apply-templates select="@* except @srcpath" mode="#current"/>
               <xsl:copy-of select="current-group()/@srcpath"/>
               <xsl:apply-templates select="current-group()[not(self::dbk:anchor)]/node() 
                                            union current-group()[self::dbk:anchor]" mode="#current" />
@@ -54,6 +54,12 @@
         </xsl:choose>
       </xsl:for-each-group>
     </xsl:copy>
+  </xsl:template>
+
+  <!-- collateral: replace name of mapped symbols with default Unicode font name -->
+  <xsl:template match="@css:font-family[. = $docx2hub:symbol-font-names][.. = docx2hub:font-map(.)/symbol/@char]"
+    mode="docx2hub:join-runs">
+    <xsl:attribute name="{name()}" select="$docx2hub:symbol-replacement-rfonts/@w:ascii"/>
   </xsl:template>
 
   <xsl:template match="dbk:para" mode="docx2hub:join-runs">

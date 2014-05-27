@@ -26,6 +26,14 @@
   <xsl:variable name="docx2hub:symbol-font-names" as="xs:string+" 
     select="('Math1', 'Symbol', 'Wingdings')"/>
 
+  <xsl:variable name="docx2hub:symbol-replacement-rfonts" as="element(w:rFonts)">
+    <w:rFonts w:ascii="Cambria Math" w:hAnsi="Cambria Math" w:cs="Cambria Math"/>
+  </xsl:variable>
+  
+  <!-- Set to 'yes' if you want to leave the symbols unaltered for which there exists no Unicode mapping. 
+    If set to 'no', they will generate a phrase with the role 'hub:ooxml-symbol' (see below) -->
+  <xsl:param name="keep-unmappable-syms" as="xs:string" select="'no'"/>
+  
   <xsl:template match="w:sym
                        |
                        w:t[string-length(.)=1 and ../w:rPr/w:rFonts/@w:ascii=$docx2hub:symbol-font-names]
@@ -59,8 +67,7 @@
       </xsl:call-template>
     </xsl:if>
     <xsl:variable name="number" select="if (self::w:sym) then @w:char else xs:string(.)"/>
-    <xsl:variable name="font-map-name" select="concat('fontmaps/', replace($font, ' ', '_'), '.xml')" as="xs:string" />
-    <xsl:variable name="font_map" select="if (doc-available($font-map-name)) then document($font-map-name)/symbols else ()" as="element(symbols)?"/>
+    <xsl:variable name="font_map" as="element(symbols)?" select="docx2hub:font-map($font)"/>
     <xsl:variable name="text" as="node()">
       <xsl:choose>
         <xsl:when test="if (self::w:sym) then $font_map/symbol[@number = $number] else $font_map/symbol[@entity = $number]">
@@ -129,17 +136,23 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:function name="docx2hub:font-map" as="element(symbols)?">
+    <xsl:param name="font-name" as="xs:string"/>
+    <xsl:variable name="font-map-name" select="concat('fontmaps/', replace($font-name, ' ', '_'), '.xml')" as="xs:string" />
+    <xsl:sequence select="if (doc-available($font-map-name)) then document($font-map-name)/symbols else ()"/>
+  </xsl:function>
+
   <xsl:template name="create-replacement">
     <xsl:param name="font" as="xs:string"/><!-- e.g., Wingdings -->
     <xsl:param name="number" as="xs:string"/><!-- hex number, e.g., F064 -->
-    <xsl:param name="leave-unmappable-symbols-unchanged" as="xs:boolean?" select="false()" tunnel="yes"/>
+    <xsl:param name="leave-unmappable-symbols-unchanged" as="xs:boolean?" select="$keep-unmappable-syms = 'yes'" tunnel="yes"/>
     <xsl:choose>
       <xsl:when test="$leave-unmappable-symbols-unchanged">
         <xsl:copy-of select="."/>
       </xsl:when>
       <xsl:otherwise>
         <phrase xmlns="http://docbook.org/ns/docbook" role="hub:ooxml-symbol" css:font-family="{$font}" annotations="{$number}"
-          srcpath="{(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]}"/>    
+          srcpath="{(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]}"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
