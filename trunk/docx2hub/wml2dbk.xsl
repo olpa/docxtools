@@ -393,10 +393,6 @@
     <xsl:copy/>
   </xsl:template>
 
-  <!-- The characters have already been mapped to unicode, so hopefully the surrounding
-       text’s font will be able to render them. -->
-  <xsl:template match="@css:font-family[. eq 'Symbol']" mode="wml-to-dbk" priority="2"/> 
-
   <xsl:template match="@*" mode="wml-to-dbk">
     <xsl:call-template name="signal-error" xmlns="">
       <xsl:with-param name="error-code" select="'W2D_021'"/>
