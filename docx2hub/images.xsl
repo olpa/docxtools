@@ -90,25 +90,30 @@
   <!-- parent v:shape is processed in vml mode, see objects.xsl -->
   <xsl:template match="v:imagedata" mode="vml">
     <xsl:param name="inline" select="false()" tunnel="yes"/>
-    <xsl:variable name="image-dimensions" select="tokenize(parent::v:shape/@style, ';')" as="xs:string*"/>
     <xsl:element name="{if ($inline) then 'inlinemediaobject' else 'mediaobject'}">
       <xsl:if test="ancestor::w:object">
-        <xsl:attribute name="annotations" select="concat('object_',generate-id(ancestor::w:object[1]))"/>  
+        <xsl:attribute name="annotations" select="concat('object_',generate-id(ancestor::w:object[1]))"/>
       </xsl:if>
-      <xsl:apply-templates select="@srcpath" mode="#current"/>
-      <xsl:for-each select="$image-dimensions[1]">
-        <xsl:attribute name="css:width" select="replace(., '^width:', '')"/>  
-      </xsl:for-each>
-      <xsl:for-each select="$image-dimensions[2]">
-        <xsl:attribute name="css:height" select="replace(., '^height:', '')"/>
-      </xsl:for-each>
+      <xsl:apply-templates select="@srcpath, parent::v:shape/@style" mode="#current"/>
       <xsl:call-template name="create-imageobject">
         <xsl:with-param name="image-id" select="@r:id"/>
         <xsl:with-param name="embedded" select="true()"/>
       </xsl:call-template>
     </xsl:element>
   </xsl:template>
-  
+
+  <xsl:template match="@style" mode="vml" priority="4">
+    <xsl:analyze-string select="." regex="\s*;\s*">
+      <xsl:non-matching-substring>
+        <xsl:analyze-string select="." regex="(.+)\s*:\s*(.+)">
+          <xsl:matching-substring>
+            <xsl:attribute name="css:{regex-group(1)}" select="regex-group(2)"/>
+          </xsl:matching-substring>
+        </xsl:analyze-string>
+      </xsl:non-matching-substring>
+    </xsl:analyze-string>
+  </xsl:template>
+
   <!-- externally referenced images -->
   <xsl:template match="a:blip[@r:link]" mode="wml-to-dbk">
     <xsl:call-template name="create-imageobject">
