@@ -876,6 +876,26 @@
       <xsl:apply-templates select="node() except (docx2hub:attribute | docx2hub:color-percentage | docx2hub:wrap | docx2hub:style-link | dbk:tabs)" mode="#current" />
     </xsl:variable>
     <xsl:choose>
+      <!-- do not wrap whitespace only subscript or superscript -->
+      <xsl:when test="w:t and docx2hub:wrap/@element = ('superscript', 'subscript') 
+                      and exists(docx2hub:wrap/@element[ . ne 'superscript' and . ne 'subscript'])
+                      and (
+                        every $el in $content/* 
+                        satisfies $el/self::w:t[@xml:space eq 'preserve'][matches(., '^\p{Zs}$')]
+                      )">
+        <xsl:sequence select="docx2hub:wrap($content, (docx2hub:wrap[not(@element = ('superscript', 'subscript'))]))" />
+      </xsl:when>
+      <!-- do not wrap whitespace only subscript or superscript -->
+      <xsl:when test="w:t and docx2hub:wrap/@element = ('superscript', 'subscript') 
+                      and not(exists(docx2hub:wrap/@element[ . ne 'superscript' and . ne 'subscript']))
+                      and (
+                        every $el in $content/* 
+                        satisfies $el/self::w:t[@xml:space eq 'preserve'][matches(., '^\p{Zs}$')]
+                      )">
+        <xsl:copy>
+          <xsl:sequence select="docx2hub:wrap($content, (docx2hub:wrap[not(@element = ('superscript', 'subscript'))]))" />
+        </xsl:copy>
+      </xsl:when>
       <xsl:when test="exists(docx2hub:wrap) and exists(self::css:rule | self::dbk:style)">
         <xsl:copy>
           <xsl:attribute name="remap" select="docx2hub:wrap/@element" />
