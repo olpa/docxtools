@@ -33,12 +33,12 @@
     <!-- replaced with variable below. transformation failed with german quotation marks -->
     <!--<xsl:variable name="instru" select="replace(replace(replace($instr,'\\&quot;','_quot_'),'\\([&#8222;&#8220;])','$1'),'\\:', '#_-semi-_-colon-_#')"/>-->
     <xsl:variable name="instru" select="replace(replace(replace($instr,'\\&quot;','_quot_'),'&#8222;|&#8220;','&quot;'),'\\:', '#_-semi-_-colon-_#')"/>
-    <!--    <xsl:choose>
+    <xsl:choose>
       <xsl:when test="matches($instru,'&quot;(\s+\\[bi])?\s*$')">
         <xsl:variable name="split-instru" select="tokenize($instru,'(^|&quot;)[\s&#160;]*[Xx][eE]($|[\s&#160;])')[string-length(.) gt 0]" as="xs:string*"/>
         <xsl:for-each select="$split-instru">
-        <xsl:variable name="current-instru" select="if (matches(.,'&quot;(\s+\\[bi])?\s*$')) then concat('XE ',.) else concat('XE ',.,'&quot;')"/>-->  
-          <xsl:if test="matches(., '\\[^bfrity]')">
+        <xsl:variable name="current-instru" select="if (matches(.,'&quot;(\s+\\[bi])?\s*$')) then concat('XE ',.) else concat('XE ',.,'&quot;')"/>  
+          <xsl:if test="matches($current-instru, '\\[^bfrity]')">
             <xsl:call-template name="signal-error">
               <xsl:with-param name="error-code" select="'W2D_001'"/>
               <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
@@ -51,8 +51,8 @@
           </xsl:if>
           <xsl:variable name="see" as="xs:string?">
             <xsl:choose>
-              <xsl:when test="matches(., '\\t')">
-                <xsl:value-of select="replace(., '^.*\\t\s*&quot;(.+?)&quot;.*$', '$1')"/>
+              <xsl:when test="matches($current-instru, '\\t')">
+                <xsl:value-of select="replace($current-instru, '^.*\\t\s*&quot;(.+?)&quot;.*$', '$1')"/>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:sequence select="()"/>
@@ -61,15 +61,15 @@
           </xsl:variable>
           <xsl:variable name="type" as="xs:string?">
             <xsl:choose>
-              <xsl:when test="matches(., '\\f')">
-                <xsl:value-of select="replace(., '^.*\\f\s*&quot;?(.+?)&quot;?\s*(\\.*$|$)', '$1')"/>
+              <xsl:when test="matches($current-instru, '\\f')">
+                <xsl:value-of select="replace($current-instru, '^.*\\f\s*&quot;?(.+?)&quot;?\s*(\\.*$|$)', '$1')"/>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:sequence select="()"/>
               </xsl:otherwise>
             </xsl:choose>
           </xsl:variable>
-          <xsl:variable name="term" select="tokenize(replace(., '^\s*[Xx][Ee]\s+&quot;(.+?)&quot;.*$', '$1'), ':')"/>
+          <xsl:variable name="term" select="tokenize(replace($current-instru, '^\s*[Xx][Ee]\s+&quot;(.+?)&quot;.*$', '$1'), ':')"/>
           <indexterm>
             <xsl:if test="not(empty($type))">
               <xsl:attribute name="type" select="$type"/>
@@ -93,7 +93,7 @@
               </see>
             </xsl:if>
           </indexterm>
-        <!--</xsl:for-each>
+        </xsl:for-each>
       </xsl:when>
       <xsl:otherwise>
         <xsl:message select="$nodes[1]"></xsl:message>
@@ -107,7 +107,7 @@
           </xsl:with-param>
         </xsl:call-template>
       </xsl:otherwise>
-    </xsl:choose>-->
+    </xsl:choose>
   </xsl:template>
   
 </xsl:stylesheet>
