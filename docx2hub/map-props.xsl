@@ -52,6 +52,9 @@
             <keyword role="source-dir-uri">
               <xsl:value-of select="/w:root/@xml:base" />
             </keyword>
+            <keyword role="archive-dir-uri">
+              <xsl:value-of select="concat(replace(/w:root/@xml:base, '^(.+)/[^/]+/?', '$1'), '/')"/>
+            </keyword>
           </xsl:if>
           <keyword role="source-basename">
             <!-- /w:root/@xml:base example: file:/data/docx/M_001.docx.tmp/ -->
