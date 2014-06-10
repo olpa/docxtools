@@ -66,6 +66,12 @@
     </phrase>
   </xsl:template>
 
+  <xsl:template match="w:t[ancestor::w:footnote]
+                          [following-sibling::w:tab or parent::w:r/following-sibling::w:r[w:tab]]
+                          [not(preceding-sibling::w:t[not(matches(.,'^[\s\)]*$'))]) and not(parent::w:r/preceding-sibling::w:r[w:t[not(matches(.,'^[\s\)]*$'))]])]
+                          [matches(.,'^[\s\)]*$')]"
+                mode="wml-to-dbk"/>
+
   <xsl:template match="*[*]
                         [self::dbk:superscript or self::w:r[@role eq 'Funotenzeichen']]
                         [every $n in node() satisfies $n/self::w:footnoteReference]" mode="wml-to-dbk" priority="3">
