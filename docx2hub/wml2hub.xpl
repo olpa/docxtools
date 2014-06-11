@@ -25,6 +25,9 @@
   <p:input port="source">
     <p:empty/>
   </p:input>
+  <p:input port="xslt">
+    <p:document href="main.xsl"/>
+  </p:input>
   <p:output port="result" primary="true"/>
   <p:output port="insert-xpath">
     <p:pipe step="insert-xpath" port="result"/>
@@ -67,10 +70,6 @@
   </p:load>
   
   <p:sink/>
-  
-  <p:load name="stylesheet" href="main.xsl"/>
-  
-  <p:sink/>
 
   <p:add-attribute attribute-name="value" match="/c:param-set/c:param[@name = 'error-msg-file-path']">
     <p:with-option name="attribute-value" select="replace( static-base-uri(), '/wml2hub.xpl', '' )"/>
@@ -96,7 +95,7 @@
   <letex:xslt-mode msg="yes" mode="insert-xpath">
     <p:input port="source"><p:pipe step="document" port="result" /></p:input>
     <p:input port="parameters"><p:pipe step="params" port="result" /></p:input>
-    <p:input port="stylesheet"><p:pipe step="stylesheet" port="result" /></p:input>
+    <p:input port="stylesheet"><p:pipe step="docx2hub" port="xslt" /></p:input>
     <p:input port="models"><p:empty /></p:input>
     <p:with-option name="prefix" select="concat('docx2hub/', $basename, '/01')"/>
     <p:with-option name="debug" select="$debug"/>
@@ -109,7 +108,7 @@
   
   <letex:xslt-mode msg="yes" mode="docx2hub:add-props">
     <p:input port="parameters"><p:pipe step="params" port="result" /></p:input>
-    <p:input port="stylesheet"><p:pipe step="stylesheet" port="result" /></p:input>
+    <p:input port="stylesheet"><p:pipe step="docx2hub" port="xslt" /></p:input>
     <p:input port="models"><p:empty /></p:input>
     <p:with-option name="prefix" select="concat('docx2hub/', $basename, '/03')"/>
     <p:with-option name="debug" select="$debug"/>
@@ -119,7 +118,7 @@
   
   <letex:xslt-mode msg="yes" mode="docx2hub:props2atts">
     <p:input port="parameters"><p:pipe step="params" port="result" /></p:input>
-    <p:input port="stylesheet"><p:pipe step="stylesheet" port="result" /></p:input>
+    <p:input port="stylesheet"><p:pipe step="docx2hub" port="xslt" /></p:input>
     <p:input port="models"><p:empty /></p:input>
     <p:with-option name="prefix" select="concat('docx2hub/', $basename, '/04')"/>
     <p:with-option name="debug" select="$debug"/>
@@ -129,7 +128,7 @@
   
   <letex:xslt-mode msg="yes" mode="docx2hub:remove-redundant-run-atts">
     <p:input port="parameters"><p:pipe step="params" port="result" /></p:input>
-    <p:input port="stylesheet"><p:pipe step="stylesheet" port="result" /></p:input>
+    <p:input port="stylesheet"><p:pipe step="docx2hub" port="xslt" /></p:input>
     <p:input port="models"><p:empty /></p:input>
     <p:with-option name="prefix" select="concat('docx2hub/', $basename, '/05')"/>
     <p:with-option name="debug" select="$debug"/>
@@ -139,7 +138,7 @@
   
   <letex:xslt-mode msg="yes" mode="docx2hub:separate-field-functions">
     <p:input port="parameters"><p:pipe step="params" port="result" /></p:input>
-    <p:input port="stylesheet"><p:pipe step="stylesheet" port="result" /></p:input>
+    <p:input port="stylesheet"><p:pipe step="docx2hub" port="xslt" /></p:input>
     <p:input port="models"><p:empty /></p:input>
     <p:with-option name="prefix" select="concat('docx2hub/', $basename, '/11')"/>
     <p:with-option name="debug" select="$debug"/>
@@ -149,7 +148,7 @@
   
   <letex:xslt-mode msg="yes" mode="wml-to-dbk">
     <p:input port="parameters"><p:pipe step="params" port="result" /></p:input>
-    <p:input port="stylesheet"><p:pipe step="stylesheet" port="result" /></p:input>
+    <p:input port="stylesheet"><p:pipe step="docx2hub" port="xslt" /></p:input>
     <p:input port="models"><p:empty /></p:input>
     <p:with-option name="prefix" select="concat('docx2hub/', $basename, '/20')"/>
     <p:with-option name="debug" select="$debug"/>
@@ -161,7 +160,7 @@
   
   <letex:xslt-mode msg="yes" mode="docx2hub:join-runs">
     <p:input port="parameters"><p:pipe step="params" port="result" /></p:input>
-    <p:input port="stylesheet"><p:pipe step="stylesheet" port="result" /></p:input>
+    <p:input port="stylesheet"><p:pipe step="docx2hub" port="xslt" /></p:input>
     <p:input port="models"><p:empty /></p:input>
     <p:with-option name="prefix" select="concat('docx2hub/', $basename, '/24')"/>
     <p:with-option name="debug" select="$debug"/>
