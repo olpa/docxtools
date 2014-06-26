@@ -52,8 +52,8 @@
         <prop name="w:contextualSpacing" implement="maybe later"/><!-- collapsible spacing between same-style paras, boolean prop. §17.3.1.9 -->
         <prop name="w:dstrike">
           <val eq="false" />
-          <val eq="true" target-name="css:text-decoration-line" default="none" active="line-through"/>
-          <val eq="true" target-name="css:text-decoration-style" default="solid" active="double"/>
+          <val eq="true" target-name="css:text-decoration-line" target-value="line-through"/>
+          <val eq="true" target-name="css:text-decoration-style" target-value="double"/>
         </prop>
         <prop name="w:em">
           <val eq="none"/>
