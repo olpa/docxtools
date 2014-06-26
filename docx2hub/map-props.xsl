@@ -307,7 +307,7 @@
     <xsl:variable name="prop" select="key('docx2hub:prop', docx2hub:propkey(.), $docx2hub:propmap)" />
     <xsl:variable name="raw-output" as="element(*)*">
       <xsl:apply-templates select="$prop" mode="#current">
-        <xsl:with-param name="val" select="." tunnel="yes" />
+        <xsl:with-param name="val" select="." tunnel="yes" as="item()"/>
       </xsl:apply-templates>
       <xsl:if test="empty($prop)">
         <!-- Fallback (no mapping in propmap): -->
@@ -356,7 +356,6 @@
   </xsl:function>
 
   <xsl:template match="prop" mode="docx2hub:add-props" as="node()*">
-    <xsl:param name="val" as="node()" tunnel="yes" />
     <xsl:variable name="atts" as="element(*)*">
       <!-- in the following line, val is a potential child of prop (do not cofuse with $val)! -->
       <xsl:apply-templates select="@type, val, @target-value[not(../(@type, val))]" mode="#current" />
@@ -381,7 +380,7 @@
   </xsl:template>
 
   <xsl:template match="prop/@type" mode="docx2hub:add-props" as="node()*">
-    <xsl:param name="val" as="node()" tunnel="yes" />
+    <xsl:param name="val" as="item()" tunnel="yes" /><!-- element or attribute -->
     <xsl:choose>
 
       <xsl:when test=". eq 'percentage'">
@@ -795,15 +794,15 @@
   </xsl:function>
 
   <xsl:template match="val/@match" mode="docx2hub:add-props" as="element(*)?">
-    <xsl:param name="val" as="node()" tunnel="yes" />
+    <xsl:param name="val" as="item()" tunnel="yes" />
     <xsl:if test="matches($val/@w:val, .)">
       <xsl:call-template name="docx2hub:XML-Hubformat-atts" />
     </xsl:if>
   </xsl:template>
 
   <xsl:template match="val/@eq" mode="docx2hub:add-props" as="element(*)?">
-    <xsl:param name="val" as="node()" tunnel="yes" />
-    <xsl:if test="$val eq .">
+    <xsl:param name="val" as="item()" tunnel="yes" />
+    <xsl:if test="string($val) = string(.) or (string(.) = 'true' and empty($val/@*))">
       <xsl:call-template name="docx2hub:XML-Hubformat-atts" />
     </xsl:if>
   </xsl:template>
