@@ -879,8 +879,8 @@
       <xsl:when test="w:t and docx2hub:wrap/@element = ('superscript', 'subscript') 
                       and exists(docx2hub:wrap/@element[ . ne 'superscript' and . ne 'subscript'])
                       and (
-                        every $el in $content/* 
-                        satisfies $el/self::w:t[@xml:space eq 'preserve'][matches(., '^\p{Zs}$')]
+                        every $el in $content[self::*] 
+                        satisfies $el[self::w:t[@xml:space eq 'preserve'][matches(., '^\p{Zs}*$')]]
                       )">
         <xsl:sequence select="docx2hub:wrap($content, (docx2hub:wrap[not(@element = ('superscript', 'subscript'))]))" />
       </xsl:when>
@@ -888,8 +888,8 @@
       <xsl:when test="w:t and docx2hub:wrap/@element = ('superscript', 'subscript') 
                       and not(exists(docx2hub:wrap/@element[ . ne 'superscript' and . ne 'subscript']))
                       and (
-                        every $el in $content/* 
-                        satisfies $el/self::w:t[@xml:space eq 'preserve'][matches(., '^\p{Zs}$')]
+                        every $el in $content[self::*] 
+                        satisfies $el[self::w:t[@xml:space eq 'preserve'][matches(., '^\p{Zs}*$')]]
                       )">
         <xsl:copy>
           <xsl:sequence select="docx2hub:wrap($content, (docx2hub:wrap[not(@element = ('superscript', 'subscript'))]))" />
