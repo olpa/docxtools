@@ -289,7 +289,7 @@
               <xsl:variable name="attributes" select="./@*" as="attribute()*"/>
               <xsl:if test="not(tokenize(./text(),$regex-char)[1]='')">
                 <xsl:element name="{$element-name}">
-                  <xsl:apply-templates select="$attributes" mode="#current"/>
+                  <xsl:copy-of select="$attributes"/>
                   <xsl:value-of select="tokenize(./text(),$regex-char)[1]"/>
                 </xsl:element>
               </xsl:if>
@@ -298,7 +298,7 @@
                   <xsl:value-of select="$string-char"/>
                 </text>
                 <xsl:element name="{$element-name}">
-                  <xsl:apply-templates select="$attributes" mode="#current"/>
+                  <xsl:copy-of select="$attributes"/>
                   <xsl:value-of select="."/>
                 </xsl:element>
               </xsl:for-each>
