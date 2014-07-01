@@ -98,6 +98,7 @@
       <xsl:call-template name="create-imageobject">
         <xsl:with-param name="image-id" select="@r:id"/>
         <xsl:with-param name="embedded" select="true()"/>
+        <xsl:with-param name="rels" select="if (ancestor::w:footnote) then //w:footnoteRels else if (ancestor::w:comment) then //w:commentRels else //w:docRels"/>
       </xsl:call-template>
     </xsl:element>
   </xsl:template>
@@ -125,9 +126,10 @@
   <xsl:template name="create-imageobject">
     <xsl:param name="image-id" as="xs:string"/>
     <xsl:param name="embedded" as="xs:boolean"/>
+    <xsl:param name="rels" as="node()*" select="//w:docRels"/>
     <!-- the file reference of an image object is stored in {docx}/_rels/document.xml.rels -->
     <xsl:variable name="relationships" 
-      select="//w:docRels/rel:Relationships/rel:Relationship[@Type eq 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image']" 
+      select="$rels/rel:Relationships/rel:Relationship[@Type eq 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image']" 
       as="element(rel:Relationship)+"/>
     <xsl:variable name="file-uri" select="$relationships[@Id eq $image-id]/@Target" as="xs:string"/>
     <!-- include container prefix for files embedded in docx -->
