@@ -360,7 +360,9 @@
                        | *:style/w:numPr 
                        | css:rule/w:tblPr 
                        | /*/w:numbering 
-                       | /*/w:docRels 
+                       | /*/w:docRels
+                       | /*/w:footnoteRels
+                       | /*/w:commentRels
                        | /*/w:fonts 
                        | /*/w:comments 
                        | /*/w:footnotes
