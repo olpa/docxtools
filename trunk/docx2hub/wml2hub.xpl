@@ -5,16 +5,19 @@
   xmlns:transpect="http://www.le-tex.de/namespace/transpect"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" version="1.0" name="docx2hub" type="docx2hub:convert">
 
-  <!-- * This script is used to convert docx to hub format. The output is stored in the directory of the input docx file
-       * invoke with "sh calabash/calabash.sh wml2hub.xpl docx=PATH-TO-MY-DOCX-FILE.docx" 
-       * where docx may be a an OS path or a file:, http:, or https: URL.
-       *
-       * Import it with
-       * <p:import href="http://transpect.le-tex.de/docx2hub/wml2hub.xpl" />
-       * if you use it from transpect or if you imported this project as svn:external.
-       * In the latter case, include the following line in you project's xmlcatalog/catalog.xml:
-       * <nextCatalog catalog="../docx2hub/xmlcatalog/catalog.xml"/>
-       * -->
+
+  <p:documentation xmlns="http://www.w3.org/1999/xhtml">
+    <p>This script is used to convert docx to Hub XML. By default, the output is stored in the same directory as the input docx
+      file, with the same basename.</p>
+    <p>Invoke it with</p>
+    <p><code>sh calabash/calabash.sh wml2hub.xpl docx=PATH-TO-MY-DOCX-FILE.docx</code></p>
+    <p>where docx may be a an OS path or a file:, http:, or https: URL.</p>
+    <p>Import it with</p>
+    <p><code>&lt;p:import href="http://transpect.le-tex.de/docx2hub/wml2hub.xpl" /></code></p>
+    <p>if you use it from transpect or if you imported this project as svn:external.</p>
+    <p>* In the latter case, include the following line in you project's xmlcatalog/catalog.xml:</p>
+    <p><code>* &lt;nextCatalog catalog="../docx2hub/xmlcatalog/catalog.xml"/></code></p>
+  </p:documentation>
 
   <p:input port="source">
     <p:empty/>
