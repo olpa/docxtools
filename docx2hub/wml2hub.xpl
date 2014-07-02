@@ -73,7 +73,7 @@
     <p:with-option name="zip" select="/c:result/@os-path" >
       <p:pipe step="locate-docx" port="result"/>
     </p:with-option>
-    <p:with-option name="dest-dir" select="if ($extract-dir = '' 
+    <p:with-option name="dest-dir" select="if ($extract-dir = '') 
                                            then concat(/c:result/@os-path, '.tmp')
                                            else $extract-dir">
       <p:pipe step="locate-docx" port="result"/>
