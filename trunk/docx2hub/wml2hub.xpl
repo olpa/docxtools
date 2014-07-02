@@ -6,6 +6,7 @@
   xmlns:letex="http://www.le-tex.de/namespace" 
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:docx2hub = "http://www.le-tex.de/namespace/docx2hub"
+  xmlns:transpect="http://www.le-tex.de/namespace/transpect"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   version="1.0"
   name="docx2hub"
@@ -14,6 +15,7 @@
 
   <!-- * This script is used to convert docx to hub format. The output is stored in the directory of the input docx file
        * invoke with "sh calabash/calabash.sh wml2hub.xpl docx=PATH-TO-MY-DOCX-FILE.docx" 
+       * where docx may be a an OS path or a file:, http:, or https: URL.
        *
        * Import it with
        * <p:import href="http://transpect.le-tex.de/docx2hub/wml2hub.xpl" />
@@ -34,7 +36,8 @@
   </p:output>
     
   <p:option name="docx" required="true">
-    <p:documentation>A file name as recognized by your system's JVM. Not a file: URI.</p:documentation>
+    <p:documentation>OS name (preferably with full path, may not resolve if only a relative path is given),
+    file:, http:, or https: URL. The file will be fetched first if it is an HTTP URL.</p:documentation>
   </p:option>
   <p:option name="debug" required="false" select="'no'"/>
   <p:option name="debug-dir-uri" required="false" select="'debug'"/>
@@ -42,12 +45,17 @@
   <p:option name="unwrap-tooltip-links" required="false" select="'no'"/>
   <p:option name="hub-version" required="false" select="'1.1'"/>
   <p:option name="fail-on-error" select="'no'"/>
+  <p:option name="extract-dir" required="false" select="''">
+    <p:documentation>Directory (OS path, not file: URL) to which the file will be unzipped. 
+      If option is empty string, will be '.tmp' appended to OS file path.</p:documentation>
+  </p:option>
   <p:serialization port="result" omit-xml-declaration="false"/>
 
   <!-- import libs with extension steps -->
   
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl" />
   <p:import href="http://transpect.le-tex.de/calabash-extensions/ltx-lib.xpl" />
+  <p:import href="http://transpect.le-tex.de/xproc-util/load-file/load-file.xpl" />
   <p:import href="http://transpect.le-tex.de/xproc-util/xml-model/prepend-hub-xml-model.xpl" />
   <p:import href="http://transpect.le-tex.de/xproc-util/xslt-mode/xslt-mode.xpl"/>
   <p:import href="wml2hub.lib.xpl" />
@@ -55,12 +63,20 @@
 
   <p:variable name="basename" select="replace($docx, '^(.+?)([^/\\]+)\.do[ct][mx]$', '$2')"/>
 
+  <transpect:file-uri name="locate-docx">
+    <p:with-option name="filename" select="$docx"/>
+  </transpect:file-uri>
+
   <!-- unzip or print out error message -->
     
   <letex:unzip name="unzip">
-    <p:with-option name="zip" select="$docx" />
-    <p:with-option name="dest-dir" select="concat($docx, '.tmp')">
-      <p:pipe step="docx2hub" port="source"/>
+    <p:with-option name="zip" select="/c:result/@os-path" >
+      <p:pipe step="locate-docx" port="result"/>
+    </p:with-option>
+    <p:with-option name="dest-dir" select="if ($extract-dir = '' 
+                                           then concat(/c:result/@os-path, '.tmp')
+                                           else $extract-dir">
+      <p:pipe step="locate-docx" port="result"/>
     </p:with-option>
     <p:with-option name="overwrite" select="'yes'" />
   </letex:unzip>
