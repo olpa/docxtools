@@ -715,6 +715,7 @@
                 <value key="info-text"><xsl:value-of select="$instrText"/></value>
               </xsl:with-param>
             </xsl:call-template>
+            <xsl:apply-templates select="$text" mode="#current"/>
           </xsl:when>
           <xsl:when test="$tokens[1] = 'INCLUDEPICTURE'">
             <xsl:call-template name="handle-figures">
@@ -736,7 +737,9 @@
               <xsl:apply-templates select="$text" mode="#current"/>
             </link>
           </xsl:when>
-          <xsl:when test="matches($instrText,'^[\s&#160;]*$')"/>
+          <xsl:when test="matches($instrText,'^[\s&#160;]*$')">
+            <xsl:apply-templates select="$text" mode="#current"/>
+          </xsl:when>
           <xsl:when test="$tokens[1] = 'AUTOTEXT'">
             <xsl:call-template name="signal-error" xmlns="">
               <xsl:with-param name="error-code" select="'W2D_045'"/>
@@ -747,6 +750,7 @@
                 <value key="info-text"><xsl:value-of select="$instrText"/></value>
               </xsl:with-param>
             </xsl:call-template>
+            <xsl:apply-templates select="$text" mode="#current"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:call-template name="signal-error" xmlns="">
@@ -758,6 +762,7 @@
                 <value key="info-text"><xsl:value-of select="$instrText"/></value>
               </xsl:with-param>
             </xsl:call-template>
+            <xsl:apply-templates select="$text" mode="#current"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
