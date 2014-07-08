@@ -50,7 +50,7 @@
 
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
   <p:import href="http://transpect.le-tex.de/calabash-extensions/ltx-lib.xpl"/>
-  <p:import href="http://transpect.le-tex.de/xproc-util/load-file/load-file.xpl"/>
+  <p:import href="http://transpect.le-tex.de/xproc-util/file-uri/file-uri.xpl"/>
   <p:import href="http://transpect.le-tex.de/xproc-util/xml-model/prepend-hub-xml-model.xpl"/>
   <p:import href="http://transpect.le-tex.de/xproc-util/xslt-mode/xslt-mode.xpl"/>
   <p:import href="wml2hub.lib.xpl"/>
@@ -61,7 +61,7 @@
   <transpect:file-uri name="locate-docx">
     <p:with-option name="filename" select="$docx"/>
   </transpect:file-uri>
-
+  
   <!-- unzip or print out error message -->
   <letex:unzip name="unzip">
     <p:with-option name="zip" select="/c:result/@os-path">
@@ -74,7 +74,7 @@
     </p:with-option>
     <p:with-option name="overwrite" select="'yes'"/>
   </letex:unzip>
-
+  
   <p:load name="document">
     <p:with-option name="href" select="concat(/c:files/@xml:base, 'word/document.xml')"/>
   </p:load>
