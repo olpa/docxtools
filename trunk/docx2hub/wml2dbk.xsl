@@ -873,6 +873,23 @@
       <phrase role="pageBreakBefore"/>
     </xsl:if>
   </xsl:template>
+  
+  <xsl:template match="w:ruby" mode="wml-to-dbk">
+    <xsl:apply-templates mode="#current"/>
+  </xsl:template>
+  
+  <xsl:template match="w:rt" mode="wml-to-dbk">
+    <phrase role="ruby-text">
+      <xsl:apply-templates select="parent::w:ruby/@* except parent::w:ruby/@docx2hub:*" mode="#current"/>
+      <xsl:apply-templates mode="#current"/>
+    </phrase>
+  </xsl:template>
+  
+  <xsl:template match="w:rubyBase" mode="wml-to-dbk">
+    <phrase role="ruby-base">
+      <xsl:apply-templates mode="#current"/>
+    </phrase>
+  </xsl:template>
 
   <!-- math section -->
   <xsl:template match="m:oMathPara" mode="wml-to-dbk">

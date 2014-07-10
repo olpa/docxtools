@@ -113,6 +113,13 @@
         <prop name="w:rsidP" />
         <prop name="w:rsidRPr" />
         <prop name="w:rStyle" type="docx-charstyle" />
+        <prop name="w:rubyAlign">
+          <val match="center" target-name="css:ruby-align" target-value="center"/>
+          <val match="distributeSpace" target-name="css:ruby-align" target-value="space-between"/>
+          <val match="left" target-name="css:ruby-position" target-value="left"/>
+          <val match="right" target-name="css:ruby-position" target-value="right"/>
+          <val match="rightVertical" target-name="css:ruby-position" target-value="inter-character"/>
+        </prop>
         <prop name="w:sectPr" /><!-- provisional -->
         <prop name="w:semiHidden" />
         <prop name="w:shadow" type="docx-boolean-prop" target-name="css:text-shadow" default="none" active="1pt 1pt"/>

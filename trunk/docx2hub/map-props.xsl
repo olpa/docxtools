@@ -252,6 +252,10 @@
     <xsl:apply-templates select="*" mode="#current"/>
   </xsl:template>
 
+  <xsl:template match="w:rubyPr" mode="docx2hub:add-props">
+    <xsl:apply-templates select="*" mode="#current"/>
+  </xsl:template>
+
   <xsl:template match="w:tcPr" mode="docx2hub:add-props" priority="2">
     <xsl:apply-templates select="*" mode="#current" />
     <!-- for cellspan etc. processing as defined in tables.xsl: -->
@@ -293,6 +297,7 @@
                        | w:tblBorders/*
                        | w:tcPr/*
                        | w:trPr/*
+                       | w:rubyPr/*
                        | w:tblPrEx/*
                        | w:tblCellMar/*
                        | w:tcMar/*
