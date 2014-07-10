@@ -46,6 +46,8 @@
   <p:serialization port="result" omit-xml-declaration="false"/>
 
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
+  <p:import href="http://transpect.le-tex.de/calabash-extensions/ltx-lib.xpl"/>
+  <p:import href="http://transpect.le-tex.de/xproc-util/file-uri/file-uri.xpl"/>
   <p:import href="http://transpect.le-tex.de/xproc-util/xml-model/prepend-hub-xml-model.xpl"/>
   <p:import href="http://transpect.le-tex.de/xproc-util/xslt-mode/xslt-mode.xpl"/>
   <p:import href="single-tree.xpl"/>
