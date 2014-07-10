@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<p:declare-step 
-  xmlns:p="http://www.w3.org/ns/xproc" xmlns:c="http://www.w3.org/ns/xproc-step"
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc" xmlns:c="http://www.w3.org/ns/xproc-step"
   xmlns:cx="http://xmlcalabash.com/ns/extensions" xmlns:letex="http://www.le-tex.de/namespace"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:docx2hub="http://www.le-tex.de/namespace/docx2hub"
   xmlns:transpect="http://www.le-tex.de/namespace/transpect"
-  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" version="1.0"
-  name="docx-single-tree" type="docx2hub:single-tree">
+  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" version="1.0" name="docx-single-tree"
+  type="docx2hub:single-tree">
 
-  <p:input port="xslt">
+  <p:input port="source" primary="true">
+    <p:documentation>This is to prevent any other default readable port to be connected with the xslt port.</p:documentation>
+    <p:empty/>
+  </p:input>
+  <p:input port="xslt" primary="false">
     <p:document href="main.xsl"/>
   </p:input>
   <p:output port="result" primary="true"/>
@@ -69,6 +72,7 @@
         <c:param-set>
           <c:param name="error-msg-file-path"/>
           <c:param name="hub-version"/>
+          <c:param name="local-href"/>
           <c:param name="unwrap-tooltip-links"/>
           <c:param name="extract-dir-uri"/>
         </c:param-set>
@@ -89,18 +93,20 @@
       <p:pipe port="result" step="unzip"/>
     </p:with-option>
   </p:add-attribute>
-  
+
   <p:add-attribute attribute-name="value" match="/c:param-set/c:param[@name = 'local-href']">
     <p:with-option name="attribute-value" select="/c:result/@local-href">
       <p:pipe port="result" step="locate-docx"/>
     </p:with-option>
   </p:add-attribute>
-  
+
   <p:add-attribute name="params" attribute-name="value" match="/c:param-set/c:param[@name = 'unwrap-tooltip-links']">
     <p:with-option name="attribute-value" select="$unwrap-tooltip-links"/>
   </p:add-attribute>
 
-  <letex:xslt-mode msg="yes" mode="insert-xpath" >
+  <p:sink/>
+  
+  <letex:xslt-mode msg="yes" mode="insert-xpath">
     <p:input port="source">
       <p:pipe step="document" port="result"/>
     </p:input>
