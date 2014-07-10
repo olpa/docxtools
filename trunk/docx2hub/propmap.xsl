@@ -115,7 +115,8 @@
         <prop name="w:rStyle" type="docx-charstyle" />
         <prop name="w:rubyAlign">
           <val match="center" target-name="css:ruby-align" target-value="center"/>
-          <val match="distributeSpace" target-name="css:ruby-align" target-value="space-between"/>
+          <val match="distributeSpace" target-name="css:ruby-align" target-value="space-around"/>
+          <val match="distributeLetter" target-name="css:ruby-align" target-value="space-between"/>
           <val match="left" target-name="css:ruby-position" target-value="left"/>
           <val match="right" target-name="css:ruby-position" target-value="right"/>
           <val match="rightVertical" target-name="css:ruby-position" target-value="inter-character"/>
