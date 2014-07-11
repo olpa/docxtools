@@ -70,6 +70,7 @@
     <xsl:document>
       <w:root>
         <xsl:attribute name="xml:base" select="$container-base-uri"/>
+        <xsl:attribute name="extract-dir-uri" select="$extract-dir-uri"/>
         <xsl:attribute name="local-href" select="$local-href"/>
         <xsl:variable name="containerRels" as="document-node(element(rel:Relationships))"
           select="document(resolve-uri(replace($base-dir, '[^/]+/?$', '_rels/.rels')))"/>
