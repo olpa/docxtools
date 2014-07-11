@@ -24,6 +24,10 @@
   <p:input port="xslt">
     <p:document href="main.xsl"/>
   </p:input>
+  <p:input port="source" primary="true">
+    <p:documentation>This is to prevent a default readable port connecting to this step’s xslt port.</p:documentation>
+    <p:empty/>
+  </p:input>
   <p:output port="result" primary="true"/>
   <p:output port="insert-xpath">
     <p:pipe step="single-tree" port="result"/>
