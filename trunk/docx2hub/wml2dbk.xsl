@@ -28,6 +28,7 @@
   <xsl:param name="fail-on-error" select="'no'" as="xs:string?"/>
   <xsl:param name="srcpaths" select="'no'" as="xs:string?"/>
   <xsl:param name="base-dir" select="replace(base-uri(), '[^/]+$', '')"/>
+  <xsl:param name="extract-dir-uri" select="''" as="xs:string"/><!-- tmp unzip dir URI -->
   <xsl:param name="local-href" select="''" as="xs:string"/><!-- docx file URI -->
   <xsl:variable name="debug-dir" select="concat(replace($base-dir, '^(.+/)(.+?/)$', '$1'), 'debug')"/>
   <!-- Links that probably have been inserted by Word without user consent: -->
