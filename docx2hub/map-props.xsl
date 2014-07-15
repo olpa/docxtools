@@ -32,7 +32,7 @@
   <xsl:template match="/" mode="docx2hub:add-props">
     <xsl:apply-templates select="w:root/w:document/w:body" mode="#current" />
   </xsl:template>
-
+  
   <xsl:template match="@srcpath" mode="docx2hub:add-props">
     <xsl:attribute name="srcpath" select="substring-after(., /w:root/@xml:base)" />
   </xsl:template>
@@ -60,6 +60,11 @@
             <!-- /w:root/@xml:base example: file:/data/docx/M_001.docx.tmp/ -->
             <xsl:value-of select="replace(/w:root/@xml:base, '^.*/(.+)\.docx(\.tmp/?)?$', '$1')"/>
           </keyword>
+          <xsl:if test="/w:root/w:containerProps/*:Properties/*:Application">
+            <keyword role="source-application">
+              <xsl:value-of select="/w:root/w:containerProps/*:Properties/*:Application"/>
+            </keyword>
+          </xsl:if>
         </keywordset>
         <xsl:if test="exists(../../w:settings/w:docVars/w:docVar)">
           <keywordset role="docVars">
