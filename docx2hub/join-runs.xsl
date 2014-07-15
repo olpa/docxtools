@@ -36,7 +36,7 @@
       <xsl:call-template name="docx2hub_move-invalid-sidebar-elements"/>
     </xsl:if>
     <xsl:copy copy-namespaces="no">
-      <xsl:copy-of select="@*" />
+      <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:call-template name="docx2hub_pagebreak-elements-to-attributes"/>
       <xsl:for-each-group select="node()" group-adjacent="letex:signature(.)">
         <xsl:choose>
@@ -197,4 +197,55 @@
     <anchor xml:id="side_{generate-id(.)}"/>
   </xsl:template>
 
+  <!-- mode hub:fix-libre-office-issues -->
+  <!-- style names from Libre Office templates are coded in @native-name only, the @name attributes are automatically numbered 'style65' etc.
+        therefore the @names are replace by normalized @native-names in paragraphs and css:rules -->
+  
+  <xsl:function name="docx2hub:normalize-to-css-name" as="xs:string">
+    <xsl:param name="style-name" as="xs:string"/>
+    <xsl:sequence select="replace(replace(replace($style-name, '[^_~a-zA-Z0-9-]', '_'), '~', '_-_'), '^(\I)', '_$1')"/>
+  </xsl:function>
+  
+  <xsl:key name="natives" match="css:rule" use="@name"/> 
+  
+  <xsl:variable name="is-libre-office-document"
+              select="if (/dbk:hub/dbk:info/dbk:keywordset/dbk:keyword[@role = 'source-application'][matches(., '^LibreOffice', 'i')]) 
+                      then true() 
+                      else false()" as="xs:boolean"/> 
+  
+  <xsl:template match="css:rule[$is-libre-office-document]/@name" mode="docx2hub:join-runs">
+    <xsl:attribute name="{name()}">
+      <xsl:choose>
+        <xsl:when test="matches(../@native-name, '(Kein Absatzformat|^\s*$)')">
+          <xsl:sequence select="'None'"/>
+        </xsl:when>
+        <xsl:when test="matches(../@native-name, '^p$')">
+          <xsl:sequence select="'para'"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:sequence select="docx2hub:normalize-to-css-name(../@native-name)"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute> 
+  </xsl:template>
+  
+  <xsl:template match="*[not((local-name(.) = ('keyword', 'keywordset', 'anchor')))][$is-libre-office-document]/@role" mode="docx2hub:join-runs">
+    <xsl:attribute name="{name()}">
+      <xsl:choose>
+        <xsl:when test="key('natives', .)[matches(@native-name, 'Kein Absatzformat')]">
+          <xsl:sequence select="'None'"/>
+        </xsl:when>
+        <xsl:when test="key('natives', .)[matches(@native-name, '(Einfaches Absatzformat|^p$)', 'i')]">
+          <xsl:sequence select="'para'"/>
+        </xsl:when>
+        <xsl:when test="matches(., 'hub:identifier')">
+          <xsl:sequence select="."/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:sequence select="key('natives', .)/docx2hub:normalize-to-css-name(@native-name)"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute> 
+  </xsl:template>
+  
 </xsl:stylesheet>
