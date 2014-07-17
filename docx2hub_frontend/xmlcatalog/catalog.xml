@@ -2,7 +2,7 @@
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
 
   <nextCatalog catalog="../docx2hub/xmlcatalog/catalog.xml"/>
-  <nextCatalog catalog="../load-file/xmlcatalog/catalog.xml"/>
+  <nextCatalog catalog="../file-uri/xmlcatalog/catalog.xml"/>
   <nextCatalog catalog="../xml-model/xmlcatalog/catalog.xml"/>
   <nextCatalog catalog="../xslt-mode/xmlcatalog/catalog.xml"/>
   <nextCatalog catalog="../store-debug/xmlcatalog/catalog.xml"/>
