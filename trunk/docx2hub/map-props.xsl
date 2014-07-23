@@ -34,7 +34,7 @@
   </xsl:template>
   
   <xsl:template match="@srcpath" mode="docx2hub:add-props">
-    <xsl:attribute name="srcpath" select="substring-after(., /w:root/@xml:base)" />
+    <xsl:attribute name="srcpath" select="substring-after(., escape-html-uri(/w:root/@xml:base))" />
   </xsl:template>
 
   <xsl:template match="w:body" mode="docx2hub:add-props">
