@@ -17,6 +17,9 @@
   <p:output port="params">
     <p:pipe port="result" step="params"/>
   </p:output>
+  <p:output port="zip-manifest">
+    <p:pipe port="result" step="unzip"/>
+  </p:output>
 
   <p:option name="docx" required="true">
     <p:documentation>OS name (preferably with full path, may not resolve if only a relative path is given), file:, http:, or
