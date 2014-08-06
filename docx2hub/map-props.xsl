@@ -301,7 +301,7 @@
                        | w:tcBorders/* 
                        | w:tblBorders/*
                        | w:tcPr/*
-                       | w:trPr/*
+                       | w:trPr/*[local-name() ne 'tblHeader']
                        | w:rubyPr/*
                        | w:tblPrEx/*
                        | w:tblCellMar/*
