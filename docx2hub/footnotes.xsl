@@ -41,31 +41,34 @@
   
   <xsl:template match="w:footnote/w:p[w:r[matches(@role,$footnote-reference-style-regex) or w:footnoteRef]]" mode="wml-to-dbk" priority="+1">
     <xsl:param name="identifier" select="false()"/>
-    <xsl:choose>
-      <xsl:when test="$identifier">
-        <xsl:for-each-group select="*" group-adjacent="if (self::w:r[matches(@role,$footnote-reference-style-regex) or w:footnoteRef] or (matches(.,'^[\s&#160;]*$') and following-sibling::*[1][self::w:r[matches(@role,$footnote-reference-style-regex) or w:footnoteRef]])) then true() else false()">
-          <xsl:choose>
-            <xsl:when test="current-grouping-key()">
-              <phrase role="hub:identifier">
-                <xsl:apply-templates select="current-group()/node() except (current-group()/tab, 
-                                                                            current-group()[matches(.,'^[\s&#160;]*$')][not(w:footnoteRef)]
-                                                                                           [not(exists(following-sibling::w:r[matches(@role,$footnote-reference-style-regex)]
-                                                                                                                             [not(matches(.,'^[\s&#160;]*$'))])
-                                                                                                or 
-                                                                                                exists(following-sibling::w:r[w:footnoteRef]))
-                                                                                           ]/node())" mode="#current">
-                  <xsl:with-param name="identifier" select="$identifier"/>
-                </xsl:apply-templates>
-              </phrase>    
-            </xsl:when>
-            <xsl:otherwise/>
-          </xsl:choose>
-        </xsl:for-each-group>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:apply-templates select="node() except w:r[matches(@role,$footnote-reference-style-regex) or w:footnoteRef]" mode="#current"/>
-      </xsl:otherwise>
-    </xsl:choose>
+    <para>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:choose>
+        <xsl:when test="$identifier">
+          <xsl:for-each-group select="*" group-adjacent="if (self::w:r[matches(@role,$footnote-reference-style-regex) or w:footnoteRef] or (matches(.,'^[\s&#160;]*$') and following-sibling::*[1][self::w:r[matches(@role,$footnote-reference-style-regex) or w:footnoteRef]])) then true() else false()">
+            <xsl:choose>
+              <xsl:when test="current-grouping-key()">
+                <phrase role="hub:identifier">
+                  <xsl:apply-templates select="current-group()/node() except (current-group()/tab, 
+                                                                              current-group()[matches(.,'^[\s&#160;]*$')][not(w:footnoteRef)]
+                                                                                             [not(exists(following-sibling::w:r[matches(@role,$footnote-reference-style-regex)]
+                                                                                                                               [not(matches(.,'^[\s&#160;]*$'))])
+                                                                                                  or 
+                                                                                                  exists(following-sibling::w:r[w:footnoteRef]))
+                                                                                             ]/node())" mode="#current">
+                    <xsl:with-param name="identifier" select="$identifier"/>
+                  </xsl:apply-templates>
+                </phrase>    
+              </xsl:when>
+              <xsl:otherwise/>
+            </xsl:choose>
+          </xsl:for-each-group>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:apply-templates select="node() except w:r[matches(@role,$footnote-reference-style-regex) or w:footnoteRef]" mode="#current"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </para>
   </xsl:template>
 
   <!--KW 2014-08-14: 
