@@ -62,6 +62,17 @@
     <p:with-option name="overwrite" select="'yes'"/>
   </letex:unzip>
 
+  <p:choose>
+    <p:when test="name(/*) eq 'c:error'">
+      <cx:message>
+        <p:with-option name="message" select="'docx2hub error on unzipping.&#xa;', //text(), '&#xa;'"/>
+      </cx:message>
+    </p:when>
+    <p:otherwise>
+      <p:identity/>
+    </p:otherwise>
+  </p:choose>
+
   <p:load name="document">
     <p:with-option name="href" select="concat(/c:files/@xml:base, 'word/document.xml')"/>
   </p:load>
