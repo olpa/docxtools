@@ -23,9 +23,14 @@
   exclude-result-prefixes = "w o v wx xs dbk pkg r rel word200x exsl saxon fn letex mml"
   >
 
+  <xsl:variable name="footnote-reference-style-regex" select="'^(FootnoteReference|Funotenzeichen)$'"/>
+
   <xsl:template match="w:footnoteReference" mode="wml-to-dbk">
     <footnote>
       <xsl:variable name="id" select="@w:id"/>
+      <xsl:apply-templates select="/*/w:footnotes/w:footnote[@w:id = $id]/w:p[w:r[matches(@role,$footnote-reference-style-regex) or w:footnoteRef]]" mode="#current">
+        <xsl:with-param name="identifier" select="true()"/>
+      </xsl:apply-templates>
       <xsl:apply-templates select="/*/w:footnotes/w:footnote[@w:id = $id]" mode="#current"/>
     </footnote>
   </xsl:template>
@@ -33,47 +38,83 @@
   <xsl:template match="w:footnote" mode="wml-to-dbk">
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
-
-  <xsl:template match="w:footnoteRef" mode="wml-to-dbk">
-    <!-- setzt die Nummer der Fußnote. Prüfen!! -->
-    <!-- GI 2013-05-23: Apparently both Word 2013 and LibreOffice 4.0.3 generate a number even if the 
-      footnote doesn’t contain a footnoteRef. See for example DIN EN 419251-1, Sect. 6.1 -->
-    <xsl:variable name="footnote-num-format" select="/*/w:settings/w:footnotePr/w:numFmt/@w:val" as="xs:string?"/>
-    <xsl:variable name="footnote-number">
-      <xsl:number value="(count(preceding::w:footnoteRef) + 1)" 
-        format="{
-        if ($footnote-num-format)
-        then letex:get-numbering-format($footnote-num-format, '') 
-        else '1'
-        }"/>
-    </xsl:variable>
-    <phrase role="hub:identifier">
-      <xsl:choose>
-        <xsl:when test="//*:keywordset[@role='docVars']/*:keyword[@role='footnote_check']">
+  
+  <xsl:template match="w:footnote/w:p[w:r[matches(@role,$footnote-reference-style-regex) or w:footnoteRef]]" mode="wml-to-dbk" priority="+1">
+    <xsl:param name="identifier" select="false()"/>
+    <xsl:choose>
+      <xsl:when test="$identifier">
+        <xsl:for-each-group select="*" group-adjacent="if (self::w:r[matches(@role,$footnote-reference-style-regex) or w:footnoteRef] or (matches(.,'^[\s&#160;]*$') and following-sibling::*[1][self::w:r[matches(@role,$footnote-reference-style-regex) or w:footnoteRef]])) then true() else false()">
           <xsl:choose>
-            <xsl:when test="some $i in (tokenize(//*:keywordset[@role='docVars']/*:keyword[@role='footnote_check'],'&#xD;')) satisfies tokenize($i,',')[1]=$footnote-number">
-              <xsl:value-of select="tokenize(tokenize(//*:keywordset[@role='docVars']/*:keyword[@role='footnote_check'],'&#xD;')[tokenize(.,',')[1]=$footnote-number],',')[2]"/>
+            <xsl:when test="current-grouping-key()">
+              <phrase role="hub:identifier">
+                <xsl:apply-templates select="current-group()/node() except (current-group()/tab, 
+                                                                            current-group()[matches(.,'^[\s&#160;]*$')][not(w:footnoteRef)]
+                                                                                           [not(exists(following-sibling::w:r[matches(@role,$footnote-reference-style-regex)]
+                                                                                                                             [not(matches(.,'^[\s&#160;]*$'))])
+                                                                                                or 
+                                                                                                exists(following-sibling::w:r[w:footnoteRef]))
+                                                                                           ]/node())" mode="#current">
+                  <xsl:with-param name="identifier" select="$identifier"/>
+                </xsl:apply-templates>
+              </phrase>    
             </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select="$footnote-number"/>
-            </xsl:otherwise>
+            <xsl:otherwise/>
           </xsl:choose>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:value-of select="$footnote-number"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </phrase>
+        </xsl:for-each-group>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="node() except w:r[matches(@role,$footnote-reference-style-regex) or w:footnoteRef]" mode="#current"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+  <!--KW 2014-08-14: 
+    Nicht footnoteRefs werden gezaehlt, sondern footnoteReference[not(@customMarkFollows='1')]
+    Ausserdem sollte zum identifier alles in footnote zaehlen, was die Formatvorlage FootnoteReference hat (ausser whitespace).-->
+  <!-- setzt die Nummer der Fußnote. Prüfen!! -->
+  <!-- GI 2013-05-23: Apparently both Word 2013 and LibreOffice 4.0.3 generate a number even if the 
+      footnote doesn’t contain a footnoteRef. See for example DIN EN 419251-1, Sect. 6.1 -->
+  <xsl:template match="w:footnoteRef" mode="wml-to-dbk">
+    <xsl:param name="identifier" select="false()"/>
+    <xsl:choose>
+      <xsl:when test="$identifier">
+        <xsl:variable name="footnote-num-format" select="/*/w:settings/w:footnotePr/w:numFmt/@w:val" as="xs:string?"/>
+        <xsl:variable name="footnote-number">
+          <xsl:number value="(count(preceding::w:footnoteRef) + 1)" 
+            format="{
+            if ($footnote-num-format)
+            then letex:get-numbering-format($footnote-num-format, '') 
+            else '1'
+            }"/>
+        </xsl:variable>
+        <xsl:choose>
+          <xsl:when test="//*:keywordset[@role='docVars']/*:keyword[@role='footnote_check']">
+            <xsl:choose>
+              <xsl:when test="some $i in (tokenize(//*:keywordset[@role='docVars']/*:keyword[@role='footnote_check'],'&#xD;')) satisfies tokenize($i,',')[1]=$footnote-number">
+                <xsl:value-of select="if (matches(tokenize(tokenize(//*:keywordset[@role='docVars']/*:keyword[@role='footnote_check'],'&#xD;')[tokenize(.,',')[1]=$footnote-number],',')[2],'\)$') and ancestor::w:footnote//w:r[matches(@role,$footnote-reference-style-regex)][matches(.,'^[\s&#160;]*\)[\s&#160;]*$')]) then replace(tokenize(tokenize(//*:keywordset[@role='docVars']/*:keyword[@role='footnote_check'],'&#xD;')[tokenize(.,',')[1]=$footnote-number],',')[2],'\)$','') else tokenize(tokenize(//*:keywordset[@role='docVars']/*:keyword[@role='footnote_check'],'&#xD;')[tokenize(.,',')[1]=$footnote-number],',')[2]"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="$footnote-number"/>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="$footnote-number"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise/>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="w:t[ancestor::w:footnote]
                           [following-sibling::w:tab or parent::w:r/following-sibling::w:r[w:tab]]
-                          [not(preceding-sibling::w:t[not(matches(.,'^[\s\)]*$'))]) and not(parent::w:r/preceding-sibling::w:r[w:t[not(matches(.,'^[\s\)]*$'))]])]
+                          [not(preceding-sibling::w:t[not(matches(.,'^[\s\)]*$'))]) and not(parent::w:r/preceding-sibling::w:r[w:t[not(matches(.,'^[\s\)]*$'))]])][not(matches(parent::w:r/@role,$footnote-reference-style-regex))]
                           [matches(.,'^[\s\)]*$')]"
                 mode="wml-to-dbk"/>
 
   <xsl:template match="*[*]
-                        [self::dbk:superscript or self::w:r[@role eq 'Funotenzeichen']]
+                        [self::dbk:superscript or self::w:r[matches(@role,$footnote-reference-style-regex)]]
                         [every $n in node() satisfies $n/self::w:footnoteReference]" mode="wml-to-dbk" priority="3">
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
