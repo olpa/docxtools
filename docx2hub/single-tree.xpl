@@ -80,7 +80,7 @@
   <p:sink/>
 
   <p:add-attribute attribute-name="value" match="/c:param-set/c:param[@name = 'error-msg-file-path']">
-    <p:with-option name="attribute-value" select="replace( static-base-uri(), '/wml2hub.xpl', '' )"/>
+    <p:with-option name="attribute-value" select="replace(static-base-uri(), '/[^/]+$', '')"/>
     <p:input port="source">
       <p:inline>
         <c:param-set>
