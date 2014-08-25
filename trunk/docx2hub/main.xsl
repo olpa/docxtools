@@ -28,7 +28,7 @@
 
   <xsl:import href="wml2dbk.xsl"/>
   <xsl:import href="insert-xpath.xsl"/>
-  <xsl:import href="map-props.xsl"/>
+  <xsl:import href="modules/prop-mapping/map-props.xsl"/>
   <xsl:import href="join-runs.xsl"/>
 
   <!-- ================================================================================ -->
