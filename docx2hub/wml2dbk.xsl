@@ -832,7 +832,7 @@
 
   <!-- fldSimple -->
   <xsl:template match="w:fldSimple" mode="wml-to-dbk">
-    <!-- p1592 gehört zu Feldfunktionen. Wenn w:t darunter, muss der geschrieben werden -->
+    <!-- §17.16.19 p1592 gehört zu Feldfunktionen. Wenn w:t darunter, muss der geschrieben werden -->
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
