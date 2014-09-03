@@ -176,6 +176,19 @@
     </xsl:choose>
   </xsl:template>
   
+  <xsl:template match="text()[matches(., '^\s*XE\s+$')]" mode="index-processing"/>
+
+  <xsl:template match="text()[matches(.,'^\s*&quot;[^\s]+')]" mode="index-processing" priority="+1">
+    <xsl:choose>
+      <xsl:when test="matches(., '^\s*&quot;(.*)&quot;\s*$')">
+        <xsl:value-of select="replace(., '^\s*&quot;(.*)&quot;\s*$', '$1')"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="replace(., '^\s*&quot;(.*)$', '$1')"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
   <xsl:template match="text()[matches(.,'&quot;\s*$')]" mode="index-processing">
     <xsl:value-of select="letex:rm-last-quot(.)"/>
   </xsl:template>
