@@ -389,6 +389,10 @@
     </xsl:copy>   
   </xsl:template>
 
+  <xsl:template match="@srcpath" mode="wml-to-dbk">
+    <xsl:copy/>
+  </xsl:template>
+
   <xsl:template match="@*:paraId" mode="wml-to-dbk" priority="3" />
   <xsl:template match="@*:textId" mode="wml-to-dbk" priority="3" />
 
