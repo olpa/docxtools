@@ -203,8 +203,8 @@
   
   <xsl:function name="docx2hub:normalize-to-css-name" as="xs:string">
     <xsl:param name="style-name" as="xs:string"/>
-<!--    <xsl:sequence select="replace(replace(replace($style-name, '[^_~a-zA-Z0-9-]', '_'), '~', '_-_'), '^(\I)', '_$1')"/>-->
-    <xsl:sequence select="replace($style-name, '~', '_-_')"/>
+    <xsl:sequence select="replace(replace(replace($style-name, '[^-_~a-z0-9]', '_', 'i'), '~', '_-_'), '^(\I)', '_$1')"/>
+<!--    <xsl:sequence select="replace($style-name, '~', '_-_')"/>-->
   </xsl:function>
   
   <xsl:key name="natives" match="css:rule" use="@name"/> 

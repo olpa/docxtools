@@ -858,7 +858,7 @@
 
   <xsl:function name="docx2hub:css-compatible-name" as="xs:string">
     <xsl:param name="input" as="xs:string"/>
-    <xsl:sequence select="replace(replace(normalize-unicode($input, 'NFKD'), '\p{Mn}', ''), '\C', '_')"/>
+    <xsl:sequence select="replace(replace(normalize-unicode($input, 'NFKD'), '\p{Mn}', ''), '[^-_a-z0-9]', '_', 'i')"/>
   </xsl:function>
 
   <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
