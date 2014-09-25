@@ -208,7 +208,11 @@
       <xsl:variable name="default-font" as="xs:string"
         select="if ($normal/w:rPr/w:rFonts/@w:ascii)
                 then $normal/w:rPr/w:rFonts/@w:ascii
-                else letex:theme-font(w:docDefaults/w:rPrDefault/w:rPr/w:rFonts, $themes)" />
+                else letex:theme-font(
+                      (
+                        w:docDefaults/w:rPrDefault/w:rPr/w:rFonts,
+                        w:docDefaults/w:rPrDefault/w:rFonts
+                      )[1], $themes)" />
       <!-- Font-size des Standardtextes -->
       <xsl:variable name="default-font-size" as="xs:string"
         select="if ($normal/w:rPr/w:sz/@w:val)
