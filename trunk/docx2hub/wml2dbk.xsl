@@ -869,7 +869,9 @@
     <phrase role="cr"/>
   </xsl:template>
 
-  <xsl:template match="w:softHyphen" mode="wml-to-dbk"/>
+  <xsl:template match="w:softHyphen" mode="wml-to-dbk">
+  	<xsl:value-of select="'&#xad;'"/>
+  </xsl:template>
  
   <xsl:template match="w:noBreakHyphen" mode="wml-to-dbk">
       <xsl:value-of select="'&#x2011;'"/>
