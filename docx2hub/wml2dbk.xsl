@@ -554,9 +554,11 @@
 
   <xsl:template match="w:bookmarkEnd" mode="wml-to-dbk">
     <!--<anchor role="end" xml:id="{concat(preceding::w:bookmarkStart[@w:id = current()/@w:id]/@w:name, '_end')}"/>-->
-    <xsl:variable name="name" select="key('docx2hub:bookmarkStart', @w:id)" as="element(w:bookmarkStart)"/>
-    <xsl:variable name="anchor-id" select="replace(string-join(($name/@w:name, $name/@w:id, 'end'), '_'), '%20', '_')" as="xs:string"/>
-    <anchor role="end" xml:id="{replace($anchor-id, '^(\I)', '_$1')}"/>
+    <xsl:if test="exists(key('docx2hub:bookmarkStart', @w:id))">
+      <xsl:variable name="name" select="key('docx2hub:bookmarkStart', @w:id)" as="element(w:bookmarkStart)"/>
+      <xsl:variable name="anchor-id" select="replace(string-join(($name/@w:name, $name/@w:id, 'end'), '_'), '%20', '_')" as="xs:string"/>
+      <anchor role="end" xml:id="{replace($anchor-id, '^(\I)', '_$1')}"/>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="w:bookmarkStart[@w:name eq '_GoBack']" mode="wml-to-dbk wml-to-dbk-bookmarkStart"/>

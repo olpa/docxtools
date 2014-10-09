@@ -68,7 +68,7 @@
       <xsl:variable name="numPr" select="if ($context/w:numPr) 
                                          then $context/w:numPr 
                                          else ()"/>
-      <xsl:variable name="style" select="key('docx2hub:style-by-role', @role, root($context))/w:numPr" as="element(w:numPr)?"/>
+      <xsl:variable name="style" select="key('docx2hub:style-by-role', @role, root($context))[last()]/w:numPr" as="element(w:numPr)?"/>
       <xsl:sequence select="if ($numPr)
                             then if (exists(
                                        key(
