@@ -22,8 +22,9 @@
   <symbol number="F0DF" entity="&#xF0DF;" char="&#x2190;"/><!-- LEFTWARDS ARROW -->
   <symbol number="F0E0" entity="&#xF0E0;" char="&#x2192;"/><!-- RIGHTWARDS ARROW -->
   <symbol number="F0FA" entity="&#xF0FA;" char="&#x25ab;"/><!-- WHITE SMALL SQUARE -->
-  <symbol number="F0FD" entity="&#xF0FD;" char="&#x2612;"/><!-- BALLOT BOX WITH X -->
+  <symbol number="0072" entity="&#x0072;" char="&#x2610;"/><!-- BALLOT BOX -->
   <symbol number="F0FE" entity="&#xF0FE;" char="&#x2611;"/><!-- BALLOT BOX WITH CHECK -->
+  <symbol number="F0FD" entity="&#xF0FD;" char="&#x2612;"/><!-- BALLOT BOX WITH X -->
   <symbol number="003F" entity="&#x003F;" char="&#x2794;"/><!-- Heavy wide-headed rightwards arrow -->
   <symbol number="0AEA" entity="&#x0AEA;" char="&#x2794;"/><!-- Heavy wide-headed rightwards arrow -->
   <symbol number="F0A8" entity="" char="&#x25FB;"/><!-- WHITE MEDIUM SQUARE -->
