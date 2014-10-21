@@ -18,6 +18,7 @@
   xmlns:letex		= "http://www.le-tex.de/namespace"
   xmlns:mml             = "http://www.w3.org/Math/DTD/mathml2/mathml2.dtd"
   xmlns:css="http://www.w3.org/1996/css"
+  xmlns:docx2hub = "http://www.le-tex.de/namespace/docx2hub"
   xmlns="http://docbook.org/ns/docbook"
 
   exclude-result-prefixes = "w o v wx xs dbk pkg r rel word200x exsl saxon fn letex mml"
@@ -28,9 +29,6 @@
   <xsl:template match="w:footnoteReference" mode="wml-to-dbk">
     <footnote>
       <xsl:variable name="id" select="@w:id"/>
-      <xsl:apply-templates select="/*/w:footnotes/w:footnote[@w:id = $id]/w:p[w:r[matches(@role,$footnote-reference-style-regex) or w:footnoteRef]]" mode="#current">
-        <xsl:with-param name="identifier" select="true()"/>
-      </xsl:apply-templates>
       <xsl:apply-templates select="/*/w:footnotes/w:footnote[@w:id = $id]" mode="#current"/>
     </footnote>
   </xsl:template>
@@ -39,13 +37,27 @@
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
   
-  <xsl:template match="w:footnote/w:p[w:r[matches(@role,$footnote-reference-style-regex) or w:footnoteRef]]" mode="wml-to-dbk" priority="+1">
+  <xsl:function name="docx2hub:element-is-footnoteref" as="xs:boolean">
+    <xsl:param name="el" as="element()"/>
+    <xsl:sequence select="$el/self::*[name() = ('w:r', 'superscript')] and
+                          (
+                            matches($el/@role, $footnote-reference-style-regex) or 
+                            $el/w:footnoteRef
+                          )"/>
+  </xsl:function>
+
+  <xsl:template match="w:footnote/w:p[*[docx2hub:element-is-footnoteref(.)]]" mode="wml-to-dbk" priority="+1">
     <xsl:param name="identifier" select="false()"/>
     <para>
       <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:choose>
-        <xsl:when test="$identifier">
-          <xsl:for-each-group select="*" group-adjacent="if (self::w:r[matches(@role,$footnote-reference-style-regex) or w:footnoteRef] or (matches(.,'^[\s&#160;]*$') and following-sibling::*[1][self::w:r[matches(@role,$footnote-reference-style-regex) or w:footnoteRef]])) then true() else false()">
+      <xsl:for-each-group select="*" 
+            group-adjacent="if (
+                              docx2hub:element-is-footnoteref(.) or 
+                              (
+                                matches(.,'^[\s&#160;]*$') and 
+                                following-sibling::*[1][docx2hub:element-is-footnoteref(.)])
+                              ) 
+                            then true() else false()">
             <xsl:choose>
               <xsl:when test="current-grouping-key()">
                 <phrase role="hub:identifier">
@@ -56,18 +68,14 @@
                                                                                                   or 
                                                                                                   exists(following-sibling::w:r[w:footnoteRef]))
                                                                                              ]/node())" mode="#current">
-                    <xsl:with-param name="identifier" select="$identifier"/>
+                    <xsl:with-param name="identifier" select="true()"/>
                   </xsl:apply-templates>
                 </phrase>    
               </xsl:when>
               <xsl:otherwise/>
             </xsl:choose>
           </xsl:for-each-group>
-        </xsl:when>
-        <xsl:otherwise>
-          <xsl:apply-templates select="node() except w:r[matches(@role,$footnote-reference-style-regex) or w:footnoteRef]" mode="#current"/>
-        </xsl:otherwise>
-      </xsl:choose>
+      <xsl:apply-templates select="node() except *[docx2hub:element-is-footnoteref(.)]" mode="#current"/>
     </para>
   </xsl:template>
 
@@ -118,7 +126,8 @@
 
   <xsl:template match="*[*]
                         [self::dbk:superscript or self::w:r[matches(@role,$footnote-reference-style-regex)]]
-                        [every $n in node() satisfies $n/self::w:footnoteReference]" mode="wml-to-dbk" priority="3">
+                        [every $n in node() satisfies $n/self::w:*[local-name() = ('footnoteRef', 'footnoteReference')]]" 
+                mode="wml-to-dbk" priority="3">
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
