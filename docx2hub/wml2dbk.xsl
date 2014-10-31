@@ -632,7 +632,7 @@
     <xsl:variable name="rel-item" select="key($key-name, current())" as="element(rel:Relationship)" />
     <xsl:choose>
       <xsl:when test="exists(parent::w:hyperlink/@w:anchor)">
-        <xsl:attribute name="linkend" select="concat(
+        <xsl:attribute name="xlink:href" select="concat(
                                                 $rel-item/@Target,
                                                 '#',
                                                 parent::w:hyperlink/@w:anchor
