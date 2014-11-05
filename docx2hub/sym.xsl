@@ -76,7 +76,7 @@
               <br/>
             </xsl:when>
             <xsl:otherwise>
-              <text>
+              <text mapped="true">
                 <xsl:value-of select="if (self::w:sym) then $font_map/symbol[@number = $number]/@char else $font_map/symbol[@entity = $number]/@char"/>
               </text>
             </xsl:otherwise>
@@ -111,6 +111,12 @@
     </xsl:variable>
 
     <xsl:choose>
+      <xsl:when test="$text[self::text[@mapped eq 'true']]">
+        <phrase xmlns="http://docbook.org/ns/docbook" role="hub:ooxml-symbol"
+          srcpath="{(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]}">
+          <xsl:sequence select="$text/node()"/>
+        </phrase>
+      </xsl:when>
       <xsl:when test="$text[self::text]">
         <xsl:sequence select="$text/node()"/>
       </xsl:when>
