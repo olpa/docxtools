@@ -100,6 +100,10 @@
         <prop name="w:pBdr/w:left" type="docx-border" />
         <prop name="w:pBdr/w:right" type="docx-border" />
         <prop name="w:pBdr/w:top" type="docx-border"  />
+        <prop name="w:pgSz/@w:w"/>
+        <prop name="w:pgSz/@w:h"/>
+        <prop name="w:pgSz/@w:code"/>
+        <prop name="w:pgSz/@w:orient" target-name="css:orientation" type="linear"/>
         <prop name="w:position" target-name="css:top" type="docx-length-attr-negated"/>
         <prop name="w:position" target-name="css:position" target-value="relative"/>
         <prop name="w:pStyle" type="docx-parastyle" />
@@ -121,7 +125,7 @@
           <val match="right" target-name="css:ruby-position" target-value="right"/>
           <val match="rightVertical" target-name="css:ruby-position" target-value="inter-character"/>
         </prop>
-        <prop name="w:sectPr" /><!-- provisional -->
+        <!--<prop name="w:sectPr" />--><!-- provisional -->
         <prop name="w:semiHidden" />
         <prop name="w:shadow" type="docx-boolean-prop" target-name="css:text-shadow" default="none" active="1pt 1pt"/>
         <prop name="w:shd" type="docx-shd" />

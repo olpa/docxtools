@@ -29,7 +29,7 @@
       <xsl:apply-templates select="  w:tblPr/@role
                                    | w:tblPr/@css:*[matches(name(.),'(border-(top|right|bottom|left)-(style|color|width)|background-color|margin-(left|right))')]
                                    | w:tblPr/w:tblW
-                                   | @srcpath" mode="#current"/>
+                                   | @srcpath | @css:orientation" mode="#current"/>
       <tgroup>
         <xsl:attribute name="cols">
           <xsl:value-of select="count(w:tblGrid/w:gridCol)"/>
