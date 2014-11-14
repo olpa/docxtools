@@ -827,7 +827,7 @@
   </xsl:template>
 
   <!-- w:sectPr ignorieren -->
-  <xsl:template match="w:sectPr" mode="wml-to-dbk"/>
+  <xsl:template match="w:sectPr | w:pgSz" mode="wml-to-dbk"/>
  
   <xsl:template match="w:tcPr" mode="wml-to-dbk"/>
 

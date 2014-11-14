@@ -293,6 +293,10 @@
     <xsl:apply-templates select="@w:w" mode="#current" />
   </xsl:template>
 
+  <xsl:template match="w:sectPr[parent::w:pPr]" mode="docx2hub:add-props" priority="+2">
+    <xsl:apply-templates select="w:pgSz" mode="#current"/>
+  </xsl:template>
+
   <xsl:template match="  w:style/*
                        | w:rPr[not(ancestor::m:oMath)]/* 
                        | w:pBdr/* 
@@ -306,6 +310,7 @@
                        | w:tblPrEx/*
                        | w:tblCellMar/*
                        | w:tcMar/*
+                       | w:pgSz/@*
                        | w:ind/@* 
                        | w:tab/@*[local-name() ne 'srcpath']
                        | w:tcW/@* 
@@ -996,5 +1001,45 @@
                          xs:string($att) eq xs:string(current())
                        )]" mode="docx2hub:remove-redundant-run-atts" />
 
+  <xsl:template match="*[w:p[w:pgSz]]" mode="docx2hub:remove-redundant-run-atts">
+    <xsl:copy>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:for-each-group select="node()" group-ending-with="w:p[w:pgSz[@css:orientation='landscape']]">
+        <xsl:choose>
+          <xsl:when test="current-group()[last()][self::w:p[w:pgSz[@css:orientation='landscape']]]">
+            <xsl:for-each-group select="current-group()" group-starting-with="w:p[w:pgSz[not(@css:orientation='landscape')]]">
+              <xsl:choose>
+                <xsl:when test="current-group()[last()][self::w:p[w:pgSz[@css:orientation='landscape']]]">
+                  <xsl:apply-templates select="current-group()[1]" mode="#current"/>
+                  <xsl:apply-templates select="current-group()[position() gt 1]" mode="add-attribute"/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:apply-templates select="current-group()" mode="#current"/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each-group>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates select="current-group()" mode="#current"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each-group>
+    </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="*" mode="add-attribute">
+    <xsl:copy>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:apply-templates mode="docx2hub:remove-redundant-run-atts"/>
+    </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="w:tbl | w:p[descendant::v:imagedata]" mode="add-attribute">
+    <xsl:copy>
+      <xsl:attribute name="css:orientation" select="'landscape'"/>
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:apply-templates mode="docx2hub:remove-redundant-run-atts"/>
+    </xsl:copy>
+  </xsl:template>
 
 </xsl:stylesheet>
