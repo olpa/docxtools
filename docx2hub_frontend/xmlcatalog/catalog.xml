@@ -2,6 +2,8 @@
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
 
   <nextCatalog catalog="../docx2hub/xmlcatalog/catalog.xml"/>
+  <nextCatalog catalog="../hub2html/xmlcatalog/catalog.xml"/>
+  <nextCatalog catalog="../pubcoach/xmlcatalog/catalog.xml"/>
   <nextCatalog catalog="../file-uri/xmlcatalog/catalog.xml"/>
   <nextCatalog catalog="../xml-model/xmlcatalog/catalog.xml"/>
   <nextCatalog catalog="../xslt-mode/xmlcatalog/catalog.xml"/>
@@ -9,6 +11,7 @@
   <nextCatalog catalog="../resolve-uri/xmlcatalog/catalog.xml"/>
   <nextCatalog catalog="../colors/xmlcatalog/catalog.xml"/>
   <nextCatalog catalog="../hex/xmlcatalog/catalog.xml"/>
+  <nextCatalog catalog="../functx/xmlcatalog/catalog.xml"/>
   <nextCatalog catalog="../schema/Hub/xmlcatalog/catalog.xml"/>
   
 </catalog>

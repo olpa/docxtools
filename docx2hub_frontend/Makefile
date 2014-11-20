@@ -33,6 +33,16 @@ usage:
 	debug=$(DEBUG) \
 	debug-dir-uri=$(call uri,$(DEBUGDIR))
 
+%.html: %.docx.tmp/word/document.xml 
+	-$(UMASK); \
+	$(CALABASH) \
+	-o result=$(call win_path,$*.html) \
+	-o insert-xpath=$(call win_path,/dev/null) \
+	$(call uri,$(MAKEFILEDIR)/docx2hub/docx2html.xpl) \
+	docx=$(call win_path,$*).docx \
+	debug=$(DEBUG) \
+	debug-dir-uri=$(call uri,$(DEBUGDIR))
+
 %.docx.tmp/word/document.xml: %.docx
 	-$(UMASK); mkdir "$<.tmp"
 	$(UMASK); unzip -o -d "$<.tmp" "$<"
