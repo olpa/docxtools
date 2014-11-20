@@ -47,6 +47,9 @@
     <p:documentation>Directory (OS path, not file: URL) to which the file will be unzipped. If option is empty string, will be
       '.tmp' appended to OS file path.</p:documentation>
   </p:option>
+  <p:option name="create-svg" required="false" select="'no'">
+    <p:documentation>Whether Office Open Drawing ML should be mapped to SVG</p:documentation>
+  </p:option>
   <p:serialization port="result" omit-xml-declaration="false"/>
 
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
