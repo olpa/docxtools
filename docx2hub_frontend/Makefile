@@ -10,40 +10,37 @@ MAKEFILEDIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
 CALABASH = $(MAKEFILEDIR)/calabash/calabash.sh
 UMASK	= umask 002
-HUBVERSION = 1.0
 DEBUG = no
 DEBUGDIR = debug
 SRCPATHS = no
+PARAMS = docx=$(call win_path,$*).docx \
+	 debug=$(DEBUG) \
+	 debug-dir-uri=$(call uri,$(DEBUGDIR)) \
+	 srcpaths=$(SRCPATHS)
 
 usage:
 	@echo "Usage:"
 	@echo "  make -f $(MAKEFILEDIR)/Makefile path_to/xyz.hub.xml"
-	@echo "  make -f $(MAKEFILEDIR)/Makefile path_to/xyz.hub.xml.val"
+#	@echo "  make -f $(MAKEFILEDIR)/Makefile path_to/xyz.hub.xml.val"
+	@echo "  make -f $(MAKEFILEDIR)/Makefile path_to/xyz.html"
 	@echo "where path_to/xyz.docx is the source docx file"
-	@echo "Use XSLTPARAMS=\"srcpath=no\" if you don't need srcpath attributes (will speed things up) (is default now)"
-	@echo "Use HUBVERSION=1.1 for Hub 1.1 output."
+	@echo "Parameters:"
+	@echo "  DEBUG=yes|no (currently: $(DEBUG))"
+	@echo "  DEBUGDIR=path_to/debug_files (currently: $(DEBUGDIR))"
+	@echo "  SRCPATHS=yes|no (currently: $(SRCPATHS))"
 
-%.hub.xml: %.docx.tmp/word/document.xml 
+%.hub.xml:
 	-$(UMASK); \
 	$(CALABASH) \
 	-o result=$(call win_path,$*.hub.xml) \
 	-o insert-xpath=$(call win_path,/dev/null) \
 	$(call uri,$(MAKEFILEDIR)/docx2hub/wml2hub.xpl) \
-	docx=$(call win_path,$*).docx \
-	debug=$(DEBUG) \
-	debug-dir-uri=$(call uri,$(DEBUGDIR))
+	$(PARAMS)
 
-%.html: %.docx.tmp/word/document.xml 
+%.html:
 	-$(UMASK); \
 	$(CALABASH) \
 	-o result=$(call win_path,$*.html) \
-	-o insert-xpath=$(call win_path,/dev/null) \
+	-o hub=$(call win_path,$*.hub.xml) \
 	$(call uri,$(MAKEFILEDIR)/docx2hub/docx2html.xpl) \
-	docx=$(call win_path,$*).docx \
-	debug=$(DEBUG) \
-	debug-dir-uri=$(call uri,$(DEBUGDIR))
-
-%.docx.tmp/word/document.xml: %.docx
-	-$(UMASK); mkdir "$<.tmp"
-	$(UMASK); unzip -o -d "$<.tmp" "$<"
-	$(UMASK); find "$<.tmp" -exec touch "{}" \;
+	$(PARAMS)
