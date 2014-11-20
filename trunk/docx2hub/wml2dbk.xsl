@@ -480,6 +480,13 @@
         select="parent::w:tc[current() is w:p[1]]/preceding-sibling::w:bookmarkStart[. &gt;&gt; current()/parent::w:tc/preceding-sibling::*[not(self::w:bookmarkStart)][1]]"/>
       <xsl:variable name="bookmarkstart-before-tr" as="element(w:bookmarkStart)*"
         select="parent::w:tc/parent::w:tr[current() is (w:tc/w:p)[1]]/preceding-sibling::w:bookmarkStart[. &gt;&gt; current()/parent::w:tc/parent::w:tr/preceding-sibling::*[not(self::w:bookmarkStart)][1]]"/>
+      <xsl:variable name="bookmarkend-after-p" as="element(w:bookmarkEnd)*"
+        select="following-sibling::w:bookmarkEnd[. &lt;&lt; current()/following-sibling::*[not(self::w:bookmarkEnd)][1]]"/>
+      <xsl:variable name="bookmarkend-after-tc" as="element(w:bookmarkEnd)*"
+        select="parent::w:tc[current() is w:p[1]]/following-sibling::w:bookmarkEnd[. &lt;&lt; current()/parent::w:tc/following-sibling::*[not(self::w:bookmarkEnd)][1]]"/>
+      <xsl:variable name="bookmarkend-after-tr" as="element(w:bookmarkEnd)*"
+        select="parent::w:tc/parent::w:tr[current() is (w:tc/w:p)[1]]/following-sibling::w:bookmarkEnd[. &lt;&lt; current()/parent::w:tc/parent::w:tr/following-sibling::*[not(self::w:bookmarkEnd)][1]]"/>
+
       <xsl:apply-templates select="$bookmarkstart-before-p | $bookmarkstart-before-tc | $bookmarkstart-before-tr" mode="wml-to-dbk-bookmarkStart"/>
       <xsl:if test=".//w:r">
         <xsl:sequence select="letex:insert-numbering(.)"/>
@@ -492,6 +499,7 @@
           <xsl:apply-templates select="node() except dbk:tabs" mode="#current"/>
         </xsl:otherwise>
       </xsl:choose>
+      <xsl:apply-templates select="$bookmarkend-after-p | $bookmarkend-after-tc | $bookmarkend-after-tr" mode="wml-to-dbk-bookmarkEnd"/>
     </xsl:element>
   </xsl:template>
 
@@ -540,6 +548,8 @@
 
   <!-- bookmarks -->
 
+  <xsl:key name="docx2hub:bookmarkStart" match="w:bookmarkStart" use="@w:id"/>
+
   <!-- mode wml-to-dbk-bookmarkStart is for transforming bookmarkStarts that used to be in between w:ps 
     within the paras where they belong -->
   <xsl:template match="w:bookmarkStart" mode="wml-to-dbk wml-to-dbk-bookmarkStart">
@@ -549,11 +559,11 @@
 
   <!-- remove $bookmarkstart-before-p (see template for w:p above) outside of tables --> 
   <xsl:template match="w:bookmarkStart[following-sibling::w:p]" mode="wml-to-dbk"/>
-  
-  <xsl:key name="docx2hub:bookmarkStart" match="w:bookmarkStart" use="@w:id"/>
 
-  <xsl:template match="w:bookmarkEnd" mode="wml-to-dbk">
-    <!--<anchor role="end" xml:id="{concat(preceding::w:bookmarkStart[@w:id = current()/@w:id]/@w:name, '_end')}"/>-->
+  <!-- remove $bookmarkend-after-p (see template for w:p above) outside of tables --> 
+  <xsl:template match="w:bookmarkEnd[preceding-sibling::w:p]" mode="wml-to-dbk"/>
+  
+  <xsl:template match="w:bookmarkEnd" mode="wml-to-dbk wml-to-dbk-bookmarkEnd">
     <xsl:if test="exists(key('docx2hub:bookmarkStart', @w:id))">
       <xsl:variable name="name" select="key('docx2hub:bookmarkStart', @w:id)" as="element(w:bookmarkStart)"/>
       <xsl:variable name="anchor-id" select="replace(string-join(($name/@w:name, $name/@w:id, 'end'), '_'), '%20', '_')" as="xs:string"/>
