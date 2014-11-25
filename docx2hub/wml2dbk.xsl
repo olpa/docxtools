@@ -571,9 +571,9 @@
     </xsl:if>
   </xsl:template>
 
-  <xsl:template match="w:bookmarkStart[@w:name eq '_GoBack']" mode="wml-to-dbk wml-to-dbk-bookmarkStart"/>
+  <xsl:template match="w:bookmarkStart[@w:name eq '_GoBack']" mode="wml-to-dbk wml-to-dbk-bookmarkStart" priority="2"/>
   
-  <xsl:template match="w:bookmarkEnd[key('docx2hub:bookmarkStart', @w:id)/@w:name eq '_GoBack']" mode="wml-to-dbk"/>
+  <xsl:template match="w:bookmarkEnd[key('docx2hub:bookmarkStart', @w:id)/@w:name eq '_GoBack']" mode="wml-to-dbk wml-to-dbk-bookmarkEnd" priority="2"/>
   
   <!-- comments -->
   <xsl:template match="w:commentRangeStart" mode="wml-to-dbk"/>
