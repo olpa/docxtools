@@ -43,11 +43,13 @@
         </xsl:choose>
       </xsl:for-each>
     </xsl:variable>
+    <xsl:variable name="instr-from-nodes-text" as="xs:string?"
+      select="string-join($instr-from-nodes, '')"/>
     <xsl:choose>
-      <xsl:when test="matches($instr-from-nodes[last()],'&quot;(\s+\\[bi])?\s*$')">
+      <xsl:when test="matches($instr-from-nodes-text,'&quot;(\s+\\[bi])?\s*$')">
         <xsl:for-each-group select="$instr-from-nodes" group-starting-with="node()[matches(.,'^[\s&#160;]*[Xx][eE][\s&#160;]+')]">
-          <xsl:variable name="instr-from-nodes-text" select="string-join(current-group(),'')"/>
-          <xsl:if test="matches($instr-from-nodes-text, '\\[^bfrity]')">
+          <xsl:variable name="current-instr-from-nodes-text" select="string-join(current-group(),'')"/>
+          <xsl:if test="matches($current-instr-from-nodes-text, '\\[^bfrity]')">
             <xsl:call-template name="signal-error">
               <xsl:with-param name="error-code" select="'W2D_001'"/>
               <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
@@ -60,8 +62,8 @@
           </xsl:if>
           <xsl:variable name="see" as="xs:string?">
             <xsl:choose>
-              <xsl:when test="matches($instr-from-nodes-text, '\\t')">
-                <xsl:value-of select="replace($instr-from-nodes-text, '^.*\\t\s*&quot;(.+?)&quot;(\\.*$|$)', '$1')"/>
+              <xsl:when test="matches($current-instr-from-nodes-text, '\\t')">
+                <xsl:value-of select="replace($current-instr-from-nodes-text, '^.*\\t\s*&quot;(.+?)&quot;(\\.*$|$)', '$1')"/>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:sequence select="()"/>
@@ -70,11 +72,11 @@
           </xsl:variable>
           <xsl:variable name="type" as="xs:string?">
             <xsl:choose>
-              <xsl:when test="matches($instr-from-nodes-text, '\\f')">
-                <xsl:value-of select="replace($instr-from-nodes-text, '^.*\\f\s*&quot;?(.+?)&quot;?\s*(\\.*$|$)', '$1')"/>
+              <xsl:when test="matches($current-instr-from-nodes-text, '\\f')">
+                <xsl:value-of select="replace($current-instr-from-nodes-text, '^.*\\f\s*&quot;?(.+?)&quot;?\s*(\\.*$|$)', '$1')"/>
               </xsl:when>
-              <xsl:when test="some $i in tokenize($instr-from-nodes-text,':') satisfies matches($i,'Register§§')">
-                <xsl:value-of select="replace(tokenize($instr-from-nodes-text,':')[matches(.,'.*Register§§')],'.*Register§§(.*)$','$1')"/>
+              <xsl:when test="some $i in tokenize($current-instr-from-nodes-text,':') satisfies matches($i,'Register§§')">
+                <xsl:value-of select="replace(tokenize($current-instr-from-nodes-text,':')[matches(.,'.*Register§§')],'.*Register§§(.*)$','$1')"/>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:sequence select="()"/>
@@ -82,20 +84,20 @@
             </xsl:choose>
           </xsl:variable>
           <xsl:variable name="indexterm-attributes" as="attribute()*">
-            <xsl:if test="matches($instr-from-nodes-text, '\\i')">
+            <xsl:if test="matches($current-instr-from-nodes-text, '\\i')">
               <xsl:attribute name="pagenum" select="'italic'"/>
             </xsl:if>
-            <xsl:if test="matches($instr-from-nodes-text, '\\b')">
+            <xsl:if test="matches($current-instr-from-nodes-text, '\\b')">
               <xsl:attribute name="pagenum" select="'bold'"/>
             </xsl:if>
-            <xsl:if test="matches($instr-from-nodes-text, '\\s')">
+            <xsl:if test="matches($current-instr-from-nodes-text, '\\s')">
               <xsl:attribute name="class" select="'startofrange'"/>
             </xsl:if>
-            <xsl:if test="matches($instr-from-nodes-text, '\\e')">
+            <xsl:if test="matches($current-instr-from-nodes-text, '\\e')">
               <xsl:attribute name="class" select="'endofrange'"/>
             </xsl:if>
-            <xsl:if test="matches($instr-from-nodes-text, '\\r')">
-              <xsl:attribute name="id" select="letex:rereplace-chars(replace($instr-from-nodes-text, '^.*\\r\s*&quot;?\s*(.+?)\s*&quot;?\s*(\\.*$|$)', '$1'))"/>
+            <xsl:if test="matches($current-instr-from-nodes-text, '\\r')">
+              <xsl:attribute name="id" select="letex:rereplace-chars(replace($current-instr-from-nodes-text, '^.*\\r\s*&quot;?\s*(.+?)\s*&quot;?\s*(\\.*$|$)', '$1'))"/>
             </xsl:if>
             <xsl:if test="not(empty($type))">
               <xsl:attribute name="type" select="letex:rereplace-chars($type)"/>
