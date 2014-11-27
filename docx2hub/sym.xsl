@@ -167,12 +167,12 @@
     <xsl:param name="tokens" as="xs:string+"/>
     <xsl:param name="context" as="node()"/>
     <xsl:choose>
-      <xsl:when test="$tokens[3] = '\f' and count($tokens) = 4">
-        <xsl:variable name="font" select="replace($tokens[4], '&quot;', '')"/>
+      <xsl:when test="count(index-of($tokens,'\f'))=1 and index-of($tokens,'\f') &gt; 2">
+        <xsl:variable name="font" select="replace($tokens[position()=(index-of($tokens,'\f')+1)], '&quot;', '')"/>
         <xsl:variable name="sym" select="$tokens[2]"/>
         <xsl:choose>
           <xsl:when test="$font = $docx2hub:symbol-font-names">
-            <xsl:variable name="number" select="if (matches($tokens[2], '^[0-9]+$')) then letex:dec-to-hex(xs:integer($tokens[2])) else 'NaN'"/>
+            <xsl:variable name="number" select="if (matches($sym, '^[0-9]+$')) then letex:dec-to-hex(xs:integer($sym)) else 'NaN'"/>
             <xsl:choose>
               <xsl:when test="$number = 'NaN'">
                 <xsl:call-template name="signal-error">
@@ -181,14 +181,14 @@
                   <xsl:with-param name="hash">
                     <value key="xpath"><xsl:value-of select="$context/(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]"/></value>
                     <value key="level">WRN</value>
-                    <value key="info-text"><xsl:value-of select="concat($font, ': ', $tokens[2])"/></value>
-                    <value key="pi">Could not map char <xsl:value-of select="string-to-codepoints($tokens[2])"/> in font <xsl:value-of select="$font"/> (message b)</value>
+                    <value key="info-text"><xsl:value-of select="concat($font, ': ', $sym)"/></value>
+                    <value key="pi">Could not map char <xsl:value-of select="string-to-codepoints($sym)"/> in font <xsl:value-of select="$font"/> (message b)</value>
                     <value key="comment"/>
                   </xsl:with-param>
                 </xsl:call-template>
                 <xsl:call-template name="create-replacement">
                   <xsl:with-param name="font" select="$font"/>
-                  <xsl:with-param name="number" select="$tokens[2]"/>
+                  <xsl:with-param name="number" select="$sym"/>
                 </xsl:call-template>
               </xsl:when>
               <xsl:otherwise>
@@ -203,14 +203,14 @@
               <xsl:with-param name="hash">
                 <value key="xpath"><xsl:value-of select="$context/(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]"/></value>
                 <value key="level">WRN</value>
-                <value key="info-text"><xsl:value-of select="concat($font, ': ', $tokens[2])"/></value>
-                <value key="pi">Could not map char <xsl:value-of select="string-to-codepoints($tokens[2])"/> in font <xsl:value-of select="$font"/> (message a)</value>
+                <value key="info-text"><xsl:value-of select="concat($font, ': ', $sym)"/></value>
+                <value key="pi">Could not map char <xsl:value-of select="string-to-codepoints($sym)"/> in font <xsl:value-of select="$font"/> (message a)</value>
                 <value key="comment"/>
               </xsl:with-param>
             </xsl:call-template>
             <xsl:call-template name="create-replacement">
               <xsl:with-param name="font" select="$font"/>
-              <xsl:with-param name="number" select="$tokens[2]"/>
+              <xsl:with-param name="number" select="$sym"/>
             </xsl:call-template>
           </xsl:otherwise>
         </xsl:choose>
