@@ -26,7 +26,7 @@
       https: URL. The file will be fetched first if it is an HTTP URL.</p:documentation>
   </p:option>
   <p:option name="debug" required="false" select="'no'"/>
-  <p:option name="debug-dir-uri" required="false" select="'debug'"/>
+  <p:option name="debug-dir-uri" required="false" select="'file:/tmp/debug'"/>
   <p:option name="srcpaths" required="false" select="'no'"/>
   <p:option name="unwrap-tooltip-links" required="false" select="'no'"/>
   <p:option name="hub-version" required="false" select="'1.1'"/>
