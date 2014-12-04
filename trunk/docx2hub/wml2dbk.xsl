@@ -26,6 +26,7 @@
 
   <xsl:param name="debug" select="'yes'" as="xs:string?"/>
   <xsl:param name="fail-on-error" select="'no'" as="xs:string?"/>
+  <xsl:param name="field-vars" select="'no'" as="xs:string?"/>
   <xsl:param name="srcpaths" select="'no'" as="xs:string?"/>
   <xsl:param name="base-dir" select="replace(base-uri(), '[^/]+$', '')"/>
   <xsl:param name="extract-dir-uri" select="''" as="xs:string"/><!-- tmp unzip dir URI -->
@@ -756,6 +757,16 @@
               <xsl:apply-templates select="$text" mode="#current"/>
             </link>
           </xsl:when>
+          <xsl:when test="$tokens[1] = 'SET'">
+            <xsl:choose>
+              <xsl:when test="$field-vars='yes'">
+                <keyword role="{concat('fieldVar_',$tokens[2])}">
+                  <xsl:value-of select="$tokens[3]"/>
+                </keyword>    
+              </xsl:when>
+              <xsl:otherwise/>
+            </xsl:choose>
+          </xsl:when>
           <xsl:when test="matches($instrText,'^[\s&#160;]*$')">
             <xsl:apply-templates select="$text" mode="#current"/>
           </xsl:when>
@@ -816,7 +827,6 @@
     <letex:field-function name="ADVANCE"/>
     <letex:field-function name="QUOTE"/>
     <letex:field-function name="SEQ"/>
-    <letex:field-function name="SET" destroy="yes"/>
     <letex:field-function name="STYLEREF"/>
     <letex:field-function name="TOC" destroy="yes"/>
     <letex:field-function name="\IF"/>

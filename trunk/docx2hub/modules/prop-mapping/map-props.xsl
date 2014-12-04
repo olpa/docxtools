@@ -81,6 +81,9 @@
               select="/w:root/w:containerProps/customProps:Properties/customProps:property"/>
           </keywordset>
         </xsl:if>
+        <xsl:if test="$field-vars='yes'">
+          <keywordset role="fieldVars"/>
+        </xsl:if>
         <xsl:choose>
           <xsl:when test="$hub-version eq '1.0'">
             <xsl:call-template name="docx2hub:hub-1.0-styles">
