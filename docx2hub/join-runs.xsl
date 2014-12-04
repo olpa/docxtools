@@ -41,7 +41,7 @@
       <xsl:for-each-group select="node()" group-adjacent="letex:signature(.)">
         <xsl:choose>
           <xsl:when test="current-grouping-key() eq ''">
-            <xsl:sequence select="current-group()" />
+            <xsl:apply-templates select="current-group()" mode="#current"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:copy copy-namespaces="no">
@@ -254,5 +254,23 @@
       </xsl:choose>
     </xsl:attribute> 
   </xsl:template>
+  
+  <xsl:template match="*:keywordset[@role='fieldVars']" mode="docx2hub:join-runs">
+    <xsl:if test="exists(//*:keyword[matches(@role,'^fieldVar_')])">
+      <xsl:copy>
+        <xsl:apply-templates select="@*" mode="#current"/>
+        <xsl:apply-templates select="//*:keyword[matches(@role,'^fieldVar_')]" mode="field-var"/>
+      </xsl:copy>  
+    </xsl:if>
+  </xsl:template>
+  
+  <xsl:template match="*:keyword[matches(@role,'^fieldVar_')]" mode="field-var">
+    <xsl:copy>
+      <xsl:attribute name="role" select="replace(@role,'^fieldVar_','')"/>
+      <xsl:apply-templates mode="#current"/>
+    </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="*:keyword[matches(@role,'^fieldVar_')]" mode="docx2hub:join-runs"/>
   
 </xsl:stylesheet>

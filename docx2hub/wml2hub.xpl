@@ -43,6 +43,7 @@
   <p:option name="unwrap-tooltip-links" required="false" select="'no'"/>
   <p:option name="hub-version" required="false" select="'1.1'"/>
   <p:option name="fail-on-error" required="false" select="'no'"/>
+  <p:option name="field-vars" required="false" select="'no'"/>
   <p:option name="extract-dir" required="false" select="''">
     <p:documentation>Directory (OS path, not file: URL) to which the file will be unzipped. If option is empty string, will be
       '.tmp' appended to OS file path.</p:documentation>
@@ -66,6 +67,7 @@
     <p:with-option name="hub-version" select="$hub-version"/>
     <p:with-option name="unwrap-tooltip-links" select="$unwrap-tooltip-links"/>
     <p:with-option name="fail-on-error" select="$fail-on-error"/>
+    <p:with-option name="field-vars" select="$field-vars"/>
     <p:with-option name="srcpaths" select="$srcpaths"/>
     <p:with-option name="extract-dir" select="$extract-dir"/>
     <p:input port="xslt">
@@ -89,6 +91,7 @@
     <p:with-option name="debug" select="$debug"/>
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
     <p:with-param name="fail-on-error" select="$fail-on-error"/>
+    <p:with-param name="field-vars" select="$field-vars"/>
   </letex:xslt-mode>
 
   <letex:xslt-mode msg="yes" mode="docx2hub:props2atts">
@@ -163,6 +166,7 @@
     <p:with-option name="hub-version" select="$hub-version"/>
     <p:with-param name="srcpaths" select="$srcpaths"/>
     <p:with-param name="fail-on-error" select="$fail-on-error"/>
+    <p:with-param name="field-vars" select="$field-vars"/>
   </letex:xslt-mode>
 
   <letex:xslt-mode msg="yes" mode="docx2hub:join-runs">
