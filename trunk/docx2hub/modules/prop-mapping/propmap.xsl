@@ -135,7 +135,7 @@
         <prop name="w:spacing/@w:before" type="docx-length-attr" target-name="css:margin-top" />
         <prop name="w:spacing/@w:afterLines" implement="maybe later" />
         <prop name="w:spacing/@w:beforeLines" implement="maybe later" />
-        <prop name="w:spacing/@w:line" type="docx-length-attr" target-name="css:line-height" />
+        <prop name="w:spacing/@w:line" type="docx-line" target-name="css:line-height" />
         <prop name="w:spacing/@w:val" implement="maybe later (letter spacing, a run property)" />
         <prop name="w:strike" target-name="css:text-decoration-line">
           <val eq="true" target-value="line-through"/>
