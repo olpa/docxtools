@@ -287,7 +287,7 @@
 
   <xsl:template match="w:spacing" mode="docx2hub:add-props" priority="2">
     <!-- Precedence as per § 17.3.1.33.
-         Ignore autosacing and lineRule.
+         Ignore autospacing.
          Handles both w:pPr/w:spacing and w:rPr/w:spacing in this template rule. -->
     <xsl:apply-templates select="@w:val | @w:after | @w:before | @w:line, @w:afterLines | @w:beforeLines" mode="#current" />
   </xsl:template>
@@ -400,6 +400,17 @@
   <xsl:template match="prop/@type" mode="docx2hub:add-props" as="node()*">
     <xsl:param name="val" as="item()" tunnel="yes" /><!-- element or attribute -->
     <xsl:choose>
+
+      <xsl:when test=". eq 'docx-line'">
+        <xsl:choose>
+          <xsl:when test="$val/parent::*[@w:lineRule and not(@w:lineRule='auto')]">
+            <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="docx2hub:pt-length(($val, $val/@w:val, $val/@w:w)[normalize-space()][1])" /></docx2hub:attribute>
+          </xsl:when>
+          <xsl:otherwise>
+            <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="number($val) div 240" /></docx2hub:attribute>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
 
       <xsl:when test=". eq 'percentage'">
         <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="if (xs:integer($val) eq -1) then 1 else xs:double($val) * 0.01" /></docx2hub:attribute>
