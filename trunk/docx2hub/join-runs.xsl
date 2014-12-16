@@ -30,7 +30,7 @@
        dbk:anchors (corresponds to w:bookmarkStart/End) only for dbk:anchor. 
        dbk:anchors between identically formatted phrases will be merged into
        with the phrases' content into a consolidated phrase. -->
-  <xsl:template match="*[w:r or dbk:phrase]" mode="docx2hub:join-runs" priority="3">
+  <xsl:template match="*[w:r or dbk:phrase or dbk:superscript or dbk:subscript]" mode="docx2hub:join-runs" priority="3">
     <!-- move sidebars to para level --><xsl:variable name="context" select="."/>
     <xsl:if test="self::dbk:para and .//dbk:sidebar">
       <xsl:call-template name="docx2hub_move-invalid-sidebar-elements"/>
@@ -95,7 +95,7 @@
     <xsl:value-of select="string-join($result-strings,'')"/>
   </xsl:function>
 
-  <xsl:template match="dbk:phrase" mode="docx2hub:join-runs-signature">
+  <xsl:template match="dbk:phrase|dbk:superscript|dbk:subscript" mode="docx2hub:join-runs-signature">
     <xsl:sequence select="string-join(
                             (: don't join runs that contain field chars or instrText :)
                             (name(), w:fldChar/@w:fldCharType, w:instrText/name(), letex:attr-hashes(.)), 
