@@ -37,14 +37,15 @@
     <p:documentation>OS name (preferably with full path, may not resolve if only a relative path is given), file:, http:, or
       https: URL. The file will be fetched first if it is an HTTP URL.</p:documentation>
   </p:option>
-  <p:option name="debug" required="false" select="'no'"/>
-  <p:option name="debug-dir-uri" required="false" select="'debug'"/>
-  <p:option name="srcpaths" required="false" select="'no'"/>
-  <p:option name="unwrap-tooltip-links" required="false" select="'no'"/>
-  <p:option name="hub-version" required="false" select="'1.1'"/>
-  <p:option name="fail-on-error" required="false" select="'no'"/>
-  <p:option name="field-vars" required="false" select="'no'"/>
-  <p:option name="extract-dir" required="false" select="''">
+  <p:option name="debug" select="'no'"/>
+  <p:option name="debug-dir-uri" select="'debug'"/>
+  <p:option name="status-dir-uri" select="'status'"/>
+  <p:option name="srcpaths" select="'no'"/>
+  <p:option name="unwrap-tooltip-links" select="'no'"/>
+  <p:option name="hub-version" select="'1.1'"/>
+  <p:option name="fail-on-error" select="'no'"/>
+  <p:option name="field-vars" select="'no'"/>
+  <p:option name="extract-dir" select="''">
     <p:documentation>Directory (OS path, not file: URL) to which the file will be unzipped. If option is empty string, will be
       '.tmp' appended to OS file path.</p:documentation>
   </p:option>
@@ -58,7 +59,20 @@
   <p:import href="http://transpect.le-tex.de/xproc-util/file-uri/file-uri.xpl"/>
   <p:import href="http://transpect.le-tex.de/xproc-util/xml-model/prepend-hub-xml-model.xpl"/>
   <p:import href="http://transpect.le-tex.de/xproc-util/xslt-mode/xslt-mode.xpl"/>
+  <p:import href="http://transpect.le-tex.de/book-conversion/converter/xpl/simple-progress-msg.xpl"/>
   <p:import href="single-tree.xpl"/>
+
+  <letex:simple-progress-msg name="start-msg" file="docx2hub-start.txt">
+    <p:input port="msgs">
+      <p:inline>
+        <c:messages>
+          <c:message xml:lang="en">Starting DOCX to flat Hub XML conversion</c:message>
+          <c:message xml:lang="de">Beginne Konvertierung von DOCX zu flachem Hub XML</c:message>
+        </c:messages>
+      </p:inline>
+    </p:input>
+    <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+  </letex:simple-progress-msg>
 
   <docx2hub:single-tree name="single-tree">
     <p:with-option name="docx" select="$docx"/>
@@ -198,6 +212,17 @@
   <letex:prepend-hub-xml-model name="pi">
     <p:with-option name="hub-version" select="$hub-version"/>
   </letex:prepend-hub-xml-model>
+  
+  <letex:simple-progress-msg name="success-msg" file="docx2hub-success.txt">
+    <p:input port="msgs">
+      <p:inline>
+        <c:messages>
+          <c:message xml:lang="en">Successfully finished DOCX to flat Hub XML conversion</c:message>
+          <c:message xml:lang="de">Konvertierung von DOCX zu flachem Hub XML erfolgreich abgeschlossen</c:message>
+        </c:messages>
+      </p:inline>
+    </p:input>
+    <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+  </letex:simple-progress-msg>
 
 </p:declare-step>
-
