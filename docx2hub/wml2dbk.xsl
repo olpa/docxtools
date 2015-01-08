@@ -50,6 +50,7 @@
   <xsl:key name="comment-rel-by-id" match="w:commentRels/rel:Relationships/rel:Relationship" use="@Id" />
   <xsl:key name="symbol-by-number" match="symbol" use="upper-case(replace(@number, '^0*(.+?)$', '$1'))" />
   <xsl:key name="symbol-by-entity" match="symbol" use="@entity" />
+  <xsl:key name="style-by-name" match="css:rule | dbk:style" use="@name | @role"/>
 
 
   <!-- sorted includes -->

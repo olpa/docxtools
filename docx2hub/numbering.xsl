@@ -52,8 +52,6 @@
     </xsl:choose>
   </xsl:function>
 
-  <xsl:key name="style-by-name" match="css:rule | dbk:style" use="@name | @role"/>
-
   <xsl:function name="letex:different-style-att" as="xs:boolean">
     <xsl:param name="att" as="attribute(*)"/>
     <xsl:param name="context" as="element(*)"/>
