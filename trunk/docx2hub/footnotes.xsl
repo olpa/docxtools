@@ -125,8 +125,18 @@
                 mode="wml-to-dbk"/>
 
   <xsl:template match="*[*]
-                        [self::dbk:superscript or self::w:r[matches(@role,$footnote-reference-style-regex)]]
-                        [every $n in node() satisfies $n/self::w:*[local-name() = ('footnoteRef', 'footnoteReference')]]" 
+                        [
+                          self::dbk:superscript or 
+                          self::w:r[
+                            matches(@role,$footnote-reference-style-regex)
+                            or
+                            key('style-by-name', @role, root(.))/@remap eq 'superscript'
+                          ]
+                        ]
+                        [
+                          every $n in node() 
+                          satisfies $n/self::w:*[local-name() = ('footnoteRef', 'footnoteReference')]
+                        ]" 
                 mode="wml-to-dbk" priority="3">
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
