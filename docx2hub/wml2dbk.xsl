@@ -81,7 +81,15 @@
   <xsl:template name="handle-field-function">
     <xsl:param name="nodes" as="element(*)*"/>
     <xsl:param name="is-multi-para" as="xs:boolean" select="false()"/>
+    <xsl:variable name="field-code" select="normalize-space(string-join($nodes/w:instrText, ''))" as="xs:string"/>
     <xsl:choose>
+      <!-- construct link element -->
+      <xsl:when test="matches($field-code, '^REF\s.+')">
+        <xsl:variable name="linkend" select="replace($field-code, '^REF\s_([a-z]+\d+)\s?.+$', '$1', 'i')" as="xs:string"/>
+        <link linkend="{$linkend}">
+          <xsl:apply-templates select="$nodes" mode="#current"/>
+        </link>    
+      </xsl:when>
       <xsl:when test="$is-multi-para">
         <xsl:choose>
           <xsl:when test="$nodes[1][self::w:p[count(w:r/w:fldChar[@w:fldCharType = 'begin']) = 2]]">
@@ -555,8 +563,7 @@
   <!-- mode wml-to-dbk-bookmarkStart is for transforming bookmarkStarts that used to be in between w:ps 
     within the paras where they belong -->
   <xsl:template match="w:bookmarkStart" mode="wml-to-dbk wml-to-dbk-bookmarkStart">
-    <xsl:variable name="anchor-id" select="replace(concat(@w:name, '_', @w:id), '%20', '_')" as="xs:string"/>
-    <anchor role="start" xml:id="{replace($anchor-id, '^(\I)', '_$1')}" xreflabel="{@w:id}"/>
+    <anchor role="start" xml:id="{replace(@w:name, '^_([a-z]+\d+)_?.*$', '$1', 'i')}" xreflabel="{@w:id}"/>
   </xsl:template>
 
   <!-- remove $bookmarkstart-before-p (see template for w:p above) outside of tables --> 
