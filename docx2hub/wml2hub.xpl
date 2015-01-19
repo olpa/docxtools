@@ -59,20 +59,24 @@
   <p:import href="http://transpect.le-tex.de/xproc-util/file-uri/file-uri.xpl"/>
   <p:import href="http://transpect.le-tex.de/xproc-util/xml-model/prepend-hub-xml-model.xpl"/>
   <p:import href="http://transpect.le-tex.de/xproc-util/xslt-mode/xslt-mode.xpl"/>
-  <p:import href="http://transpect.le-tex.de/book-conversion/converter/xpl/simple-progress-msg.xpl"/>
+  <p:import href="http://transpect.le-tex.de/book-conversion/converter/xpl/simple-progress-msg.xpl" 
+    use-when="doc-available('http://transpect.le-tex.de/book-conversion/converter/xpl/simple-progress-msg.xpl')"/>
   <p:import href="single-tree.xpl"/>
 
-  <letex:simple-progress-msg name="start-msg" file="docx2hub-start.txt">
-    <p:input port="msgs">
-      <p:inline>
-        <c:messages>
-          <c:message xml:lang="en">Starting DOCX to flat Hub XML conversion</c:message>
-          <c:message xml:lang="de">Beginne Konvertierung von DOCX zu flachem Hub XML</c:message>
-        </c:messages>
-      </p:inline>
-    </p:input>
-    <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
-  </letex:simple-progress-msg>
+  <p:group use-when="doc-available('http://transpect.le-tex.de/book-conversion/converter/xpl/simple-progress-msg.xpl')">
+    <letex:simple-progress-msg name="start-msg" file="docx2hub-start.txt"
+      use-when="doc-available('http://transpect.le-tex.de/book-conversion/converter/xpl/simple-progress-msg.xpl')">
+      <p:input port="msgs">
+        <p:inline>
+          <c:messages>
+            <c:message xml:lang="en">Starting DOCX to flat Hub XML conversion</c:message>
+            <c:message xml:lang="de">Beginne Konvertierung von DOCX zu flachem Hub XML</c:message>
+          </c:messages>
+        </p:inline>
+      </p:input>
+      <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+    </letex:simple-progress-msg>
+  </p:group>
 
   <docx2hub:single-tree name="single-tree">
     <p:with-option name="docx" select="$docx"/>
@@ -213,16 +217,18 @@
     <p:with-option name="hub-version" select="$hub-version"/>
   </letex:prepend-hub-xml-model>
   
-  <letex:simple-progress-msg name="success-msg" file="docx2hub-success.txt">
-    <p:input port="msgs">
-      <p:inline>
-        <c:messages>
-          <c:message xml:lang="en">Successfully finished DOCX to flat Hub XML conversion</c:message>
-          <c:message xml:lang="de">Konvertierung von DOCX zu flachem Hub XML erfolgreich abgeschlossen</c:message>
-        </c:messages>
-      </p:inline>
-    </p:input>
-    <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
-  </letex:simple-progress-msg>
+  <p:group use-when="doc-available('http://transpect.le-tex.de/book-conversion/converter/xpl/simple-progress-msg.xpl')">
+    <letex:simple-progress-msg name="success-msg" file="docx2hub-success.txt">
+      <p:input port="msgs">
+        <p:inline>
+          <c:messages>
+            <c:message xml:lang="en">Successfully finished DOCX to flat Hub XML conversion</c:message>
+            <c:message xml:lang="de">Konvertierung von DOCX zu flachem Hub XML erfolgreich abgeschlossen</c:message>
+          </c:messages>
+        </p:inline>
+      </p:input>
+      <p:with-option name="status-dir-uri" select="$status-dir-uri"/>
+    </letex:simple-progress-msg>
+  </p:group>
 
 </p:declare-step>
