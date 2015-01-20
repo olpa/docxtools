@@ -103,7 +103,7 @@
     <p:input port="models">
       <p:empty/>
     </p:input>
-    <p:with-option name="prefix" select="concat('docx2hub/', /c:param-set/c:param[name='basename']/@value, '/03')">
+    <p:with-option name="prefix" select="concat('docx2hub/', /c:param-set/c:param[@name='basename']/@value, '/03')">
       <p:pipe port="params" step="single-tree"/> 
     </p:with-option>
     <p:with-option name="debug" select="$debug"/>
@@ -122,7 +122,7 @@
     <p:input port="models">
       <p:empty/>
     </p:input>
-    <p:with-option name="prefix" select="concat('docx2hub/', /c:param-set/c:param[name='basename']/@value, '/05')">
+    <p:with-option name="prefix" select="concat('docx2hub/', /c:param-set/c:param[@name='basename']/@value, '/05')">
       <p:pipe port="params" step="single-tree"/> 
     </p:with-option>
     <p:with-option name="debug" select="$debug"/>
@@ -140,7 +140,7 @@
     <p:input port="models">
       <p:empty/>
     </p:input>
-    <p:with-option name="prefix" select="concat('docx2hub/', /c:param-set/c:param[name='basename']/@value, '/07')">
+    <p:with-option name="prefix" select="concat('docx2hub/', /c:param-set/c:param[@name='basename']/@value, '/07')">
       <p:pipe port="params" step="single-tree"/> 
     </p:with-option>
     <p:with-option name="debug" select="$debug"/>
@@ -158,7 +158,7 @@
     <p:input port="models">
       <p:empty/>
     </p:input>
-    <p:with-option name="prefix" select="concat('docx2hub/', /c:param-set/c:param[name='basename']/@value, '/11')">
+    <p:with-option name="prefix" select="concat('docx2hub/', /c:param-set/c:param[@name='basename']/@value, '/11')">
       <p:pipe port="params" step="single-tree"/> 
     </p:with-option>
     <p:with-option name="debug" select="$debug"/>
@@ -176,7 +176,7 @@
     <p:input port="models">
       <p:empty/>
     </p:input>
-    <p:with-option name="prefix" select="concat('docx2hub/', /c:param-set/c:param[name='basename']/@value, '/20')">
+    <p:with-option name="prefix" select="concat('docx2hub/', /c:param-set/c:param[@name='basename']/@value, '/20')">
       <p:pipe port="params" step="single-tree"/> 
     </p:with-option>
     <p:with-option name="debug" select="$debug"/>
@@ -197,7 +197,7 @@
     <p:input port="models">
       <p:empty/>
     </p:input>
-    <p:with-option name="prefix" select="concat('docx2hub/', /c:param-set/c:param[name='basename']/@value, '/24')">
+    <p:with-option name="prefix" select="concat('docx2hub/', /c:param-set/c:param[@name='basename']/@value, '/24')">
       <p:pipe port="params" step="single-tree"/> 
     </p:with-option>
     <p:with-option name="debug" select="$debug"/>
@@ -208,8 +208,8 @@
 
   <p:add-attribute match="/*" attribute-name="xml:base" name="rebase">
     <p:with-option name="attribute-value" 
-      select="replace(/c:param-set/c:param[name='local-href']/@value, '\.do[ct][xm]$', '.hub.xml')">
-      <p:pipe step="single-tree" port="result"/>
+      select="replace(/c:param-set/c:param[@name='local-href']/@value, '\.do[ct][xm]$', '.hub.xml')">
+      <p:pipe step="single-tree" port="params"/>
     </p:with-option>
   </p:add-attribute>
 
