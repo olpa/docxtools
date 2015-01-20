@@ -64,8 +64,7 @@
   <p:import href="single-tree.xpl"/>
 
   <p:group use-when="doc-available('http://transpect.le-tex.de/book-conversion/converter/xpl/simple-progress-msg.xpl')">
-    <letex:simple-progress-msg name="start-msg" file="docx2hub-start.txt"
-      use-when="doc-available('http://transpect.le-tex.de/book-conversion/converter/xpl/simple-progress-msg.xpl')">
+    <letex:simple-progress-msg name="start-msg" file="docx2hub-start.txt">
       <p:input port="msgs">
         <p:inline>
           <c:messages>
