@@ -939,7 +939,7 @@
   </xsl:template>
 
   <xsl:template match="m:oMath" mode="wml-to-dbk">
-    <inlineequation role="omml">
+    <inlineequation>
       <xsl:apply-templates select="@* except @srcpath" mode="#current"/>
       <xsl:apply-templates select="." mode="omml2mml"/>
     </inlineequation>

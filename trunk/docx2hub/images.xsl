@@ -83,7 +83,6 @@
   <xsl:template match="a:blip[@r:embed]" mode="wml-to-dbk">
     <xsl:call-template name="create-imageobject">
       <xsl:with-param name="image-id" select="@r:embed"/>
-      <xsl:with-param name="embedded" select="true()"/>
     </xsl:call-template>
   </xsl:template>
   
@@ -97,8 +96,6 @@
       <xsl:apply-templates select="@srcpath, parent::v:shape/@style" mode="#current"/>
       <xsl:call-template name="create-imageobject">
         <xsl:with-param name="image-id" select="@r:id"/>
-        <xsl:with-param name="embedded" select="true()"/>
-        <xsl:with-param name="rels" select="if (ancestor::w:footnote) then //w:footnoteRels else if (ancestor::w:comment) then //w:commentRels else //w:docRels"/>
       </xsl:call-template>
     </xsl:element>
   </xsl:template>
@@ -119,27 +116,32 @@
   <xsl:template match="a:blip[@r:link]" mode="wml-to-dbk">
     <xsl:call-template name="create-imageobject">
       <xsl:with-param name="image-id" select="@r:link"/>
-      <xsl:with-param name="embedded" select="false()"/>
     </xsl:call-template>
   </xsl:template>
   
+  <xsl:key name="docrel" match="rel:Relationship" use="@Id"/>
+  
   <xsl:template name="create-imageobject">
     <xsl:param name="image-id" as="xs:string"/>
-    <xsl:param name="embedded" as="xs:boolean"/>
-    <xsl:param name="rels" as="node()*" select="//w:docRels"/>
-    <!-- the file reference of an image object is stored in {docx}/_rels/document.xml.rels -->
-    <xsl:variable name="relationships" 
-      select="$rels/rel:Relationships/rel:Relationship[@Type eq 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image']" 
-      as="element(rel:Relationship)+"/>
-    <xsl:variable name="file-uri" select="$relationships[@Id eq $image-id]/@Target" as="xs:string"/>
-    <!-- include container prefix for files embedded in docx -->
-    <xsl:variable name="patched-file-uri" select="
-      if($embedded) 
-      then concat('container:word/', $file-uri)
-      else replace(replace($file-uri, '(file:/)//(.+)', '$1$2'),'\\', '/')" as="xs:string"/>
+    <xsl:variable name="rels" as="element(rel:Relationships)"
+      select="if (ancestor::w:footnote) 
+              then /*/w:footnoteRels/rel:Relationships
+              else 
+                if (ancestor::w:comment) 
+                then /*/w:commentRels/rel:Relationships 
+                else 
+                  if (ancestor::w:endnote) 
+                  then /*/w:endnoteRels/rel:Relationships 
+                  else 
+                    /*/w:docRels/rel:Relationships"/>
+    <xsl:variable name="rel" as="element(rel:Relationship)"
+      select="$rels/rel:Relationship[@Id = $image-id]"/>
+    <xsl:variable name="patched-file-uri" select="replace($rel/@Target, '\\', '/')" as="xs:string"/>
     <imageobject>
       <xsl:apply-templates select="../a:srcRect" mode="wml-to-dbk"/>
-      <imagedata fileref="{$patched-file-uri}"/>
+      <imagedata fileref="{if ($rel/@TargetMode = 'External') 
+                           then $patched-file-uri
+                           else concat('container:word/', $patched-file-uri)}"/>
     </imageobject>
   </xsl:template>
   
