@@ -46,7 +46,7 @@
     <xsl:variable name="instr-from-nodes-text" as="xs:string?"
       select="string-join($instr-from-nodes, '')"/>
     <xsl:choose>
-      <xsl:when test="matches($instr-from-nodes-text,'&quot;(\s+\\[bi])?\s*$')">
+      <xsl:when test="matches(string-join($instr-from-nodes,''),'&quot;(\s*\\[a-z])*\s*$')">
         <xsl:for-each-group select="$instr-from-nodes" group-starting-with="node()[matches(.,'^[\s&#160;]*[Xx][eE][\s&#160;]+')]">
           <xsl:variable name="current-instr-from-nodes-text" select="string-join(current-group(),'')"/>
           <xsl:if test="matches($current-instr-from-nodes-text, '\\[^bfrity]')">
@@ -153,7 +153,7 @@
         </xsl:for-each-group>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:message select="$nodes[1]"></xsl:message>
+        <xsl:message select="$nodes[1]"/>
         <xsl:call-template name="signal-error">
           <xsl:with-param name="error-code" select="'W2D_002'"/>
           <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
@@ -167,18 +167,18 @@
     </xsl:choose>
   </xsl:template>
   
-  <xsl:template match="text()[matches(., '^\s*XE\s*&quot;.*$')]" mode="index-processing" priority="10">
+  <xsl:template match="text()[matches(., '^\s*[xX][eE]\s*&quot;.*$')]" mode="index-processing" priority="10">
     <xsl:choose>
-      <xsl:when test="matches(., '\s*XE\s*&quot;(.*)&quot;\s*$')">
-        <xsl:value-of select="replace(., '^\s*XE\s*&quot;(.*)&quot;\s*$', '$1')"/>
+      <xsl:when test="matches(., '\s*[xX][eE]\s*&quot;(.*)&quot;\s*$')">
+        <xsl:value-of select="replace(., '^\s*[xX][eE]\s*&quot;(.*)&quot;\s*$', '$1')"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:value-of select="replace(., '^\s*XE\s*&quot;(.*)$', '$1')"/>
+        <xsl:value-of select="replace(., '^\s*[xX][eE]\s*&quot;(.*)$', '$1')"/>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
   
-  <xsl:template match="text()[matches(., '^\s*XE\s+$')]" mode="index-processing"/>
+  <xsl:template match="text()[matches(., '^\s*[xX][eE]\s+$')]" mode="index-processing"/>
 
   <xsl:template match="text()[matches(.,'^\s*&quot;[^\s]+')]" mode="index-processing" priority="+1">
     <xsl:choose>
