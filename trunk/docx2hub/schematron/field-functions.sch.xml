@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://purl.oclc.org/dsdl/schematron" 
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:dbk="http://docbook.org/ns/docbook"
+  queryBinding="xslt2">
+  
+  <ns prefix="w" uri="http://schemas.openxmlformats.org/wordprocessingml/2006/main"/>
+  
+  <pattern id="test">
+    <rule context="w:instrText">
+      <report test="true()" id="instrText" diagnostics="instrText_de">
+        <span class="srcpath"><xsl:value-of select="concat(
+                                                      /dbk:hub/dbk:info/dbk:keywordset[@role = 'hub']/dbk:keyword[@role = 'source-dir-uri'], 
+                                                      ancestor::*[@srcpath][1]/@srcpath
+                                                    )"/></span>
+        instrText!
+      </report>
+    </rule>
+  </pattern>
+  
+  <diagnostics>
+    <diagnostic id="instrText_de">Feldfunktion!</diagnostic>
+  </diagnostics>
+  
+</schema>

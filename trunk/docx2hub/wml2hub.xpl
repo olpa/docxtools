@@ -28,9 +28,19 @@
     <p:documentation>This is to prevent a default readable port connecting to this step’s xslt port.</p:documentation>
     <p:empty/>
   </p:input>
+  <p:input port="field-functions-schematron">
+    <p:document href="schematron/field-functions.sch.xml"/>
+    <p:documentation>Schematron that will validate the intermediate format after merging/splitting Word field functions.</p:documentation>
+  </p:input>
   <p:output port="result" primary="true"/>
   <p:output port="insert-xpath">
     <p:pipe step="single-tree" port="result"/>
+  </p:output>
+  <p:output port="report" sequence="true">
+    <p:pipe port="result" step="check-field-functions"/>
+  </p:output>
+  <p:output port="schema" sequence="true">
+    <p:pipe port="result" step="decorate-field-functions-schematron"/>
   </p:output>
 
   <p:option name="docx" required="true">
@@ -147,7 +157,7 @@
     <p:with-param name="fail-on-error" select="$fail-on-error"/>
   </letex:xslt-mode>
 
-  <letex:xslt-mode msg="yes" mode="docx2hub:separate-field-functions">
+  <letex:xslt-mode msg="yes" mode="docx2hub:separate-field-functions" name="separate-field-functions">
     <p:input port="parameters">
       <p:pipe step="single-tree" port="params"/>
     </p:input>
@@ -165,7 +175,38 @@
     <p:with-param name="fail-on-error" select="$fail-on-error"/>
   </letex:xslt-mode>
 
+  <p:validate-with-schematron assert-valid="false" name="check-field-functions0">
+    <p:input port="schema">
+      <p:pipe port="field-functions-schematron" step="docx2hub"/>
+    </p:input>
+    <p:input port="parameters"><p:empty/></p:input>
+    <p:with-param name="allow-foreign" select="'true'"/>
+  </p:validate-with-schematron>
+
+  <p:sink/>
+
+  <p:add-attribute name="check-field-functions" match="/*" 
+    attribute-name="transpect:rule-family" attribute-value="docx2hub_field-functions">
+    <p:input port="source">
+      <p:pipe port="report" step="check-field-functions0"/>
+    </p:input>
+  </p:add-attribute>
+  
+  <p:sink/>
+  
+  <p:add-attribute name="decorate-field-functions-schematron" match="/*" 
+    attribute-name="transpect:rule-family" attribute-value="docx2hub_field-functions">
+    <p:input port="source">
+      <p:pipe port="field-functions-schematron" step="docx2hub"/>
+    </p:input>
+  </p:add-attribute>
+  
+  <p:sink/>
+
   <letex:xslt-mode msg="yes" mode="wml-to-dbk">
+    <p:input port="source">
+      <p:pipe port="result" step="separate-field-functions"/>
+    </p:input>
     <p:input port="parameters">
       <p:pipe step="single-tree" port="params"/>
     </p:input>
