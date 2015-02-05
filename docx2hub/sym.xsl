@@ -67,17 +67,21 @@
       </xsl:call-template>
     </xsl:if>
     <xsl:variable name="number" select="if (self::w:sym) then @w:char else xs:string(.)"/>
-    <xsl:variable name="font_map" as="element(symbols)?" select="docx2hub:font-map($font)"/>
+    <xsl:variable name="font_map" as="document-node(element(symbols))?" select="docx2hub:font-map($font)"/>
     <xsl:variable name="text" as="node()">
       <xsl:choose>
-        <xsl:when test="if (self::w:sym) then $font_map/symbol[@number = $number] else $font_map/symbol[@entity = $number]">
+        <xsl:when test="if (self::w:sym) then $font_map/symbols/symbol[@number = $number] else $font_map/symbols/symbol[@entity = $number]">
           <xsl:choose>
-            <xsl:when test="if (self::w:sym) then $font_map/symbol[@number = $number]/@char = '&#x000a;' else $font_map/symbol[@entity = $number]/@char = '&#x000a;'">
+            <xsl:when test="if (self::w:sym) 
+                            then $font_map/symbols/symbol[@number = $number]/@char = '&#x000a;' 
+                            else $font_map/symbols/symbol[@entity = $number]/@char = '&#x000a;'">
               <br/>
             </xsl:when>
             <xsl:otherwise>
               <text mapped="true">
-                <xsl:value-of select="if (self::w:sym) then $font_map/symbol[@number = $number]/@char else $font_map/symbol[@entity = $number]/@char"/>
+                <xsl:value-of select="if (self::w:sym) 
+                                      then $font_map/symbols/symbol[@number = $number]/@char 
+                                      else $font_map/symbols/symbol[@entity = $number]/@char"/>
               </text>
             </xsl:otherwise>
           </xsl:choose>
@@ -142,10 +146,10 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:function name="docx2hub:font-map" as="element(symbols)?">
+  <xsl:function name="docx2hub:font-map" as="document-node(element(symbols))?">
     <xsl:param name="font-name" as="xs:string"/>
     <xsl:variable name="font-map-name" select="concat('fontmaps/', replace($font-name, ' ', '_'), '.xml')" as="xs:string" />
-    <xsl:sequence select="if (doc-available($font-map-name)) then document($font-map-name)/symbols else ()"/>
+    <xsl:sequence select="if (doc-available($font-map-name)) then document($font-map-name) else ()"/>
   </xsl:function>
 
   <xsl:template name="create-replacement">
