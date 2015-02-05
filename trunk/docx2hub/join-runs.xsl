@@ -57,9 +57,10 @@
   </xsl:template>
 
   <!-- collateral: replace name of mapped symbols with default Unicode font name -->
-  <xsl:template match="@css:font-family[. = $docx2hub:symbol-font-names][.. = docx2hub:font-map(.)/symbol/@char]"
+  <xsl:template match="@css:font-family[. = $docx2hub:symbol-font-names][.. = docx2hub:font-map(.)/symbols/symbol/@char]"
     mode="docx2hub:join-runs">
-    <xsl:attribute name="{name()}" select="$docx2hub:symbol-replacement-rfonts/@w:ascii"/>
+    <xsl:variable name="target-font" as="xs:string?" select="docx2hub:font-map(.)/symbols/symbol[@char = current()/..]/@font"/>
+    <xsl:attribute name="{name()}" select="if ($target-font) then $target-font else $docx2hub:symbol-replacement-rfonts/@w:ascii"/>
   </xsl:template>
 
   <xsl:template match="dbk:para" mode="docx2hub:join-runs">
