@@ -130,8 +130,8 @@
   <symbol number="005E" entity="&#x005E;" char="&#x22A5;"/><!-- UP TACK -->
   <symbol number="F05F" entity="&#xF05F;" char="&#x005F;"/><!-- LOW LINE -->
   <symbol number="005F" entity="&#x005F;" char="&#x005F;"/><!-- LOW LINE -->
-  <symbol number="F060" entity="&#xF060;" char="&#xF8E5;"/><!-- radical extender # corporate char -->
-  <symbol number="0060" entity="&#x0060;" char="&#xF8E5;"/><!-- radical extender # corporate char -->
+  <!--<symbol number="F060" entity="&#xF060;" char="&#xF8E5;"/>--><!-- radical extender # corporate char -->
+  <!--<symbol number="0060" entity="&#x0060;" char="&#xF8E5;"/>--><!-- radical extender # corporate char -->
   <symbol number="F061" entity="&#xF061;" char="&#x03B1;"/><!-- GREEK SMALL LETTER ALPHA -->
   <symbol number="0061" entity="&#x0061;" char="&#x03B1;"/><!-- GREEK SMALL LETTER ALPHA -->
   <symbol number="F062" entity="&#xF062;" char="&#x03B2;"/><!-- GREEK SMALL LETTER BETA -->
@@ -192,9 +192,9 @@
   <symbol number="007D" entity="&#x007D;" char="&#x007D;"/><!-- RIGHT CURLY BRACKET -->
   <symbol number="F07E" entity="&#xF07E;" char="&#x223C;"/><!-- TILDE OPERATOR -->
   <symbol number="007E" entity="&#x007E;" char="&#x223C;"/><!-- TILDE OPERATOR -->
-  <symbol number="F0A0" entity="&#xF0A0;" char="&#x20AC;"/><!-- EURO SIGN -->
-  <symbol number="00A0" entity="&#x00A0;" char="&#x20AC;"/><!-- EURO SIGN -->
-  <symbol number="F0A1" entity="&#xF0A1;" char="&#x03D2;"/><!-- GREEK UPSILON WITH HOOK SYMBOL -->
+  <!--<symbol number="F0A0" entity="&#xF0A0;" char="&#x20AC;"/>--><!-- EURO SIGN (not in this font!) -->
+  <!--<symbol number="00A0" entity="&#x00A0;" char="&#x20AC;"/>--><!-- EURO SIGN -->
+  <symbol number="F0A1" entity="&#xF0A1;" char="&#x03D2;" font="Cambria"/><!-- GREEK UPSILON WITH HOOK SYMBOL -->
   <symbol number="00A1" entity="&#x00A1;" char="&#x03D2;"/><!-- GREEK UPSILON WITH HOOK SYMBOL -->
   <symbol number="F0A2" entity="&#xF0A2;" char="&#x2032;"/><!-- PRIME	# minute -->
   <symbol number="00A2" entity="&#x00A2;" char="&#x2032;"/><!-- PRIME	# minute -->
@@ -206,12 +206,12 @@
   <symbol number="00A5" entity="&#x00A5;" char="&#x221E;"/><!-- INFINITY -->
   <symbol number="F0A6" entity="&#xF0A6;" char="&#x0192;"/><!-- LATIN SMALL LETTER F WITH HOOK -->
   <symbol number="00A6" entity="&#x00A6;" char="&#x0192;"/><!-- LATIN SMALL LETTER F WITH HOOK -->
-  <symbol number="F0A7" entity="&#xF0A7;" char="&#x2663;"/><!-- BLACK CLUB SUIT -->
-  <symbol number="00A7" entity="&#x00A7;" char="&#x2663;"/><!-- BLACK CLUB SUIT -->
+  <symbol number="F0A7" entity="&#xF0A7;" char="&#x2663;" font="Times New Roman"/><!-- BLACK CLUB SUIT -->
+  <symbol number="00A7" entity="&#x00A7;" char="&#x2663;" font="Times New Roman"/><!-- BLACK CLUB SUIT -->
   <symbol number="F0A8" entity="&#xF0A8;" char="&#x2666;"/><!-- BLACK DIAMOND SUIT -->
   <symbol number="00A8" entity="&#x00A8;" char="&#x2666;"/><!-- BLACK DIAMOND SUIT -->
-  <symbol number="F0A9" entity="&#xF0A9;" char="&#x2665;"/><!-- BLACK HEART SUIT -->
-  <symbol number="00A9" entity="&#x00A9;" char="&#x2665;"/><!-- BLACK HEART SUIT -->
+  <symbol number="F0A9" entity="&#xF0A9;" char="&#x2665;" font="Times New Roman"/><!-- BLACK HEART SUIT -->
+  <symbol number="00A9" entity="&#x00A9;" char="&#x2665;" font="Times New Roman"/><!-- BLACK HEART SUIT -->
   <symbol number="F0AA" entity="&#xF0AA;" char="&#x2660;"/><!-- BLACK SPADE SUIT -->
   <symbol number="00AA" entity="&#x00AA;" char="&#x2660;"/><!-- BLACK SPADE SUIT -->
   <symbol number="F0AB" entity="&#xF0AB;" char="&#x2194;"/><!-- LEFT RIGHT ARROW -->
@@ -250,8 +250,8 @@
   <symbol number="00BB" entity="&#x00BB;" char="&#x2248;"/><!-- ALMOST EQUAL TO -->
   <symbol number="F0BC" entity="&#xF0BC;" char="&#x2026;"/><!-- HORIZONTAL ELLIPSIS -->
   <symbol number="00BC" entity="&#x00BC;" char="&#x2026;"/><!-- HORIZONTAL ELLIPSIS -->
-  <symbol number="F0BD" entity="&#xF0BD;" char="&#x23D0;"/><!-- VERTICAL LINE EXTENSION (for arrows) # for Unicode 4.0 and later -->
-  <symbol number="00BD" entity="&#x00BD;" char="&#x23D0;"/><!-- VERTICAL LINE EXTENSION (for arrows) # for Unicode 4.0 and later -->
+  <symbol number="F0BD" entity="&#xF0BD;" char="&#x23D0;" font="Segoe UI Symbol"/><!-- VERTICAL LINE EXTENSION (for arrows) # for Unicode 4.0 and later -->
+  <symbol number="00BD" entity="&#x00BD;" char="&#x23D0;" font="Segoe UI Symbol"/><!-- VERTICAL LINE EXTENSION (for arrows) # for Unicode 4.0 and later -->
   <symbol number="F0BE" entity="&#xF0BE;" char="&#x23AF;"/><!-- HORIZONTAL LINE EXTENSION (for arrows) # for Unicode 3.2 and later -->
   <symbol number="00BE" entity="&#x00BE;" char="&#x23AF;"/><!-- HORIZONTAL LINE EXTENSION (for arrows) # for Unicode 3.2 and later -->
   <symbol number="F0BF" entity="&#xF0BF;" char="&#x21B5;"/><!-- DOWNWARDS ARROW WITH CORNER LEFTWARDS -->
@@ -382,5 +382,5 @@
   <symbol number="00FD" entity="&#x00FD;" char="&#x23AC;"/><!-- RIGHT CURLY BRACKET MIDDLE PIECE # for Unicode 3.2 and later -->
   <symbol number="F0FE" entity="&#xF0FE;" char="&#x23AD;"/><!-- RIGHT CURLY BRACKET LOWER HOOK # for Unicode 3.2 and later -->
   <symbol number="00FE" entity="&#x00FE;" char="&#x23AD;"/><!-- RIGHT CURLY BRACKET LOWER HOOK # for Unicode 3.2 and later -->
-  <symbol number="F0FF" entity="&#xF0FF;" char="&#x2610;"/><!-- BALLOT BOX -->
+  <symbol number="F0FF" entity="&#xF0FF;" char="&#x2610;" font="Segoe UI Symbol"/><!-- BALLOT BOX -->
 </symbols>
