@@ -149,7 +149,9 @@
               </xsl:if>
             </indexterm>  
           </xsl:variable>
-          <xsl:apply-templates select="$indexterm" mode="index-processing-1"/>
+          <xsl:if test="not(matches(string-join(current-group(),''),'^\s*$'))">
+            <xsl:apply-templates select="$indexterm" mode="index-processing-1"/>            
+          </xsl:if>
         </xsl:for-each-group>
       </xsl:when>
       <xsl:otherwise>
