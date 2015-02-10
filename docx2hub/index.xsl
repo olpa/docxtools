@@ -84,12 +84,12 @@
             </xsl:choose>
           </xsl:variable>
           <xsl:variable name="indexterm-attributes" as="attribute()*">
-            <xsl:if test="matches($current-instr-from-nodes-text, '\\i')">
+            <!--<xsl:if test="matches($current-instr-from-nodes-text, '\\i')">
               <xsl:attribute name="pagenum" select="'italic'"/>
             </xsl:if>
             <xsl:if test="matches($current-instr-from-nodes-text, '\\b')">
               <xsl:attribute name="pagenum" select="'bold'"/>
-            </xsl:if>
+            </xsl:if>-->
             <xsl:if test="matches($current-instr-from-nodes-text, '\\s')">
               <xsl:attribute name="class" select="'startofrange'"/>
             </xsl:if>
