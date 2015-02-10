@@ -63,7 +63,7 @@
           <xsl:variable name="see" as="xs:string?">
             <xsl:choose>
               <xsl:when test="matches($current-instr-from-nodes-text, '\\t')">
-                <xsl:value-of select="replace($current-instr-from-nodes-text, '^.*\\t\s*&quot;(.+?)&quot;(\\.*$|$)', '$1')"/>
+                <xsl:value-of select="replace($current-instr-from-nodes-text, '^.*\\t\s*&quot;(.+?)&quot;(.*$|$)', '$1')"/>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:sequence select="()"/>
