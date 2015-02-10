@@ -8,7 +8,7 @@
   
   <pattern id="test">
     <rule context="w:instrText">
-      <report test="true()" id="instrText" diagnostics="instrText_de">
+      <report test="false()" id="instrText" diagnostics="instrText_de" role="info">
         <span class="srcpath"><xsl:value-of select="concat(
                                                       /dbk:hub/dbk:info/dbk:keywordset[@role = 'hub']/dbk:keyword[@role = 'source-dir-uri'], 
                                                       ancestor::*[@srcpath][1]/@srcpath
