@@ -204,7 +204,7 @@
     <xsl:copy copy-namespaces="no">
       <xsl:attribute name="xml:base" select="base-uri()" />
       <!-- Font des Standardtextes -->
-      <xsl:variable name="normal" select="key('docx2hub:style', 'Normal')[1]" as="element(w:style)?" />
+      <xsl:variable name="normal" select="key('docx2hub:style', 'Normal')" as="element(w:style)?" />
       <xsl:variable name="default-font" as="xs:string"
         select="if ($normal/w:rPr/w:rFonts/@w:ascii)
                 then $normal/w:rPr/w:rFonts/@w:ascii
@@ -216,7 +216,7 @@
       <!-- Font-size des Standardtextes -->
       <xsl:variable name="default-font-size" as="xs:string"
         select="if ($normal/w:rPr/w:sz/@w:val)
-                then $normal/w:rPr/w:sz/@w:val
+                then ($normal/w:rPr/w:sz/@w:val)[1]
                 else '20'" />
       <xsl:apply-templates select="@*, * except w:latentStyles" mode="#current" >
         <xsl:with-param name="default-font" select="$default-font" tunnel="yes"/>
