@@ -17,9 +17,9 @@
   <xsl:template match="w:drawing[descendant::a:blip]" mode="wml-to-dbk">
     <mediaobject>
       <xsl:apply-templates select="@srcpath" mode="#current"/>
-      <xsl:if test=".//wp:docPr/@descr ne ''">
+      <xsl:if test=".//wp:docPr/@*[name() = ('descr', 'title')][. ne '']">
         <alt>
-          <xsl:value-of select=".//wp:docPr/@descr"/>
+          <xsl:value-of select="(.//wp:docPr/@*[name() = ('descr', 'title')][. ne ''])[1]"/>
         </alt>
       </xsl:if>
       <xsl:apply-templates select="descendant::a:blip" mode="wml-to-dbk"/>
