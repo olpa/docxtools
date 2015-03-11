@@ -75,7 +75,11 @@
   </p:choose>
 
   <p:load name="document">
-    <p:with-option name="href" select="concat(/c:files/@xml:base, 'word/document.xml')"/>
+    <p:with-option name="href" 
+      select="concat(
+                /c:files/@xml:base,
+                (/c:files/c:file/@name[matches(., '^word/document\d?.xml$')])[1]
+              )"/>
   </p:load>
 
   <p:sink/>
