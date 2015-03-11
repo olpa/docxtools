@@ -67,6 +67,10 @@
 
   <xsl:template match="/w:document" mode="insert-xpath" as="document-node(element(w:root))" priority="2">
     <xsl:variable name="container-base-uri" select="replace($base-dir, 'word/$', '')" as="xs:string"/>
+    <xsl:variable name="docRels-uri" as="xs:anyURI"
+      select="if (doc-available(resolve-uri(concat($base-dir,'_rels/document2.xml.rels'))))
+                  then resolve-uri(concat($base-dir,'_rels/document2.xml.rels'))
+                  else resolve-uri(concat($base-dir,'_rels/document.xml.rels'))"/>
     <xsl:document>
       <w:root>
         <xsl:attribute name="xml:base" select="$container-base-uri"/>
@@ -75,13 +79,16 @@
         <xsl:variable name="containerRels" as="document-node(element(rel:Relationships))"
           select="document(resolve-uri(replace($base-dir, '[^/]+/?$', '_rels/.rels')))"/>
         <xsl:variable name="docRels" as="document-node(element(rel:Relationships))"
-          select="document(resolve-uri(concat($base-dir,'_rels/document.xml.rels')))"/>
+          select="document($docRels-uri)"/>
         <!-- At the moment, we only need themes for default font resolution that takes place
              in the current mode. Therefore, we don’t include the theme documents below  
              /w:root yet. We rather pass them as a tunneled variable. -->
         <xsl:variable name="themes" as="document-node(element(a:theme))*"
           select="for $t in $docRels/rel:Relationships/rel:Relationship[@Type eq 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme']/@Target
-                  return document(resolve-uri($t, $base-dir))"/>
+                  return 
+                    if(doc-available(resolve-uri(concat($container-base-uri, $t)))) 
+                    then document(resolve-uri(concat($container-base-uri, $t)))
+                    else document(resolve-uri($t, $base-dir))"/>
         <xsl:apply-templates select="document(resolve-uri('styles.xml', $base-dir))/w:styles" mode="#current">
           <xsl:with-param name="themes" select="$themes" tunnel="yes"/>
         </xsl:apply-templates>
@@ -115,7 +122,7 @@
                     return document(resolve-uri($t, $container-base-uri))"/>
         </w:containerProps>
         <w:docRels>
-          <xsl:apply-templates select="document(resolve-uri('_rels/document.xml.rels', $base-dir))/rel:Relationships"
+          <xsl:apply-templates select="document($docRels-uri)/rel:Relationships"
             mode="#current"/>
         </w:docRels>
         <xsl:if test="doc-available(resolve-uri('_rels/footnotes.xml.rels', $base-dir))">
@@ -136,13 +143,13 @@
           <xsl:variable name="type" select="current()" as="xs:string"/>
           <xsl:if
             test="some $rel-file
-                        in document(resolve-uri('_rels/document.xml.rels', $base-dir))/rel:Relationships/rel:Relationship[
+                        in document($docRels-uri)/rel:Relationships/rel:Relationship[
                           @Type eq concat('http://schemas.openxmlformats.org/officeDocument/2006/relationships/', $type)
                         ]/@Target
                         satisfies doc-available(resolve-uri(concat('_rels/', $rel-file, '.rels'), $base-dir))">
             <xsl:element name="w:{$type}Rels">
               <xsl:for-each
-                select="document(resolve-uri('_rels/document.xml.rels', $base-dir))/rel:Relationships/rel:Relationship[
+                select="document($docRels-uri)/rel:Relationships/rel:Relationship[
                                       @Type eq concat('http://schemas.openxmlformats.org/officeDocument/2006/relationships/', $type)
                                     ]">
                 <xsl:if test="doc-available(resolve-uri(concat('_rels/', @Target, '.rels')))">
@@ -155,7 +162,7 @@
           </xsl:if>
           <xsl:element name="w:{$type}">
             <xsl:for-each
-              select="document(resolve-uri('_rels/document.xml.rels', $base-dir))/rel:Relationships/rel:Relationship[
+              select="document($docRels-uri)/rel:Relationships/rel:Relationship[
                                   @Type eq concat('http://schemas.openxmlformats.org/officeDocument/2006/relationships/', $type)
                                 ]">
               <xsl:if test="doc-available(resolve-uri(@Target))">
