@@ -58,7 +58,7 @@
           </xsl:if>
           <keyword role="source-basename">
             <!-- /w:root/@xml:base example: file:/data/docx/M_001.docx.tmp/ -->
-            <xsl:value-of select="replace(/w:root/@xml:base, '^.*/(.+)\.docx(\.tmp/?)?$', '$1')"/>
+            <xsl:value-of select="replace(/w:root/@xml:base, '^.*/(.+)\.doc[xm](\.tmp/?)?$', '$1')"/>
           </keyword>
           <xsl:if test="/w:root/w:containerProps/*:Properties/*:Application">
             <keyword role="source-application">
