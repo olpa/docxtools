@@ -10,6 +10,7 @@
   xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
   xmlns:css="http://www.w3.org/1996/css"
   xmlns:letex		= "http://www.le-tex.de/namespace"
+  xmlns:docx2hub = "http://www.le-tex.de/namespace/docx2hub"
   xmlns="http://docbook.org/ns/docbook"
   exclude-result-prefixes = "w v xs r rel letex"
   version="2.0">
@@ -94,6 +95,11 @@
         <xsl:attribute name="annotations" select="concat('object_',generate-id(ancestor::w:object[1]))"/>
       </xsl:if>
       <xsl:apply-templates select="@srcpath, parent::v:shape/@style" mode="#current"/>
+      <xsl:if test="ancestor::v:shape[1]/@docx2hub:generated-alt">
+        <alt>
+          <xsl:value-of select="ancestor::v:shape[1]/@docx2hub:generated-alt"/>
+        </alt>
+      </xsl:if>
       <xsl:call-template name="create-imageobject">
         <xsl:with-param name="image-id" select="@r:id"/>
       </xsl:call-template>
