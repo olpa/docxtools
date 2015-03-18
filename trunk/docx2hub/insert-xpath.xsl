@@ -54,12 +54,12 @@
               'w:drawing'
             )"/>
 
-  <xsl:template match="*[ name() = $docx2hub:srcpath-elements ]
-                        [ /*/name() = ('w:document', 'w:footnotes', 'w:endnotes', 'w:comments')]" mode="insert-xpath">
+  <xsl:template match="*[ $srcpaths = 'yes' ]
+                        [ name() = $docx2hub:srcpath-elements ]
+                        [ /*/name() = ('w:document', 'w:footnotes', 'w:endnotes', 'w:comments')]
+                        " mode="insert-xpath">
     <xsl:copy copy-namespaces="no">
-      <xsl:if test="$srcpaths eq 'yes'">
-        <xsl:attribute name="srcpath" select="docx2hub:srcpath(.)"/>
-      </xsl:if>
+      <xsl:attribute name="srcpath" select="docx2hub:srcpath(.)"/>
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:apply-templates mode="#current"/>
     </xsl:copy>
