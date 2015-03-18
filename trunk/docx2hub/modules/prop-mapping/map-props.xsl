@@ -1015,6 +1015,13 @@
                          xs:string($att) eq xs:string(current())
                        )]" mode="docx2hub:remove-redundant-run-atts" />
 
+  <xsl:template match="w:r[*]
+                          [every $c in * satisfies ($c/(self::w:instrText | self::w:fldChar))]
+                          /@*[matches(name(), '^(css:|xml:lang)')]" mode="docx2hub:remove-redundant-run-atts" 
+                priority="10"/>
+  
+
+
   <xsl:template match="*[w:p[w:pgSz]]" mode="docx2hub:remove-redundant-run-atts">
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
