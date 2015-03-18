@@ -39,6 +39,7 @@
   <p:serialization port="result" omit-xml-declaration="false"/>
 
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
+  <p:import href="http://transpect.le-tex.de/xproc-util/store-debug/store-debug.xpl"/>
   <p:import href="http://transpect.le-tex.de/calabash-extensions/ltx-lib.xpl"/>
   <p:import href="http://transpect.le-tex.de/xproc-util/file-uri/file-uri.xpl"/>
   <p:import href="http://transpect.le-tex.de/xproc-util/xslt-mode/xslt-mode.xpl"/>
@@ -84,45 +85,50 @@
 
   <p:sink/>
 
-  <p:add-attribute attribute-name="value" match="/c:param-set/c:param[@name = 'error-msg-file-path']">
+  <p:add-attribute attribute-name="value" match="/c:param" name="error-msg-file-path">
     <p:with-option name="attribute-value" select="replace(static-base-uri(), '/[^/]+$', '')"/>
     <p:input port="source">
-      <p:inline>
-        <c:param-set>
-          <c:param name="error-msg-file-path"/>
-          <c:param name="hub-version"/>
-          <c:param name="local-href"/>
-          <c:param name="unwrap-tooltip-links"/>
-          <c:param name="extract-dir-uri"/>
-        </c:param-set>
-      </p:inline>
+      <p:inline><c:param name="error-msg-file-path"/></p:inline>
     </p:input>
   </p:add-attribute>
-
-  <p:add-attribute attribute-name="value" match="/c:param-set/c:param[@name = 'hub-version']">
-    <p:with-option name="attribute-value" select="$hub-version"/>
-  </p:add-attribute>
-
-  <p:add-attribute attribute-name="value" match="/c:param-set/c:param[@name = 'basename']">
-    <p:with-option name="attribute-value" select="$basename"/>
-  </p:add-attribute>
-
-  <p:add-attribute attribute-name="value" match="/c:param-set/c:param[@name = 'extract-dir-uri']">
-    <p:with-option name="attribute-value" select="/c:files/@xml:base">
-      <p:pipe port="result" step="unzip"/>
-    </p:with-option>
-  </p:add-attribute>
-
-  <p:add-attribute attribute-name="value" match="/c:param-set/c:param[@name = 'local-href']">
+  
+  <p:add-attribute attribute-name="value" match="/c:param" name="local-href">
     <p:with-option name="attribute-value" select="/c:result/@local-href">
       <p:pipe port="result" step="locate-docx"/>
     </p:with-option>
+    <p:input port="source">
+      <p:inline><c:param name="local-href"/></p:inline>
+    </p:input>
+  </p:add-attribute>
+  
+  <p:add-attribute attribute-name="value" match="/c:param" name="extract-dir-uri">
+    <p:with-option name="attribute-value" select="/c:files/@xml:base">
+      <p:pipe port="result" step="unzip"/>
+    </p:with-option>
+    <p:input port="source">
+      <p:inline><c:param name="extract-dir-uri"/></p:inline>
+    </p:input>
   </p:add-attribute>
 
-  <p:add-attribute name="params" attribute-name="value" match="/c:param-set/c:param[@name = 'unwrap-tooltip-links']">
-    <p:with-option name="attribute-value" select="$unwrap-tooltip-links"/>
-  </p:add-attribute>
+  <p:in-scope-names name="vars"/>
 
+  <p:insert position="last-child" name="params">
+    <p:input port="source">
+      <p:pipe port="result" step="vars"/>
+    </p:input>
+    <p:input port="insertion">
+      <p:pipe port="result" step="error-msg-file-path"/>
+      <p:pipe port="result" step="extract-dir-uri"/>
+      <p:pipe port="result" step="local-href"/>
+    </p:input>
+  </p:insert>
+
+  <letex:store-debug>
+    <p:with-option name="pipeline-step" select="concat('docx2hub/', $basename, '/00-params')"/>
+    <p:with-option name="active" select="$debug"/>
+    <p:with-option name="base-uri" select="$debug-dir-uri"/>
+  </letex:store-debug>
+  
   <p:sink/>
   
   <letex:xslt-mode msg="yes" mode="insert-xpath">

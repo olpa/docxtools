@@ -21,7 +21,7 @@
   xmlns:css="http://www.w3.org/1996/css"
   xmlns="http://docbook.org/ns/docbook"
 
-  exclude-result-prefixes = "w o v wx xs dbk pkg r rel word200x exsl saxon fn letex mml"
+  exclude-result-prefixes = "w o v wx xs dbk pkg r rel word200x exsl saxon fn letex mml docx2hub"
 >
 
   <!-- w:r is here for historic reasons. We used to group the text runs
@@ -46,7 +46,9 @@
           <xsl:otherwise>
             <xsl:copy copy-namespaces="no">
               <xsl:apply-templates select="@* except @srcpath" mode="#current"/>
-              <xsl:copy-of select="current-group()/@srcpath"/>
+              <xsl:if test="$srcpaths = 'yes'">
+                <xsl:attribute name="srcpath" select="current-group()/@srcpath" separator=" "/>
+              </xsl:if>
               <xsl:apply-templates select="current-group()[not(self::dbk:anchor)]/node() 
                                            union current-group()[self::dbk:anchor]" mode="#current" />
             </xsl:copy>
@@ -273,5 +275,31 @@
   </xsl:template>
   
   <xsl:template match="*:keyword[matches(@role,'^fieldVar_')]" mode="docx2hub:join-runs"/>
+  
+  <!-- This mode has to run before docx2hub:separate-field-functions --> 
+  <xsl:template match="*[w:r/w:instrText]" mode="docx2hub:join-instrText-runs" >
+    <xsl:copy copy-namespaces="no">
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:for-each-group select="node()" 
+        group-adjacent="exists(self::w:r[*][every $c in * satisfies ($c/self::w:instrText)])">
+        <xsl:choose>
+          <xsl:when test="current-grouping-key()">
+            <xsl:copy copy-namespaces="no">
+              <xsl:apply-templates select="@* except @srcpath" mode="#current"/>
+              <xsl:if test="$srcpaths = 'yes'">
+                <xsl:attribute name="srcpath" select="current-group()/@srcpath" separator=" "/>
+              </xsl:if>
+              <w:instrText xsl:exclude-result-prefixes="#all">
+                <xsl:sequence select="string-join(current-group()/w:instrText, '')"/>
+              </w:instrText>
+            </xsl:copy>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:copy-of select="current-group()"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each-group>
+    </xsl:copy>
+  </xsl:template>
   
 </xsl:stylesheet>
