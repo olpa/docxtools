@@ -2,6 +2,7 @@
 <xsl:stylesheet version="2.0"
   xmlns:xsl		= "http://www.w3.org/1999/XSL/Transform"
   xmlns:xs		= "http://www.w3.org/2001/XMLSchema"
+  xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:w		= "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:dbk		= "http://docbook.org/ns/docbook"
   xmlns:r		= "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
@@ -200,7 +201,7 @@
                   <xsl:apply-templates select="(current-group()[w:instrText])[1]" mode="wml-to-dbk">
                     <xsl:with-param name="instrText" select="string-join(current-group()//text()[parent::w:instrText], '')" tunnel="yes" as="xs:string?"/>
                     <xsl:with-param name="nodes" select="current-group()[descendant::w:instrText]" tunnel="yes" as="element(*)*"/>
-                    <xsl:with-param name="text" select="current-group()[.//text()[parent::w:t] or .//w:tab or .//w:br]" tunnel="yes" as="element(*)*"/>
+                    <xsl:with-param name="text" select="current-group()[.//text()[parent::w:t] or .//w:tab or .//w:br or .//w:pict]" tunnel="yes" as="element(*)*"/>
                   </xsl:apply-templates>
                 </xsl:when>
                 <xsl:otherwise>
@@ -747,11 +748,21 @@
             <xsl:apply-templates select="$text" mode="#current"/>
           </xsl:when>
           <xsl:when test="$tokens[1] = 'INCLUDEPICTURE'">
-            <xsl:call-template name="handle-figures">
-              <xsl:with-param name="instr" select="$instrText"/>
-              <xsl:with-param name="text" select="$text"/>
-              <xsl:with-param name="nodes" select="$nodes"/>
-            </xsl:call-template>
+            <xsl:choose>
+              <!-- figures are preferably handled by looking at the relationships 
+              because INLCUDEPICTURE is more like a history of all locations where
+              the image was once included from.  -->
+              <xsl:when test="$text/v:pict">
+                <xsl:apply-templates select="$text" mode="#current"/>    
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:call-template name="handle-figures">
+                  <xsl:with-param name="instr" select="$instrText"/>
+                  <xsl:with-param name="text" select="$text"/>
+                  <xsl:with-param name="nodes" select="$nodes"/>
+                </xsl:call-template>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:when>
           <xsl:when test="$tokens[1] = 'HYPERLINK'">
             <xsl:variable name="without-options" select="$tokens[not(matches(., '\\[lo]'))]" as="xs:string+"/>
