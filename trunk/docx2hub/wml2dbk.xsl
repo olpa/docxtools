@@ -2,7 +2,6 @@
 <xsl:stylesheet version="2.0"
   xmlns:xsl		= "http://www.w3.org/1999/XSL/Transform"
   xmlns:xs		= "http://www.w3.org/2001/XMLSchema"
-  xmlns:v="urn:schemas-microsoft-com:vml"
   xmlns:w		= "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
   xmlns:dbk		= "http://docbook.org/ns/docbook"
   xmlns:r		= "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
@@ -751,8 +750,12 @@
             <xsl:choose>
               <!-- figures are preferably handled by looking at the relationships 
               because INLCUDEPICTURE is more like a history of all locations where
-              the image was once included from.  -->
-              <xsl:when test="$text/v:pict">
+              the image was once included from.  
+              Because there may be multiple INCLUDEPICTURES, we ignore them not only
+              if the w:pict is contained in a field function, but if there is any 
+              w:pict in the current paragraph. Is this assumption justified?
+              -->
+              <xsl:when test="$nodes/ancestor::w:p//w:pict">
                 <xsl:apply-templates select="$text" mode="#current"/>    
               </xsl:when>
               <xsl:otherwise>
