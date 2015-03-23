@@ -564,7 +564,26 @@
   <!-- mode wml-to-dbk-bookmarkStart is for transforming bookmarkStarts that used to be in between w:ps 
     within the paras where they belong -->
   <xsl:template match="w:bookmarkStart" mode="wml-to-dbk wml-to-dbk-bookmarkStart">
-    <anchor role="start" xml:id="{replace(@w:name, '^_([a-z]+\d+)_?.*$', '$1', 'i')}" xreflabel="{@w:id}"/>
+    <anchor role="start">
+      <xsl:apply-templates select="@w:name" mode="bookmark-id"/>
+    </anchor>
+  </xsl:template>
+  
+  <xsl:template match="w:bookmarkStart/@w:name" 
+    mode="bookmark-id" as="attribute(xml:id)">
+    <xsl:param name="end" select="false()"/>
+    <xsl:attribute name="xml:id" 
+      select="  replace(
+                  replace(
+                    string-join(
+                      (., ../@w:id, if ($end) then 'end' else ()), 
+                      '_'
+                    ), 
+                    '%20', 
+                    '_'),
+                  '^(\I)',
+                  '_$1'
+                )"/>
   </xsl:template>
 
   <!-- remove $bookmarkstart-before-p (see template for w:p above) outside of tables --> 
@@ -575,9 +594,12 @@
   
   <xsl:template match="w:bookmarkEnd" mode="wml-to-dbk wml-to-dbk-bookmarkEnd">
     <xsl:if test="exists(key('docx2hub:bookmarkStart', @w:id))">
-      <xsl:variable name="name" select="key('docx2hub:bookmarkStart', @w:id)" as="element(w:bookmarkStart)"/>
-      <xsl:variable name="anchor-id" select="replace(string-join(($name/@w:name, $name/@w:id, 'end'), '_'), '%20', '_')" as="xs:string"/>
-      <anchor role="end" xml:id="{replace($anchor-id, '^(\I)', '_$1')}"/>
+      <xsl:variable name="start" select="key('docx2hub:bookmarkStart', @w:id)" as="element(w:bookmarkStart)"/>
+      <anchor role="end">
+        <xsl:apply-templates select="$start/@w:name" mode="bookmark-id">
+          <xsl:with-param name="end" select="true()"/>
+        </xsl:apply-templates>
+      </anchor>
     </xsl:if>
   </xsl:template>
 
