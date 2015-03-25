@@ -484,6 +484,9 @@
   <xsl:template match="w:p" mode="wml-to-dbk">
     <xsl:element name="para">
       <xsl:apply-templates select="@* except @*[matches(name(),'^w:rsid')]" mode="#current"/>
+      <xsl:if test=".//w:r">
+        <xsl:sequence select="letex:insert-numbering(.)"/>
+      </xsl:if>
       <!-- Only necessary in tables? They'll get lost otherwise. -->
       <xsl:variable name="bookmarkstart-before-p" as="element(w:bookmarkStart)*"
         select="preceding-sibling::w:bookmarkStart[. &gt;&gt; current()/preceding-sibling::*[not(self::w:bookmarkStart)][1]]"/>
@@ -499,9 +502,6 @@
         select="parent::w:tc/parent::w:tr[current() is (w:tc/w:p)[1]]/following-sibling::w:bookmarkEnd[. &lt;&lt; current()/parent::w:tc/parent::w:tr/following-sibling::*[not(self::w:bookmarkEnd)][1]]"/>
 
       <xsl:apply-templates select="$bookmarkstart-before-p | $bookmarkstart-before-tc | $bookmarkstart-before-tr" mode="wml-to-dbk-bookmarkStart"/>
-      <xsl:if test=".//w:r">
-        <xsl:sequence select="letex:insert-numbering(.)"/>
-      </xsl:if>
       <xsl:choose>
         <xsl:when test="w:r[w:fldChar]">
           <xsl:call-template name="inline-field-function"/>
@@ -726,7 +726,6 @@
     <xsl:param name="instrText" as="xs:string?" tunnel="yes"/>
     <xsl:param name="text" as="element(*)*" tunnel="yes"/>
     <xsl:param name="nodes" as="element(*)*" tunnel="yes"/>
-    
     <xsl:variable name="tokens" as="xs:string*">
       <xsl:analyze-string select="($instrText, ' ')[ . ne ''][1]" regex="&quot;(.*?)&quot;">
         <xsl:matching-substring>
