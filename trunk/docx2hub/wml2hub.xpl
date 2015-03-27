@@ -205,7 +205,8 @@
   <p:sink/>
 
   <p:add-attribute name="check-field-functions" match="/*" 
-    attribute-name="transpect:rule-family" attribute-value="docx2hub_field-functions">
+    attribute-name="transpect:rule-family" attribute-value="docx2hub">
+    <p:documentation>Will also check other things such as change markup.</p:documentation>
     <p:input port="source">
       <p:pipe port="report" step="check-field-functions0"/>
     </p:input>
@@ -214,7 +215,7 @@
   <p:sink/>
   
   <p:add-attribute name="decorate-field-functions-schematron" match="/*" 
-    attribute-name="transpect:rule-family" attribute-value="docx2hub_field-functions">
+    attribute-name="transpect:rule-family" attribute-value="docx2hub">
     <p:input port="source">
       <p:pipe port="field-functions-schematron" step="docx2hub"/>
     </p:input>
