@@ -58,6 +58,12 @@
     </xsl:copy>
   </xsl:template>
 
+  <!-- collateral: remove links that don’t link -->
+  <xsl:template match="dbk:link[every $a in @* satisfies ('srcpath' = $a/name())]" mode="docx2hub:join-runs" priority="3">
+    <xsl:message select="'LLLLLLLLLLLLLLLLLLLLLLLL'"></xsl:message>
+    <xsl:apply-templates mode="#current"/>
+  </xsl:template>
+
   <!-- collateral: replace name of mapped symbols with default Unicode font name -->
   <xsl:template match="@css:font-family[. = $docx2hub:symbol-font-names][.. = docx2hub:font-map(.)/symbols/symbol/@char]"
     mode="docx2hub:join-runs">
