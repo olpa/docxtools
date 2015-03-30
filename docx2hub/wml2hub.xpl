@@ -243,6 +243,7 @@
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
     <p:with-option name="hub-version" select="$hub-version"/>
     <p:with-param name="srcpaths" select="$srcpaths"/>
+    <p:with-param name="unwrap-tooltip-links" select="$unwrap-tooltip-links"/>
     <p:with-param name="fail-on-error" select="$fail-on-error"/>
     <p:with-param name="field-vars" select="$field-vars"/>
   </letex:xslt-mode>
