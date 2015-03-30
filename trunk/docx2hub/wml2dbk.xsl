@@ -646,7 +646,7 @@
     </link>
   </xsl:template>
 
-  <xsl:template match="w:hyperlink[@w:tooltip][$unwrap-tooltip-links = 'yes']" mode="wml-to-dbk">
+  <xsl:template match="w:hyperlink[@w:tooltip][$unwrap-tooltip-links = ('yes', 'true')]" mode="wml-to-dbk">
     <xsl:apply-templates select="*" mode="#current"/>
   </xsl:template>
 
