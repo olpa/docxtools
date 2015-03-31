@@ -59,7 +59,7 @@
   </xsl:template>
 
   <!-- collateral: remove links that don’t link -->
-  <xsl:template match="dbk:link[every $a in @* satisfies ('srcpath' = $a/name())]" mode="docx2hub:join-runs" priority="3">
+  <xsl:template match="dbk:link[@*][every $a in @* satisfies ('srcpath' = $a/name())]" mode="docx2hub:join-runs" priority="5">
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
