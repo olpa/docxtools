@@ -404,8 +404,13 @@
 
   <xsl:template name="cell.morerows">
     <xsl:if test="w:tcPr/w:vMerge/@w:val = 'restart'">
+      <xsl:variable name="is-thead-tr" as="xs:boolean" 
+        select="exists(parent::w:tr[w:trPr/w:tblHeader or w:tblHeader])"/>
       <xsl:variable name="counts" as="xs:integer*">
         <xsl:choose>
+          <xsl:when test="$is-thead-tr = true() and not(../following-sibling::w:tr[1][w:trPr/w:tblHeader or w:tblHeader])">
+            <xsl:sequence select="999"/>
+          </xsl:when>
           <xsl:when test="../following-sibling::w:tr[1]/w:tc[letex:colcount(1, .) = letex:colcount(1, current())][docx2hub:is-blind-vmerged-cell(.)]">
             <xsl:for-each-group select="../following-sibling::w:tr/w:tc[letex:colcount(1, .) = letex:colcount(1, current())]" 
               group-adjacent="docx2hub:is-blind-vmerged-cell(.)">
@@ -413,11 +418,13 @@
             </xsl:for-each-group>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:sequence select="24"/>
+            <xsl:sequence select="999"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:variable>
-      <xsl:attribute name="morerows" select="$counts[1]" />
+      <xsl:if test="$counts[1] != 999">
+        <xsl:attribute name="morerows" select="$counts[1]"/>
+      </xsl:if>
       <!-- uncommented, mk: do not invent information where none exist -->
       <!--<xsl:attribute name="css:border-bottom-style" select="'none'" />-->
     </xsl:if>
