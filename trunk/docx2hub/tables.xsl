@@ -38,7 +38,10 @@
           <xsl:with-param name="width" 
             select="if (not(w:tblPr/w:tblW) or w:tblPr/w:tblW/@w:type = 'pct') then 0 else w:tblPr/w:tblW/@w:w" tunnel="yes"/>
         </xsl:apply-templates>
-        <xsl:if test="w:tr[w:trPr/w:tblHeader or w:tblHeader]">
+        <xsl:variable name="every-row-is-a-header" as="xs:boolean"
+          select="every $tr in w:tr satisfies $tr[w:trPr/w:tblHeader or w:tblHeader]"/>
+        <xsl:if test="w:tr[w:trPr/w:tblHeader or w:tblHeader] and 
+                      not($every-row-is-a-header)">
           <thead>
             <xsl:apply-templates select="w:tr[w:trPr/w:tblHeader or w:tblHeader]" mode="tables">
               <xsl:with-param name="cols" select="count(w:tblGrid/w:gridCol)" tunnel="yes"/>
@@ -48,7 +51,9 @@
           </thead>
         </xsl:if>
         <tbody>
-          <xsl:apply-templates select="* except w:tr[w:trPr/w:tblHeader or w:tblHeader]" mode="tables">
+          <xsl:apply-templates mode="tables"
+            select="if($every-row-is-a-header) then *
+                    else * except w:tr[w:trPr/w:tblHeader or w:tblHeader]">
             <xsl:with-param name="cols" select="count(w:tblGrid/w:gridCol)" tunnel="yes"/>
             <xsl:with-param name="width" select="w:tblPr/w:tblW/@w:w" tunnel="yes"/>
             <xsl:with-param name="col-widths" select="(for $x in w:tblGrid/w:gridCol return $x/@w:w)" tunnel="yes"/>
