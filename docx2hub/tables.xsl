@@ -99,6 +99,16 @@
     <xsl:attribute name="css:width" select="docx2hub:pt-length(@w:w)"/>
   </xsl:template>
   
+  <xsl:template match="w:tblPr/w:tblW[@w:type eq 'pct']" mode="wml-to-dbk" priority="2">
+    <!-- Percentage with a percent sign or integer value for which 5000 = 100%.
+    The latter is not in the spec but here: http://officeopenxml.com/WPtableWidth.php-->
+    <xsl:attribute name="css:width" select="if(ends-with(@w:w, '%'))
+                                            then @w:w
+                                            else if (@w:w castable as xs:integer)
+                                                 then concat(round(xs:double(@w:w) * 0.2) * 0.1, '%')
+                                                 else @w:w"/>
+  </xsl:template>
+  
   <xsl:template match="w:tblPr/w:tblW" mode="wml-to-dbk">
     <!-- validation will complain about a unitless value --> 
     <xsl:attribute name="css:width" select="@w:w"/>
@@ -133,19 +143,6 @@
       <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
       <xsl:with-param name="hash">
         <value key="xpath"><xsl:value-of select="@srcpath"/></value>
-        <value key="level">INT</value>
-        <value key="mode">tables</value>
-        <value key="info-text"><xsl:value-of select="concat('Element: ', name(), '     Parent: ', ../name())"/></value>
-      </xsl:with-param>
-    </xsl:call-template>
-  </xsl:template>
-
-  <xsl:template match="@*" mode="tables">
-    <xsl:call-template name="signal-error" xmlns="">
-      <xsl:with-param name="error-code" select="'W2D_021'"/>
-      <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
-      <xsl:with-param name="hash">
-        <value key="xpath"><xsl:value-of select="../@srcpath"/></value>
         <value key="level">INT</value>
         <value key="mode">tables</value>
         <value key="info-text"><xsl:value-of select="concat('Element: ', name(), '     Parent: ', ../name())"/></value>
@@ -232,11 +229,16 @@
     <xsl:element name="entry">
 <!--      <xsl:copy-of select="ancestor::w:tbl[1]/w:tblPr/@css:*[not(matches(local-name(), '^(border|background-color|width)'))]"/>-->
       <xsl:copy-of select="ancestor::w:tr[1]/@css:*[not(matches(local-name(), '^(background-color|(min-)?height|width)'))]"/>
+      <xsl:variable name="is-first-cell" select="letex:node-index-of(../w:tc, .) = 1" as="xs:boolean"/>
+      <xsl:variable name="is-last-cell" select="letex:node-index-of(../w:tc, .) = count(../w:tc)" as="xs:boolean"/>
       <xsl:apply-templates select="$row-overrides" mode="wml-to-dbk">
-        <xsl:with-param name="is-first-cell" select="letex:node-index-of(../w:tc, .) = 1" tunnel="yes"/>
-        <xsl:with-param name="is-last-cell" select="letex:node-index-of(../w:tc, .) = count(../w:tc)" tunnel="yes"/>
+        <xsl:with-param name="is-first-cell" select="$is-first-cell" tunnel="yes"/>
+        <xsl:with-param name="is-last-cell" select="$is-last-cell" tunnel="yes"/>
       </xsl:apply-templates>
-      <xsl:copy-of select="@*" />
+      <xsl:apply-templates select="@*" mode="#current">
+        <xsl:with-param name="is-first-cell" select="$is-first-cell" tunnel="yes"/>
+        <xsl:with-param name="is-last-cell" select="$is-last-cell" tunnel="yes"/>
+      </xsl:apply-templates>
       <!-- Process any spans -->
       <xsl:call-template name="cell.span"/>
       <xsl:call-template name="cell.morerows"/>

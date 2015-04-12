@@ -117,6 +117,7 @@
         <prop name="w:rsidP" />
         <prop name="w:rsidRPr" />
         <prop name="w:rStyle" type="docx-charstyle" />
+        <prop name="w:rtl" type="docx-boolean-prop" target-name="css:direction" default="ltr" active="rtl"/>
         <prop name="w:rubyAlign">
           <val match="center" target-name="css:ruby-align" target-value="center"/>
           <val match="distributeSpace" target-name="css:ruby-align" target-value="space-around"/>
@@ -182,6 +183,8 @@
         <prop name="w:tcBorders/w:left" type="docx-border" />
         <prop name="w:tcBorders/w:right" type="docx-border" />
         <prop name="w:tcBorders/w:top" type="docx-border"  />
+        <prop name="w:tcBorders/w:insideV" type="docx-border"  />
+        <prop name="w:tcBorders/w:insideH" type="docx-border"  />
         <prop name="w:tcMar" type="passthru" />
         <prop name="w:tcMar/w:bottom" type="docx-padding" />
         <prop name="w:tcMar/w:left" type="docx-padding" />
