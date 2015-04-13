@@ -231,13 +231,13 @@
       <xsl:copy-of select="ancestor::w:tr[1]/@css:*[not(matches(local-name(), '^(background-color|(min-)?height|width)'))]"/>
       <xsl:variable name="is-first-cell" select="letex:node-index-of(../w:tc, .) = 1" as="xs:boolean"/>
       <xsl:variable name="is-last-cell" select="letex:node-index-of(../w:tc, .) = count(../w:tc)" as="xs:boolean"/>
-      <xsl:apply-templates select="$row-overrides" mode="wml-to-dbk">
+      <xsl:variable name="is-first-row-in-group" select="letex:node-index-of(../../w:tr, ..) = 1" as="xs:boolean"/>
+      <xsl:variable name="is-last-row-in-group" select="letex:node-index-of(../../w:tr, ..) = count(../../w:tr)" as="xs:boolean"/>
+      <xsl:apply-templates select="$row-overrides, @*" mode="wml-to-dbk">
         <xsl:with-param name="is-first-cell" select="$is-first-cell" tunnel="yes"/>
         <xsl:with-param name="is-last-cell" select="$is-last-cell" tunnel="yes"/>
-      </xsl:apply-templates>
-      <xsl:apply-templates select="@*" mode="#current">
-        <xsl:with-param name="is-first-cell" select="$is-first-cell" tunnel="yes"/>
-        <xsl:with-param name="is-last-cell" select="$is-last-cell" tunnel="yes"/>
+        <xsl:with-param name="is-first-row-in-group" select="$is-first-row-in-group" tunnel="yes"/>
+        <xsl:with-param name="is-last-row-in-group" select="$is-last-row-in-group" tunnel="yes"/>
       </xsl:apply-templates>
       <!-- Process any spans -->
       <xsl:call-template name="cell.span"/>
