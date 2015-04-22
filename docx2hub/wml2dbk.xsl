@@ -818,7 +818,7 @@
               <xsl:if test="$tooltip">
                 <xsl:attribute name="xlink:title" select="$tooltip"/>
               </xsl:if>
-              <xsl:apply-templates select="$text" mode="#current"/>
+              <xsl:apply-templates select="($nodes//@srcpath)[1], $text" mode="#current"/>
             </link>
           </xsl:when>
           <xsl:when test="$tokens[1] = 'SET'">
