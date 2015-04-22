@@ -418,13 +418,14 @@
 
       <xsl:when test=". eq 'lang'">
         <docx2hub:attribute name="{../@target-name}">
-          <!-- provisional -->
-          <xsl:value-of select="if (matches($val, 'German') or matches($val, '\Wde\W'))
+          <xsl:variable name="stringval" select="if ($val/self::w:lang) then $val/@w:val else $val"/>
+          <xsl:value-of select="if (matches($stringval, 'German') or matches($stringval, '\Wde\W'))
                                 then 'de'
                                 else 
-                                  if (matches($val, 'English'))
+                                  if (matches($stringval, 'English'))
                                   then 'en'
-                                  else $val" />
+                                  else replace($stringval, '^(\p{Ll}+).*$', '$1')" />
+          <!-- stripping the country by default. If someone needs it, we need to introduce an option -->
         </docx2hub:attribute>
       </xsl:when>
 
