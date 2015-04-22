@@ -741,6 +741,22 @@
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
 
+  <xsl:template match="@xml:lang" mode="wml-to-dbk" priority="5">
+    <xsl:variable name="context" select="." as="attribute(*)"/>
+    <xsl:variable name="ancestors-with-langs" as="element(*)+">
+      <xsl:for-each select="ancestor::*">
+        <xsl:copy>
+          <xsl:copy-of select="key('style-by-name', @role)/@xml:lang"/>
+          <xsl:copy-of select="@xml:lang except $context"/>
+        </xsl:copy>
+      </xsl:for-each>
+    </xsl:variable>
+    <!-- Only output the next specific xml:lang if its string value differs from the current one’s: -->
+    <xsl:if test="not($ancestors-with-langs[@xml:lang][last()]/@xml:lang = $context)">
+      <xsl:next-match/>
+    </xsl:if>
+  </xsl:template>
+
   <!-- instrText (w:instrText)  [not(../preceding-sibling::*[w:instrText])] -->
   <xsl:template match="w:instrText" mode="wml-to-dbk" priority="20">
     <xsl:param name="instrText" as="xs:string?" tunnel="yes"/>
