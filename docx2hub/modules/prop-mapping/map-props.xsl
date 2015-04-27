@@ -418,7 +418,7 @@
 
       <xsl:when test=". eq 'lang'">
         <docx2hub:attribute name="{../@target-name}">
-          <xsl:variable name="stringval" select="if ($val/self::w:lang) then $val/@w:val else $val"/>
+          <xsl:variable name="stringval" select="if ($val/self::w:lang) then ($val/@w:val, $val/@w:bidi)[1] else $val"/>
           <xsl:value-of select="if (matches($stringval, 'German') or matches($stringval, '\Wde\W'))
                                 then 'de'
                                 else 
