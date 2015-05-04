@@ -912,7 +912,7 @@
                         every $el in $content[self::*] 
                         satisfies $el[self::w:t[@xml:space eq 'preserve'][matches(., '^\p{Zs}*$')]]
                       )">
-        <xsl:sequence select="docx2hub:wrap($content, (docx2hub:wrap[not(@element = ('superscript', 'subscript'))]))" />
+        <xsl:sequence select="docx2hub:wrap((@srcpath, $content), (docx2hub:wrap[not(@element = ('superscript', 'subscript'))]))" />
       </xsl:when>
       <!-- do not wrap whitespace only subscript or superscript -->
       <xsl:when test="w:t and docx2hub:wrap/@element = ('superscript', 'subscript') 
@@ -922,17 +922,17 @@
                         satisfies $el[self::w:t[@xml:space eq 'preserve'][matches(., '^\p{Zs}*$')]]
                       )">
         <xsl:copy>
-          <xsl:sequence select="docx2hub:wrap($content, (docx2hub:wrap[not(@element = ('superscript', 'subscript'))]))" />
+          <xsl:sequence select="docx2hub:wrap((@srcpath, $content), (docx2hub:wrap[not(@element = ('superscript', 'subscript'))]))" />
         </xsl:copy>
       </xsl:when>
       <xsl:when test="exists(docx2hub:wrap) and exists(self::css:rule | self::dbk:style)">
         <xsl:copy>
           <xsl:attribute name="remap" select="docx2hub:wrap/@element" />
-          <xsl:sequence select="@*, $content" />
+          <xsl:sequence select="@*, (@srcpath, $content)" />
         </xsl:copy>
       </xsl:when>
       <xsl:when test="exists(docx2hub:wrap) and not(self::css:rule or self::dbk:style)">
-        <xsl:sequence select="docx2hub:wrap($content, (docx2hub:wrap))" />
+        <xsl:sequence select="docx2hub:wrap((@srcpath, $content), (docx2hub:wrap))" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:copy>
@@ -943,7 +943,7 @@
   </xsl:template>
 
   <xsl:function name="docx2hub:wrap" as="node()*">
-    <xsl:param name="content" as="node()*" />
+    <xsl:param name="content" as="item()*" /><!-- attribute(srcpath) or node() -->
     <xsl:param name="wrappers" as="element(docx2hub:wrap)*" />
     <xsl:choose>
       <xsl:when test="exists($wrappers)">
