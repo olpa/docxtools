@@ -616,9 +616,13 @@
     <xsl:if test="exists(key('docx2hub:bookmarkStart', @w:id))">
       <xsl:variable name="start" select="key('docx2hub:bookmarkStart', @w:id)" as="element(w:bookmarkStart)"/>
       <anchor role="end">
+        <xsl:variable name="id" as="attribute(xml:id)">
+          <xsl:apply-templates select="$start/@w:name" mode="bookmark-id"/> 
+        </xsl:variable>
         <xsl:apply-templates select="$start/@w:name" mode="bookmark-id">
           <xsl:with-param name="end" select="true()"/>
         </xsl:apply-templates>
+        <xsl:attribute name="linkend" select="$id"/>
       </anchor>
     </xsl:if>
   </xsl:template>
