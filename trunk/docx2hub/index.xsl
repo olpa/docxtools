@@ -15,18 +15,21 @@
   xmlns:rel		= "http://schemas.openxmlformats.org/package/2006/relationships"
   xmlns:exsl		= 'http://exslt.org/common'
   xmlns:saxon		= "http://saxon.sf.net/"
+  xmlns:docx2hub = "http://www.le-tex.de/namespace/docx2hub"
   xmlns:letex		= "http://www.le-tex.de/namespace"
   xmlns:mml             = "http://www.w3.org/Math/DTD/mathml2/mathml2.dtd"
   xmlns:css="http://www.w3.org/1996/css"
   xmlns="http://docbook.org/ns/docbook"
 
-  exclude-result-prefixes = "w o v wx xs dbk pkg r rel word200x exsl saxon fn letex mml"
+  exclude-result-prefixes = "docx2hub w o v wx xs dbk pkg r rel word200x exsl saxon fn letex mml"
   >
 
   <xsl:template name="handle-index">
     <xsl:param name="instr" as="xs:string?"/>
     <xsl:param name="text" as="element(*)*"/>
     <xsl:param name="nodes" as="element(*)*"/>
+
+    <xsl:variable name="context" as="element(w:instrText)" select="."/>
 
     <xsl:variable name="instr-from-nodes" as="node()*">
       <xsl:for-each select="$nodes//w:instrText">
@@ -84,12 +87,12 @@
             </xsl:choose>
           </xsl:variable>
           <xsl:variable name="indexterm-attributes" as="attribute()*">
-            <!--<xsl:if test="matches($current-instr-from-nodes-text, '\\i')">
-              <xsl:attribute name="pagenum" select="'italic'"/>
+            <xsl:if test="matches($current-instr-from-nodes-text, '\\i')">
+              <xsl:attribute name="role" select="'hub:pagenum-italic'"/>
             </xsl:if>
             <xsl:if test="matches($current-instr-from-nodes-text, '\\b')">
-              <xsl:attribute name="pagenum" select="'bold'"/>
-            </xsl:if>-->
+              <xsl:attribute name="role" select="'hub:pagenum-bold'"/>
+            </xsl:if>
             <xsl:if test="matches($current-instr-from-nodes-text, '\\s')">
               <xsl:attribute name="class" select="'startofrange'"/>
             </xsl:if>
@@ -97,7 +100,20 @@
               <xsl:attribute name="class" select="'endofrange'"/>
             </xsl:if>
             <xsl:if test="matches($current-instr-from-nodes-text, '\\r')">
-              <xsl:attribute name="id" select="letex:rereplace-chars(replace($current-instr-from-nodes-text, '^.*\\r\s*&quot;?\s*(.+?)\s*&quot;?\s*(\\.*$|$)', '$1'))"/>
+              <xsl:variable name="id" as="xs:string" 
+                select="letex:rereplace-chars(replace($current-instr-from-nodes-text, '^.*\\r\s*&quot;?\s*(.+?)\s*&quot;?\s*(\\.*$|$)', '$1'))"/>
+              <xsl:variable name="bookmark-start" as="element(w:bookmarkStart)" 
+                select="key('docx2hub:bookmarkStart-by-name', $id, root($context))"/>
+              <xsl:variable name="start-id" as="attribute(xml:id)">
+                <xsl:apply-templates select="$bookmark-start/@w:name" mode="bookmark-id"/>
+              </xsl:variable>
+              <xsl:variable name="end-id" as="attribute(xml:id)">
+                <xsl:apply-templates select="$bookmark-start/@w:name" mode="bookmark-id">
+                  <xsl:with-param name="end" select="true()"/>
+                </xsl:apply-templates>
+              </xsl:variable>
+              <xsl:attribute name="linkends" select="$start-id, $end-id" separator=" "/>
+              <!-- Create distinct startofrange/endofrange indexterms at the anchors specified by linkends in the next pass. -->
             </xsl:if>
             <xsl:if test="not(empty($type))">
               <xsl:attribute name="type" select="letex:rereplace-chars($type)"/>
@@ -127,7 +143,9 @@
           </xsl:variable>
           <xsl:variable name="indexterm">
             <indexterm>
-              <xsl:apply-templates select="$indexterm-attributes" mode="#current"/>
+              <xsl:for-each-group select="$indexterm-attributes" group-by="name()">
+                <xsl:attribute name="{name()}" select="string-join(current-group(), ' ')"/>
+              </xsl:for-each-group>
               <xsl:for-each select="('primary', 'secondary', 'tertiary')">
                 <xsl:call-template name="indexterm-sub">
                   <xsl:with-param name="pos" select="position()"/>
