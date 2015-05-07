@@ -27,6 +27,14 @@
     <xsl:apply-templates select="key('comment-by-id', @w:id)" mode="comment"/>
   </xsl:template>
 
+  <!-- dissolve single w:r with only comment(s) -->
+  <xsl:template match="*[*]
+                        [self::w:r[matches(@role, $comment-reference-style-regex)]]
+                        [every $n in node() satisfies $n/self::w:commentReference]" 
+                mode="wml-to-dbk" priority="3">
+    <xsl:apply-templates mode="#current"/>
+  </xsl:template>
+
   <xsl:template match="w:comment" mode="comment">
     <annotation>
       <xsl:if test="@w:author | @w:date | @w:initials">
