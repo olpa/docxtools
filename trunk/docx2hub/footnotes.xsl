@@ -25,7 +25,6 @@
   >
 
   <xsl:variable name="footnote-reference-style-regex" select="'^(FootnoteReference|Funotenzeichen)$'"/>
-  <xsl:variable name="comment-reference-style-regex" select="'^(Kommentarzeichen)$'"/>
 
   <xsl:template match="w:footnoteReference" mode="wml-to-dbk">
     <footnote>

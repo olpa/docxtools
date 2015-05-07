@@ -23,6 +23,8 @@
   exclude-result-prefixes = "w o v wx xs dbk pkg r rel word200x exsl saxon fn letex mml"
   >
 
+  <xsl:variable name="comment-reference-style-regex" select="'^(Kommentarzeichen)$'"/>
+
   <xsl:template match="w:commentReference" mode="wml-to-dbk">
     <xsl:apply-templates select="key('comment-by-id', @w:id)" mode="comment"/>
   </xsl:template>
