@@ -35,6 +35,7 @@ usage:
 	-o result=$(call win_path,$*.hub.xml) \
 	-o insert-xpath=$(call win_path,/dev/null) \
 	-o report=$(call win_path,/dev/null) \
+	-o zip-manifest=$(call win_path,/dev/null) \
 	-o schema=$(call win_path,/dev/null) \
 	$(call uri,$(MAKEFILEDIR)/docx2hub/wml2hub.xpl) \
 	$(PARAMS)
