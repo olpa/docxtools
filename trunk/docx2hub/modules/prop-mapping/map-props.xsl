@@ -814,6 +814,12 @@
       <xsl:when test="$val eq 'single'">
         <xsl:sequence select="'solid'" />
       </xsl:when>
+      <xsl:when test="matches($val, '(thinThick.+Gap|dashDotStroked)')">
+        <xsl:sequence select="'dashed'" />
+      </xsl:when>
+      <xsl:when test="$val eq 'threeDEmboss'">
+        <xsl:sequence select="'groove'" />
+      </xsl:when>
       <xsl:when test="$val eq 'nil'">
         <xsl:sequence select="'none'" />
       </xsl:when>
