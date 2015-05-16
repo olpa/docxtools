@@ -91,12 +91,12 @@
               <xsl:with-param name="contexts" select="., /w:root/w:footnotes, /w:root/w:endnotes"/>
             </xsl:call-template>
           </xsl:when>
-          <xsl:when test="$hub-version eq '1.1'">
+          <xsl:otherwise>
             <xsl:call-template name="docx2hub:hub-1.1-styles">
               <xsl:with-param name="version" select="$hub-version" tunnel="yes"/>
               <xsl:with-param name="contexts" select="., /w:root/w:footnotes, /w:root/w:endnotes"/>
             </xsl:call-template>
-          </xsl:when>
+          </xsl:otherwise>
         </xsl:choose>
       </info>
       <xsl:apply-templates select="../../w:numbering" mode="#current"/>

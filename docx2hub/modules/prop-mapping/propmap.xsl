@@ -144,6 +144,7 @@
         </prop>
         <!--<prop name="w:stri-->
         <prop name="w:suppressAutoHyphens" type="docx-boolean-prop" target-name="css:hyphens" default="auto" active="manual"/>
+        <prop name="w:suppressLineNumbers" implement="maybe later"/>
         <prop name="w:sz" type="docx-font-size" target-name="css:font-size" />
         <prop name="w:szCs" />
         <prop name="w:tab/@w:leader" type="linear" target-name="leader" />
