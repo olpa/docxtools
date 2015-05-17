@@ -475,7 +475,10 @@
       
       <xsl:when test=". eq 'docx-padding'">
         <xsl:variable name="orientation" select="replace(../@name, '^.+:', '')" as="xs:string" />
-        <docx2hub:attribute name="css:padding-{$orientation}"><xsl:value-of select="docx2hub:pt-length($val/@w:w)" /></docx2hub:attribute>
+        <docx2hub:attribute name="css:padding-{$orientation}">
+          <!-- LibreOffice produced a padding of -2 dxa, so check for negativity -->
+          <xsl:value-of select="if (starts-with($val/@w:w, '-')) then '0' else docx2hub:pt-length($val/@w:w)" />
+        </docx2hub:attribute>
       </xsl:when>
 
       <xsl:when test=". eq 'docx-charstyle'">
