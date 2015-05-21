@@ -613,8 +613,8 @@
   <xsl:template match="w:bookmarkEnd[preceding-sibling::w:p]" mode="wml-to-dbk"/>
   
   <xsl:template match="w:bookmarkEnd" mode="wml-to-dbk wml-to-dbk-bookmarkEnd">
-    <xsl:if test="exists(key('docx2hub:bookmarkStart', @w:id))">
-      <xsl:variable name="start" select="key('docx2hub:bookmarkStart', @w:id)" as="element(w:bookmarkStart)"/>
+    <xsl:if test="exists(key('docx2hub:bookmarkStart', @w:id)[not(@w:name='_GoBack')])">
+      <xsl:variable name="start" select="key('docx2hub:bookmarkStart', @w:id)[not(@w:name='_GoBack')]" as="element(w:bookmarkStart)"/>
       <anchor role="end">
         <xsl:variable name="id" as="attribute(xml:id)">
           <xsl:apply-templates select="$start/@w:name" mode="bookmark-id"/> 
@@ -629,7 +629,11 @@
 
   <xsl:template match="w:bookmarkStart[@w:name eq '_GoBack']" mode="wml-to-dbk wml-to-dbk-bookmarkStart" priority="2"/>
   
-  <xsl:template match="w:bookmarkEnd[key('docx2hub:bookmarkStart', @w:id)/@w:name eq '_GoBack']" mode="wml-to-dbk wml-to-dbk-bookmarkEnd" priority="2"/>
+  <xsl:template match="w:bookmarkEnd[key('docx2hub:bookmarkStart', @w:id)/@w:name = '_GoBack']" mode="wml-to-dbk wml-to-dbk-bookmarkEnd" priority="2">
+    <xsl:if test="not(preceding::w:bookmarkStart[@w:id=current()/@w:id][1]/@w:name = '_GoBack')">
+      <xsl:next-match/>
+    </xsl:if>
+  </xsl:template>
   
   <!-- comments -->
   <xsl:template match="w:commentRangeStart" mode="wml-to-dbk"/>
