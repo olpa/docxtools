@@ -47,6 +47,8 @@
                          [if (matches(., '%\d')) then not(../../w:numFmt/@w:val = 'decimal') else true()]
                        " mode="wml-to-dbk" priority="1.5">
     <!-- priority = 1.5 because of priority = 1 ("default for attributes") in wml2dbk.xsl -->
+    
+ 
     <xsl:variable name="font" select="if (self::w:sym) 
                                       then @w:font
                                       else
