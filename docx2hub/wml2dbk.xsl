@@ -237,34 +237,67 @@
   </xsl:template>
   
   <xsl:template name="handle-nested-field-functions">
-    <xsl:param name="nodes" as="element(*)*"/>
+    <xsl:param name="nodes" as="element()*"/>
     <xsl:choose>
       <xsl:when test="not($nodes/w:fldChar[@w:fldCharType='begin'])">
         <xsl:copy-of select="$nodes"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:variable name="new-nodes">
+        <xsl:variable name="new-nodes" as="element(dbk:temp)">
           <temp>
             <xsl:for-each-group select="$nodes" group-starting-with="w:r[w:fldChar[@w:fldCharType='begin'][following::w:fldChar[@w:fldCharType = ('begin','end')][1][self::w:fldChar[@w:fldCharType = 'end']]]]">
-            <xsl:for-each-group select="current-group()" group-ending-with="w:r[w:fldChar[@w:fldCharType='end']]">
-              <xsl:choose>
-                <xsl:when test="current-group()[1][self::w:r[w:fldChar[@w:fldCharType='begin'][following::w:fldChar[@w:fldCharType = ('begin','end')][1][self::w:fldChar[@w:fldCharType = 'end']]]]] and current-group()[last()][self::w:r[w:fldChar[@w:fldCharType='end']]]">
-                  <xsl:apply-templates select="(current-group()[w:instrText])[1]" mode="wml-to-dbk">
-                    <xsl:with-param name="instrText" select="string-join(current-group()//text()[parent::w:instrText], '')" tunnel="yes" as="xs:string?"/>
-                    <xsl:with-param name="nodes" select="current-group()[descendant::w:instrText]" tunnel="yes" as="element(*)*"/>
-                    <xsl:with-param name="text" select="current-group()[.//text()[parent::w:t] or .//w:tab or .//w:br or .//w:pict or .//dbk:*]" tunnel="yes" as="element(*)*"/>
-                  </xsl:apply-templates>
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:copy-of select="current-group()"/>
-                </xsl:otherwise>
-              </xsl:choose>
+              <xsl:for-each-group select="current-group()" group-ending-with="w:r[w:fldChar[@w:fldCharType='end']]">
+                <xsl:choose>
+                  <xsl:when test="current-group()[1][self::w:r[
+                                                       w:fldChar[
+                                                         @w:fldCharType='begin'
+                                                       ][
+                                                         following::w:fldChar[
+                                                           @w:fldCharType = ('begin','end')
+                                                         ][1][
+                                                           self::w:fldChar[@w:fldCharType = 'end']
+                                                         ]
+                                                       ]
+                                                     ]
+                                                   ] 
+                                  and 
+                                  current-group()[last()][
+                                                    self::w:r[w:fldChar[@w:fldCharType='end']]
+                                                 ]">
+                    <xsl:variable name="prelim" as="node()*">
+                      <xsl:apply-templates select="(current-group()[w:instrText])[1]" mode="wml-to-dbk">
+                        <xsl:with-param name="instrText" select="string-join(current-group()//text()[parent::w:instrText], '')" tunnel="yes" as="xs:string?"/>
+                        <xsl:with-param name="nodes" select="current-group()[descendant::w:instrText]" tunnel="yes" as="element(*)*"/>
+                        <xsl:with-param name="text" select="current-group()[.//text()[parent::w:t] or .//w:tab or .//w:br or .//w:pict or .//dbk:*]" tunnel="yes" as="element(*)*"/>
+                      </xsl:apply-templates>
+                    </xsl:variable>
+                    <xsl:for-each select="$prelim">
+                      <xsl:choose>
+                        <xsl:when test="self::text()">
+                          <w:r>
+                            <!-- Not sure whether we can safely surround text output (SYMBOL field function processing output)
+                              with instrText. If we don't, SYMBOL within XE will be discarded -->
+                            <w:instrText>
+                              <xsl:sequence select="."/>
+                            </w:instrText>
+                          </w:r>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:sequence select="."/>
+                        </xsl:otherwise>
+                      </xsl:choose>  
+                    </xsl:for-each>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:copy-of select="current-group()"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:for-each-group>
             </xsl:for-each-group>
-          </xsl:for-each-group>
           </temp>
         </xsl:variable>
         <xsl:call-template name="handle-nested-field-functions">
-          <xsl:with-param name="nodes" select="$new-nodes/*/node()"/>
+          <xsl:with-param name="nodes" select="$new-nodes/node()"/>
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
