@@ -30,7 +30,7 @@
   <xsl:template match="*[w:p]" mode="docx2hub:apply-changemarkup">
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:for-each-group select="node()" 
+      <xsl:for-each-group select="*" 
         group-adjacent="docx2hub:is-merged-changemarkup-para(.) or 
                         preceding-sibling::*[1][docx2hub:is-merged-changemarkup-para(.)]">
         <xsl:choose>
