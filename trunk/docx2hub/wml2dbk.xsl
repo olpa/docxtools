@@ -54,6 +54,7 @@
 
 
   <!-- sorted includes -->
+  <xsl:include href="changemarkup.xsl"/>
   <xsl:include href="comments.xsl"/>
   <xsl:include href="endnotes.xsl"/>
   <xsl:include href="footnotes.xsl"/>
@@ -341,15 +342,6 @@
   <!-- ================================================================================ -->
   <!-- Mode: pre-process -->
   <!-- ================================================================================ -->
-
-  <!-- Verlauf -->
-  <xsl:template match="w:del" mode="docx2hub:separate-field-functions">
-    <!-- gelöschten Text wegwerfen -->
-  </xsl:template>
-
-  <xsl:template match="w:ins" mode="docx2hub:separate-field-functions">
-    <xsl:apply-templates select="*" mode="#current"/>
-  </xsl:template>
 
   <!-- Ende von Feldfunktionen ueber mehrere Absaetze in einzelnen Absatz packen -->
   <!-- Grund: wenn in dem gleichen Absatz eine neue Feldfunktion beginnt, liefert check-field-functions falsche Gruppen -->
