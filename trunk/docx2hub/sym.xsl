@@ -117,12 +117,6 @@
     </xsl:variable>
 
     <xsl:choose>
-      <xsl:when test="$text[self::text[@mapped eq 'true']]">
-        <phrase xmlns="http://docbook.org/ns/docbook" role="hub:ooxml-symbol"
-          srcpath="{(@srcpath, ancestor::*[@srcpath][1]/@srcpath)[1]}">
-          <xsl:sequence select="$text/node()"/>
-        </phrase>
-      </xsl:when>
       <xsl:when test="$text[self::text]">
         <xsl:sequence select="$text/node()"/>
       </xsl:when>
