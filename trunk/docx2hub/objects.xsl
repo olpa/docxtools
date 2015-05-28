@@ -42,6 +42,7 @@
     </xsl:variable>
     <xsl:element name="{$elt-name}">
       <xsl:attribute name="role" select="'hub:foreign'"/>
+      <xsl:copy-of select="parent::*/@srcpath"/>
       <xsl:apply-templates select="." mode="foreign"/>
     </xsl:element>
   </xsl:template>
