@@ -51,7 +51,10 @@
               'w:br',
               'v:imagedata',
               'o:OLEObject',
-              'w:drawing'
+              'w:drawing',
+              'w:comment',
+              'w:endnote',
+              'w:footnote'
             )"/>
 
   <xsl:template match="*[ $srcpaths = 'yes' ]
