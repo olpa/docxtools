@@ -39,6 +39,7 @@
 
   <xsl:template match="w:comment" mode="comment">
     <annotation>
+      <xsl:apply-templates select="@srcpath" mode="#current"/>
       <xsl:if test="@w:author | @w:date | @w:initials">
         <info>
           <xsl:if test="@w:author | @w:initials">
