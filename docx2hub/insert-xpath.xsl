@@ -169,8 +169,12 @@
               select="document($docRels-uri)/rel:Relationships/rel:Relationship[
                                   @Type eq concat('http://schemas.openxmlformats.org/officeDocument/2006/relationships/', $type)
                                 ]">
-              <xsl:if test="doc-available(resolve-uri(@Target))">
-                <xsl:apply-templates select="document(resolve-uri(@Target))" mode="#current"/>
+              <xsl:if test="doc-available(resolve-uri(document($docRels-uri)/rel:Relationships/rel:Relationship[
+                @Type eq concat('http://schemas.openxmlformats.org/officeDocument/2006/relationships/', $type)
+                ]/@Target, $base-dir))">
+                <xsl:apply-templates select="document(resolve-uri(document($docRels-uri)/rel:Relationships/rel:Relationship[
+                  @Type eq concat('http://schemas.openxmlformats.org/officeDocument/2006/relationships/', $type)
+                  ]/@Target, $base-dir))" mode="#current"/>
               </xsl:if>
             </xsl:for-each>
           </xsl:element>
