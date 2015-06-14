@@ -434,7 +434,6 @@
   <xsl:template match="  w:p/w:numPr 
                        | css:rule/w:numPr 
                        | *:style/w:numPr 
-                       | css:rule/w:tblPr 
                        | /*/w:numbering 
                        | /*/w:docRels
                        | /*/w:footnoteRels
@@ -446,6 +445,10 @@
                        | mc:AlternateContent
                        | w:fldChar" mode="wml-to-dbk" priority="-0.25"/>    
 
+  <xsl:template match="css:rule/w:tblPr" mode="wml-to-dbk">
+    <xsl:apply-templates select="@*" mode="#current"/>
+  </xsl:template>
+
   <xsl:template match="dbk:* | css:*" mode="wml-to-dbk" priority="-0.1">
      <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*" mode="#current" />
@@ -454,14 +457,38 @@
   </xsl:template>
 
   <xsl:template match="css:rule | *:style" mode="wml-to-dbk">
+    <xsl:param name="content" as="element(*)*">
+      <!-- linked-style, css:attic -->
+    </xsl:param>
     <xsl:copy copy-namespaces="no">
       <xsl:if test="w:numPr">
         <xsl:variable name="ilvl" select="w:numPr/w:ilvl/@w:val"/>
         <xsl:variable name="lvl-properties" select="key('abstract-numbering-by-id',key('numbering-by-id',w:numPr/w:numId/@w:val)/w:abstractNumId/@w:val)/w:lvl[@w:ilvl=$ilvl]"/>
         <xsl:apply-templates select="$lvl-properties/@* except $lvl-properties/@w:ilvl" mode="#current"/>
       </xsl:if>
-      <xsl:apply-templates select="@*, *" mode="#current" />
+      <xsl:apply-templates select="@*, *, $content" mode="#current" />
     </xsl:copy>   
+  </xsl:template>
+  
+  <xsl:template match="css:rule[w:tblPr[@*[contains(local-name(), 'inside')]]]" mode="wml-to-dbk">
+    <xsl:copy copy-namespaces="no">
+      <xsl:attribute name="layout-type" select="'cell'"/>
+      <xsl:attribute name="name" select="docx2hub:linked-cell-style-name(@name)"/>
+      <xsl:apply-templates select="w:tblPr/@*[contains(local-name(), 'inside')]" mode="#current">
+        <xsl:with-param name="is-first-cell" select="false()" tunnel="yes"/>
+        <xsl:with-param name="is-last-cell" select="false()" tunnel="yes"/>
+        <xsl:with-param name="is-first-row-in-group" select="false()" tunnel="yes"/>
+        <xsl:with-param name="is-last-row-in-group" select="false()" tunnel="yes"/>
+      </xsl:apply-templates>
+    </xsl:copy>
+    <!-- Cell style will be generated before processing the table style. Reason: table border properties
+      will have CSS-precedence over cell border properties. We just need to make sure that a table with 
+      no outer borders will explicitly override the cell style borders if they are present. --> 
+    <xsl:next-match>
+      <xsl:with-param name="content" as="element(dbk:linked-style)">
+        <linked-style xmlns="http://docbook.org/ns/docbook" layout-type="cell" name="{docx2hub:linked-cell-style-name(@name)}"/>
+      </xsl:with-param>
+    </xsl:next-match>
   </xsl:template>
 
   <xsl:template match="@srcpath" mode="wml-to-dbk">
