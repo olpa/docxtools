@@ -102,18 +102,22 @@
             <xsl:if test="matches($current-instr-from-nodes-text, '\\r')">
               <xsl:variable name="id" as="xs:string" 
                 select="letex:rereplace-chars(replace($current-instr-from-nodes-text, '^.*\\r\s*&quot;?\s*(.+?)\s*&quot;?\s*(\\.*$|$)', '$1'))"/>
-              <xsl:variable name="bookmark-start" as="element(w:bookmarkStart)" 
+              <xsl:variable name="bookmark-start" as="element(w:bookmarkStart)*" 
                 select="key('docx2hub:bookmarkStart-by-name', $id, root($context))"/>
-              <xsl:variable name="start-id" as="attribute(xml:id)">
-                <xsl:apply-templates select="$bookmark-start/@w:name" mode="bookmark-id"/>
-              </xsl:variable>
-              <xsl:variable name="end-id" as="attribute(xml:id)">
-                <xsl:apply-templates select="$bookmark-start/@w:name" mode="bookmark-id">
-                  <xsl:with-param name="end" select="true()"/>
-                </xsl:apply-templates>
-              </xsl:variable>
-              <xsl:attribute name="linkends" select="$start-id, $end-id" separator=" "/>
-              <!-- Create distinct startofrange/endofrange indexterms at the anchors specified by linkends in the next pass. -->
+              <xsl:choose>
+                <xsl:when test="exists($bookmark-start)">
+                  <xsl:variable name="start-id" as="attribute(xml:id)">
+                    <xsl:apply-templates select="$bookmark-start/@w:name" mode="bookmark-id"/>
+                  </xsl:variable>
+                  <xsl:variable name="end-id" as="attribute(xml:id)">
+                    <xsl:apply-templates select="$bookmark-start/@w:name" mode="bookmark-id">
+                      <xsl:with-param name="end" select="true()"/>
+                    </xsl:apply-templates>
+                  </xsl:variable>
+                  <xsl:attribute name="linkends" select="$start-id, $end-id" separator=" "/>
+                  <!-- Create distinct startofrange/endofrange indexterms at the anchors specified by linkends in the next pass. -->
+                </xsl:when>
+              </xsl:choose>
             </xsl:if>
             <xsl:if test="not(empty($type))">
               <xsl:attribute name="type" select="letex:rereplace-chars($type)"/>
