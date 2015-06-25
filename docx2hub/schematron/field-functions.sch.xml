@@ -23,6 +23,18 @@
     </rule>
   </pattern>
 
+  <pattern id="fnmarks">
+    <rule context="w:p[w:r/w:footnoteRef]">
+      <let name="marker-style" value="w:r[w:footnoteRef]/@role"/>
+      <assert test="count(w:r[@role = $marker-style]) le 1" role="warning" id="footnote_mark_style">
+        <span class="srcpath"><xsl:value-of select="concat($base-dir,@srcpath)"/></span>
+        Apparently more text than just the footnote marker has the footnote marker style, '<value-of select="$marker-style"/>'.
+        Text with this marker style: '<value-of select="string-join(w:r[@role = $marker-style], '')"/>'.
+        This text may be removed during conversion.
+      </assert>
+    </rule>
+  </pattern>
+
   <pattern id="docx_changes">
     <rule context="w:moveTo | w:ins | w:del">
       <report test="true()" role="error" id="change_markup" diagnostics="change_markup_de">
