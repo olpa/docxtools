@@ -8,7 +8,8 @@ endif
 
 MAKEFILEDIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
-CALABASH = $(MAKEFILEDIR)/calabash/calabash.sh
+HEAP=1024m
+CALABASH = $(MAKEFILEDIR)/calabash/calabash.sh HEAP=$(HEAP)
 UMASK	= umask 002
 DEBUG = no
 DEBUGDIR = debug
