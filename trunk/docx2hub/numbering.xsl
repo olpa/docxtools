@@ -89,7 +89,7 @@
                                         )/w:abstractNumId/@w:val,
                                         root($context)
                                       )/w:lvl[@w:ilvl = $numPr/w:ilvl/@w:val]
-                                 else //w:abstractNum[
+                                 else root($context)//w:abstractNum[
                                           w:styleLink/@w:val = key(
                                                                  'abstract-numbering-by-id', 
                                                                  key(
@@ -122,7 +122,7 @@
                                                   )/w:abstractNumId/@w:val,
                                                   root($context)
                                                 )/w:lvl[@w:ilvl = $style/w:ilvl/@w:val]
-                                           else //w:abstractNum[
+                                           else root($context)//w:abstractNum[
                                                     w:styleLink/@w:val = key(
                                                                            'abstract-numbering-by-id', 
                                                                            key(
@@ -132,7 +132,7 @@
                                                                            )/w:abstractNumId/@w:val,
                                                                            root($context)
                                                                          )/w:numStyleLink/@w:val
-                                                  ]/w:lvl[@w:ilvl = $numPr/w:ilvl/@w:val]
+                                                  ]/w:lvl[@w:ilvl = $style/w:ilvl/@w:val]
                                       else if ($context/@role and exists(key(
                                                                            'abstract-numbering-by-id', 
                                                                            key(
@@ -151,15 +151,37 @@
                                                   )/w:abstractNumId/@w:val,
                                                   root($context)
                                                 )/w:lvl[w:pStyle[@w:val = $context/@role]]
-                                           else key(
-                                                  'abstract-numbering-by-id', 
-                                                  key(
-                                                    'numbering-by-id', 
-                                                    $style/w:numId/@w:val, 
-                                                    root($context)
-                                                  )/w:abstractNumId/@w:val,
-                                                  root($context)
-                                                )/w:lvl[@w:ilvl = '0']
+                                                else if ($context/@role and exists(root($context)//w:abstractNum[
+                                                                                      w:styleLink/@w:val = key(
+                                                                                                             'abstract-numbering-by-id', 
+                                                                                                             key(
+                                                                                                               'numbering-by-id', 
+                                                                                                               $style/w:numId/@w:val, 
+                                                                                                               root($context)
+                                                                                                             )/w:abstractNumId/@w:val,
+                                                                                                             root($context)
+                                                                                                           )/w:numStyleLink/@w:val
+                                                                                     ]/w:lvl[w:pStyle[@w:val = $context/@role]]))
+                                                     then root($context)//w:abstractNum[
+                                                              w:styleLink/@w:val = key(
+                                                                                     'abstract-numbering-by-id', 
+                                                                                     key(
+                                                                                       'numbering-by-id', 
+                                                                                       $style/w:numId/@w:val, 
+                                                                                       root($context)
+                                                                                     )/w:abstractNumId/@w:val,
+                                                                                     root($context)
+                                                                                   )/w:numStyleLink/@w:val
+                                                            ]/w:lvl[w:pStyle[@w:val = $context/@role]]
+                                                     else key(
+                                                            'abstract-numbering-by-id', 
+                                                            key(
+                                                              'numbering-by-id', 
+                                                              $style/w:numId/@w:val, 
+                                                              root($context)
+                                                            )/w:abstractNumId/@w:val,
+                                                            root($context)
+                                                          )/w:lvl[@w:ilvl = '0']
                                 else ()"/>
     </xsl:for-each>  
     </xsl:variable>
