@@ -62,7 +62,8 @@
   <xsl:function name="letex:get-lvl-of-numbering" as="element(w:lvl)?">
     <xsl:param name="context" as="node()"/>
     <!-- for-each: just to avoid an XTDE1270 which shouldn't happen when the 3-arg form of key() is invoked: -->
-    <xsl:for-each select="$context">
+    <xsl:variable name="lvls" as="element(w:lvl)*">
+      <xsl:for-each select="$context">
       <xsl:variable name="numPr" select="if ($context/w:numPr) 
                                          then $context/w:numPr 
                                          else ()"/>
@@ -160,7 +161,10 @@
                                                   root($context)
                                                 )/w:lvl[@w:ilvl = '0']
                                 else ()"/>
-    </xsl:for-each> 
+    </xsl:for-each>  
+    </xsl:variable>
+    <xsl:sequence select="$lvls[last()]"/>
+    <!--    Only last lvl chosen, because of errors. Check for multiple lvls has to be implemented   -->
   </xsl:function>
   
   <xsl:function name="letex:get-lvl-override" as="element(*)?">
