@@ -70,6 +70,14 @@
     <xsl:param name="el" as="element()"/>
     <xsl:sequence 
       select="exists($el/self::w:p[
+                       w:pPr[w:rPr[w:ins]] or
+                       w:ins[
+                         every $r in descendant::* satisfies 
+                         name($r) = ('w:r', 'w:rPr', 'w:bookmarkStart', 'w:bookmarkEnd')
+                       ]
+                     ][
+                       not(w:pPr/w:pPrChange)
+                     ][
                        every $e in * satisfies $e[
                          self::w:pPr[w:rPr[w:ins]] or
                          self::w:ins[
