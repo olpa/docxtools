@@ -298,7 +298,7 @@
           </temp></xsl:document>
         </xsl:variable>
         <xsl:call-template name="handle-nested-field-functions">
-          <xsl:with-param name="nodes" select="$new-nodes/node()"/>
+          <xsl:with-param name="nodes" select="$new-nodes/*/node()"/>
         </xsl:call-template>
       </xsl:otherwise>
     </xsl:choose>
