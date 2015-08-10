@@ -244,8 +244,8 @@
         <xsl:copy-of select="$nodes"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:variable name="new-nodes" as="element(dbk:temp)">
-          <temp>
+        <xsl:variable name="new-nodes" as="document-node(element(dbk:temp))">
+          <xsl:document><temp>
             <xsl:for-each-group select="$nodes" group-starting-with="w:r[w:fldChar[@w:fldCharType='begin'][following::w:fldChar[@w:fldCharType = ('begin','end')][1][self::w:fldChar[@w:fldCharType = 'end']]]]">
               <xsl:for-each-group select="current-group()" group-ending-with="w:r[w:fldChar[@w:fldCharType='end']]">
                 <xsl:choose>
@@ -295,7 +295,7 @@
                 </xsl:choose>
               </xsl:for-each-group>
             </xsl:for-each-group>
-          </temp>
+          </temp></xsl:document>
         </xsl:variable>
         <xsl:call-template name="handle-nested-field-functions">
           <xsl:with-param name="nodes" select="$new-nodes/node()"/>
