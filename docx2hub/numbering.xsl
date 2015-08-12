@@ -182,7 +182,7 @@
                                                             )/w:abstractNumId/@w:val,
                                                             root($context)
                                                           )/w:lvl[@w:ilvl = '0']
-                                else ()"/>
+                                 else ()"/>
     </xsl:for-each>  
     </xsl:variable>
     <xsl:sequence select="$lvls[last()]"/>
