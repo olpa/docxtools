@@ -880,6 +880,8 @@
     </tab>
   </xsl:template>
 
+  <xsl:template match="w:tabs/w:tab[@w:val eq 'clear']" mode="docx2hub:add-props" priority="3"/>
+
 
   <xsl:key name="docx2hub:style" 
     match="CellStyle | CharacterStyle | ObjectStyle | ParagraphStyle | TableStyle" 
