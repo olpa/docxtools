@@ -101,7 +101,7 @@
         </alt>
       </xsl:if>
       <xsl:call-template name="create-imageobject">
-        <xsl:with-param name="image-id" select="(@r:id, @rel:id)[1]"/>
+        <xsl:with-param name="image-id" select="(@r:href, @rel:href, @r:id, @rel:id)[1]"/>
       </xsl:call-template>
     </xsl:element>
   </xsl:template>
