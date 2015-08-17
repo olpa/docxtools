@@ -240,6 +240,9 @@
   <xsl:template name="handle-nested-field-functions">
     <xsl:param name="nodes" as="element()*"/>
     <xsl:choose>
+      <xsl:when test="not($nodes/w:fldChar[@w:fldCharType='begin']) and $nodes//w:instrText and matches(string-join($nodes//w:instrText//text(),''),'^[A-Z\.]*[0-9]*$')">
+        <xsl:copy-of select="$nodes//w:instrText/text()"/>
+      </xsl:when>
       <xsl:when test="not($nodes/w:fldChar[@w:fldCharType='begin'])">
         <xsl:copy-of select="$nodes"/>
       </xsl:when>
