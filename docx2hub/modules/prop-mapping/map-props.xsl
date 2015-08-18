@@ -28,6 +28,7 @@
 
   <xsl:key name="docx2hub:style" match="w:style" use="@w:styleId" />
   <xsl:key name="docx2hub:style-by-role" match="css:rule | dbk:style" use="if ($hub-version eq '1.0') then @role else @name" />
+  <xsl:key name="docx2hub:font-by-name" match="w:font[@w:name]" use="@w:name"/> 
 
   <xsl:template match="/" mode="docx2hub:add-props">
     <xsl:apply-templates select="w:root/w:document/w:body" mode="#current" />
@@ -498,7 +499,12 @@
 
       <xsl:when test=". eq 'docx-font-family'">
         <xsl:if test="$val/@w:ascii or $val/@w:cs">
-          <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="$val/(@w:ascii, @w:cs)[1]" /></docx2hub:attribute>
+          <xsl:variable name="font-name" select="($val/@w:ascii, $val/@w:cs)[1]" as="xs:string"/>
+          <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="$font-name"/></docx2hub:attribute>
+          <xsl:variable name="charset" as="xs:string?" select="key('docx2hub:font-by-name', $font-name, root($val))/w:charset/@w:val"/>
+          <xsl:if test="exists($charset) and not($charset = '00')">
+            <docx2hub:attribute name="docx2hub:map-from"><xsl:value-of select="$font-name"/></docx2hub:attribute>
+          </xsl:if>
         </xsl:if>
       </xsl:when>
 

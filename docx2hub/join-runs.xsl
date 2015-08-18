@@ -24,6 +24,8 @@
   exclude-result-prefixes = "w o v wx xs dbk pkg r rel word200x exsl saxon fn letex mml docx2hub"
 >
 
+  <!--<xsl:import href="http://transpect.le-tex.de/xslt-util/hex/hex.xsl"/>-->
+
   <!-- w:r is here for historic reasons. We used to group the text runs
        prematurely until we found out that it is better to group when
        there's docbook markup. So we implemented the special case of
@@ -126,6 +128,31 @@
     <xsl:variable name="target-font" as="xs:string?" select="docx2hub:font-map(.)/symbols/symbol[@char = current()/..][1]/@font"/>
     <xsl:attribute name="{name()}" select="if ($target-font) then $target-font else $docx2hub:symbol-replacement-rfonts/@w:ascii"/>
   </xsl:template>
+  
+  <xsl:template match="@css:font-family" mode="docx2hub:join-runs" priority="2">
+    <xsl:variable name="transformed" as="attribute(css:font-family)">
+      <xsl:next-match/>
+    </xsl:variable>
+    <xsl:variable name="role" as="attribute(role)?">
+      <xsl:sequence select="../@role" />
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$transformed = . and ../@docx2hub:map-from = ."><!-- no mapping took place, although it should have -->
+        <xsl:attribute name="role" select="string-join(distinct-values((tokenize($role, '\s+'), 'hub:ooxml-symbol')), ' ')"/>
+        <xsl:attribute name="annotations" 
+          select="string-join(for $i in string-to-codepoints(..) return letex:dec-to-hex($i), ' ')"/>
+      </xsl:when>
+      <xsl:when test="$role">
+        <xsl:attribute name="role" select="$role"/>
+      </xsl:when>
+    </xsl:choose>
+    <xsl:sequence select="$transformed"/>
+  </xsl:template>
+  
+  <xsl:template match="@role[../@css:font-family]" mode="docx2hub:join-runs" priority="2"/>
+    
+  <xsl:template match="@docx2hub:map-from" mode="docx2hub:join-runs"/>
+
 
   <xsl:template match="dbk:para" mode="docx2hub:join-runs">
     <xsl:call-template name="docx2hub_move-invalid-sidebar-elements"/>
@@ -184,8 +211,10 @@
     <xsl:param name="elt" as="node()*" />
     <xsl:perform-sort>
       <xsl:sort/>
-      <xsl:sequence select="for $a in ($elt/@* except ($elt/@letex:processed, $elt/@srcpath)) return letex:attr-hash($a)" />
+      <xsl:sequence select="for $a in ($elt/@* except ($elt/@letex:processed, $elt/@srcpath, $elt/@docx2hub:map-from)) 
+                            return letex:attr-hash($a)" />
     </xsl:perform-sort>
+    <xsl:sequence select="$elt[@docx2hub:map-from[. = $elt/@css:font-family]]/generate-id()"/>
   </xsl:function>
 
   <xsl:function name="letex:attr-hash" as="xs:string">
