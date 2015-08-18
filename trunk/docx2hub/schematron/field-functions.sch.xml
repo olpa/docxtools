@@ -62,7 +62,8 @@
         All table rows are marked as table header, found no body rows. The docx converter moves all table header rows to table body, otherwise the resulting XML would be invalid.</report>
     </rule>
   </pattern>
-  
+
+
   <diagnostics>
     <diagnostic id="instrText_de" xml:lang="de">Feldfunktion!</diagnostic>
     <diagnostic id="change_markup_de" xml:lang="de">Der docx-Konverter kann nicht richtig mit Änderungs-Markup wie '<value-of 

@@ -134,7 +134,7 @@
         </xsl:call-template>
         <xsl:for-each select="$text">
           <xsl:copy>
-            <xsl:copy-of select="@*"/>
+            <xsl:copy-of select="@* except @docx2hub:map-to"/>
             <xsl:value-of select="."/>
           </xsl:copy>
         </xsl:for-each>
@@ -241,5 +241,6 @@
                             substring('0123456789abcdef', ($in mod 16) + 1, 1)
                           )"/>
   </xsl:function>
+
 
 </xsl:stylesheet>
