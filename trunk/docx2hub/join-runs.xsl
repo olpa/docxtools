@@ -47,7 +47,7 @@
           </xsl:when>
           <xsl:otherwise>
             <xsl:copy copy-namespaces="no">
-              <xsl:apply-templates select="@* except @srcpath" mode="#current"/>
+              <xsl:apply-templates select="@role, @* except (@srcpath, @role)" mode="#current"/>
               <xsl:if test="$srcpaths = 'yes'">
                 <xsl:attribute name="srcpath" select="current-group()/@srcpath" separator=" "/>
               </xsl:if>
@@ -57,6 +57,12 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:for-each-group>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="*" mode="docx2hub:join-runs">
+    <xsl:copy copy-namespaces="no">
+      <xsl:apply-templates select="@role, @* except @role, node()" mode="#current"/>
     </xsl:copy>
   </xsl:template>
 
@@ -134,7 +140,7 @@
       <xsl:next-match/>
     </xsl:variable>
     <xsl:variable name="role" as="attribute(role)?">
-      <xsl:sequence select="../@role" />
+      <xsl:apply-templates select="../@role" mode="#current"/>
     </xsl:variable>
     <xsl:choose>
       <xsl:when test="$transformed = . and ../@docx2hub:map-from = ."><!-- no mapping took place, although it should have -->
@@ -149,8 +155,6 @@
     <xsl:sequence select="$transformed"/>
   </xsl:template>
   
-  <xsl:template match="@role[../@css:font-family]" mode="docx2hub:join-runs" priority="2"/>
-    
   <xsl:template match="@docx2hub:map-from" mode="docx2hub:join-runs"/>
 
 
