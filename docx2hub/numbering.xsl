@@ -31,16 +31,21 @@
             </xsl:with-param>
           </xsl:call-template>
         </xsl:if>
-        <xsl:apply-templates mode="numbering"
-          select="$lvl/w:pPr/@*[letex:different-style-att(., $context)]">
-          <xsl:with-param name="context" select="$context" tunnel="yes"/>
-        </xsl:apply-templates>
-        <xsl:apply-templates select="$context/dbk:tabs" mode="wml-to-dbk"/>
-        <phrase role="hub:identifier">
-          <xsl:apply-templates mode="numbering"
-            select="$lvl/w:rPr/@*[letex:different-style-att(., $context)]" >
+        <xsl:variable name="context-atts" select="key('style-by-name', $context/@role, $context/root())/@* | $context/@*" as="attribute(*)*"/>
+        <xsl:variable name="pPr" as="attribute(*)*">
+          <xsl:apply-templates mode="numbering" select="$lvl/w:pPr/@*">
             <xsl:with-param name="context" select="$context" tunnel="yes"/>
           </xsl:apply-templates>
+        </xsl:variable>
+        <xsl:variable name="rPr" as="attribute(*)*">
+          <xsl:apply-templates mode="numbering" select="$lvl/w:rPr/@*">
+            <xsl:with-param name="context" select="$context" tunnel="yes"/>
+          </xsl:apply-templates>
+        </xsl:variable>
+        <xsl:sequence select="$pPr, $context-atts[name() = $pPr/name()]"/>
+        <xsl:apply-templates select="$context/dbk:tabs" mode="wml-to-dbk"/>
+        <phrase role="hub:identifier">
+          <xsl:sequence select="$rPr, $context-atts[name() = $rPr/name()]"/>
           <xsl:value-of select="letex:get-identifier($context,$lvl)"/>
         </phrase>
         <tab/>
@@ -50,13 +55,6 @@
         <xsl:apply-templates select="$context/dbk:tabs" mode="wml-to-dbk"/>
       </xsl:otherwise>
     </xsl:choose>
-  </xsl:function>
-
-  <xsl:function name="letex:different-style-att" as="xs:boolean">
-    <xsl:param name="att" as="attribute(*)"/>
-    <xsl:param name="context" as="element(*)"/>
-    <xsl:variable name="context-atts" select="key('style-by-name', $context/@role, $att/root())/@* | $context/@*" as="attribute(*)*"/>
-    <xsl:sequence select="not(some $a in $context-atts satisfies ($a/name() = $att/name() and string($a) = string($att)))"/>
   </xsl:function>
 
   <xsl:function name="letex:get-lvl-of-numbering" as="element(w:lvl)?">
