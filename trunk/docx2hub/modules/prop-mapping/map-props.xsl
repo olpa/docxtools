@@ -235,6 +235,22 @@
   <xsl:template match="w:rPr[not(ancestor::m:oMath)] | w:pPr" mode="docx2hub:add-props" priority="2">
     <xsl:apply-templates select="*" mode="#current" />
   </xsl:template>
+  
+  <xsl:template match="w:style/w:pPr[w:numPr[w:ilvl]]" mode="docx2hub:add-props" priority="3">
+    <xsl:variable name="numPr" as="element(w:numPr)" select="w:numPr"/>
+    <xsl:variable name="lvl" as="element(w:lvl)" select="key(
+                                                           'abstract-numbering-by-id', 
+                                                           key(
+                                                             'numbering-by-id', 
+                                                             $numPr/w:numId/@w:val 
+                                                           )/w:abstractNumId/@w:val
+                                                         )/w:lvl[@w:ilvl = $numPr/w:ilvl/@w:val]"/>
+    <xsl:variable name="props" as="item()*">
+      <xsl:apply-templates select="$lvl/w:pPr" mode="#current"/>
+    </xsl:variable>
+    <xsl:sequence select="$props/docx2hub:attribute"/>
+    <xsl:next-match/>
+  </xsl:template>
 
   <xsl:template match="w:lvl/w:rPr | w:lvl/w:pPr" mode="docx2hub:add-props" priority="3">
     <xsl:copy copy-namespaces="no">
