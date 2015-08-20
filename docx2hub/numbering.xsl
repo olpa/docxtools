@@ -13,6 +13,55 @@
   exclude-result-prefixes = "w xs dbk letex docx2hub"
   >
 
+  <!-- This mode is called from docx2hub:remove-redundant-run-atts as a collateral -->
+
+  <xsl:template match="w:numPr" mode="docx2hub:abstractNum">
+    <xsl:apply-templates select="w:numId[@w:val]" mode="#current">
+      <xsl:with-param name="ilvl" select="(w:ilvl/@w:val, 0)[1]"/>
+    </xsl:apply-templates>
+  </xsl:template>
+  
+  <xsl:template match="w:numId" mode="docx2hub:abstractNum">
+    <xsl:param name="ilvl" as="xs:integer"/>
+    <xsl:variable name="lvl" as="element(w:lvl)" select="key(
+                                                           'abstract-numbering-by-id', 
+                                                           key(
+                                                             'numbering-by-id', 
+                                                             @w:val 
+                                                           )/w:abstractNumId/@w:val
+                                                         )/w:lvl[@w:ilvl = $ilvl]"/>
+    <xsl:variable name="lvlOverride" as="element(w:lvlOverride)?"
+      select="key(
+                'numbering-by-id', 
+                @w:val 
+              )/w:lvlOverride[@w:ilvl = $ilvl]"/>
+    <xsl:apply-templates select="$lvl" mode="#current">
+      <xsl:with-param name="start-override" select="for $so in $lvlOverride/w:startOverride/@w:val
+                                                    return xs:integer($so)"/>
+    </xsl:apply-templates>    
+  </xsl:template>
+  
+  <xsl:template match="w:lvl" mode="docx2hub:abstractNum">
+    <xsl:param name="start-override" as="xs:integer?"></xsl:param>
+    <xsl:variable name="restart" as="xs:boolean" select="if (exists(w:lvlRestart)) 
+                                                         then if (w:lvlRestart/@w:val = '0') 
+                                                           then false() 
+                                                           else true() 
+                                                         else true()"/>
+    <xsl:if test="$restart">
+      <xsl:attribute name="docx2hub:num-restart" select="string-join((../@w:abstractNumId, @w:ilvl), '_')"/>
+      <xsl:attribute name="docx2hub:num-restart-val" 
+        select="($start-override, for $s in w:start/@w:val return xs:integer($s), 1)[1]"/>
+    </xsl:if>
+  </xsl:template>
+  
+  <!-- collateral (only the first in a row should trigger a reset) -->
+  <xsl:template match="@docx2hub:num-restart[../preceding-sibling::*[1]/@docx2hub:num-restart = current()]"
+    mode="docx2hub:join-instrText-runs">
+    <xsl:attribute name="docx2hub:num-continue" select="."/>
+  </xsl:template>
+
+
   <xsl:function name="letex:insert-numbering" as="item()*">
     <xsl:param name="context" as="element(w:p)"/>
     
@@ -208,7 +257,9 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:function>
-  
+
+  <xsl:key name="docx2hub:num-restart" match="*[@docx2hub:num-restart]" use="@docx2hub:num-restart"/>
+
   <xsl:function name="letex:get-identifier" as="xs:string">
     <xsl:param name="context" as="element(w:p)"/>
     <xsl:param name="lvl" as="element(w:lvl)"/>
@@ -218,105 +269,28 @@
                                             then letex:get-lvl-override($context)/w:lvl 
                                             else $lvl"/>
     <xsl:variable name="ilvl" select="xs:double($lvl-to-use/@w:ilvl)"/>
-    
-    <xsl:variable name="context-relevant" 
-                  select="if (matches($context/@role,'List')) 
-                          then $context/preceding-sibling::w:p
-      [
-        (
-          exists(letex:get-lvl-of-numbering(.)) 
-            and 
-          $abstract-num-id = xs:double(letex:get-lvl-of-numbering(.)/ancestor::w:abstractNum/@w:abstractNumId)
-        ) 
-          or
-        (
-          not(exists(letex:get-lvl-of-numbering(.))) 
-            and 
-          (
-            not(w:numPr) 
-              or
-            (
-              w:numPr[w:ilvl/@w:val='0' and w:numId/@w:val='0']
-                and
-              matches(@role,'List')   
-            )
-          )
-        ) 
-          or
-        (
-          exists(letex:get-lvl-of-numbering(.)) 
-            and 
-          not($abstract-num-id = xs:double(letex:get-lvl-of-numbering(.)/ancestor::w:abstractNum/@w:abstractNumId)) 
-            and
-          (some $i 
-           in ((xs:string(./@role), xs:string(letex:get-lvl-of-numbering(.)/ancestor::w:abstractNum/w:lvl[@w:ilvl=$ilvl]/w:pStyle/@w:val))) 
-           satisfies (($i = xs:string($context/@role)) or ($i=$lvl/ancestor::w:abstractNum/w:lvl[@w:ilvl=$ilvl or @w:ilvl=$ilvl -1 or @w:ilvl=$ilvl+1]/w:pStyle/@w:val))) 
-            and 
-          (letex:get-lvl-of-numbering(.)/@w:ilvl=$ilvl+1 or letex:get-lvl-of-numbering(.)/@w:ilvl=$ilvl -1)
-        )
-          or 
-        (
-          exists(letex:get-lvl-of-numbering(.))
-            and
-          not($abstract-num-id = xs:double(letex:get-lvl-of-numbering(.)/ancestor::w:abstractNum/@w:abstractNumId))
-            and 
-          (letex:get-lvl-of-numbering(.)/@w:ilvl=$ilvl+1 or letex:get-lvl-of-numbering(.)/@w:ilvl=$ilvl -1)
-            and
-          not(matches(letex:get-lvl-of-numbering(.)/w:lvlText/@w:val,'%[0-9]+'))
-        )
-      ]
-      [ 
-        not(following-sibling::w:p
-          [ . &lt;&lt; $context ]
-          [ 
-            not( 
-              (
-                exists(letex:get-lvl-of-numbering(.)) 
-                  and 
-                $abstract-num-id = xs:double(letex:get-lvl-of-numbering(.)/ancestor::w:abstractNum/@w:abstractNumId)
-              ) 
-                or
-              (
-                not(exists(letex:get-lvl-of-numbering(.))) 
-                  and 
+
+    <xsl:variable name="start-of-relevant" as="element(w:p)"
+      select="if ($context/@docx2hub:num-restart)
+              then $context
+              else
                 (
-                  not(w:numPr) 
-                    or
-                  (
-                    w:numPr[w:ilvl/@w:val='0' and w:numId/@w:val='0']
-                      and
-                    matches(@role,'List')   
-                  )
-                )
-              ) 
-                or
-              (
-                exists(letex:get-lvl-of-numbering(.)) 
-                  and 
-                not($abstract-num-id = xs:double(letex:get-lvl-of-numbering(.)/ancestor::w:abstractNum/@w:abstractNumId)) 
-                  and
-                (some $i 
-                 in ((xs:string(./@role), xs:string(letex:get-lvl-of-numbering(.)/ancestor::w:abstractNum/w:lvl[@w:ilvl=$ilvl]/w:pStyle/@w:val))) 
-                 satisfies (($i = xs:string($context/@role)) or ($i=$lvl/ancestor::w:abstractNum/w:lvl[@w:ilvl=$ilvl or @w:ilvl=$ilvl -1 or @w:ilvl=$ilvl+1]/w:pStyle/@w:val))) 
-                  and 
-                (letex:get-lvl-of-numbering(.)/@w:ilvl=$ilvl+1 or letex:get-lvl-of-numbering(.)/@w:ilvl=$ilvl -1)
-              )
-                or 
-              (
-                exists(letex:get-lvl-of-numbering(.))
-                  and
-                not($abstract-num-id = xs:double(letex:get-lvl-of-numbering(.)/ancestor::w:abstractNum/@w:abstractNumId))
-                  and 
-                (letex:get-lvl-of-numbering(.)/@w:ilvl=$ilvl+1 or letex:get-lvl-of-numbering(.)/@w:ilvl=$ilvl -1)
-                  and
-                not(matches(letex:get-lvl-of-numbering(.)/w:lvlText/@w:val,'%[0-9]+'))
-              )
-            ) 
-          ] 
-        ) 
-      ] 
-                          else $context/preceding-sibling::w:p[letex:get-lvl-of-numbering(.)/ancestor::w:abstractNum/@w:abstractNumId=$abstract-num-id]" 
-                  as="element(w:p)*"/>
+                  key(
+                    'docx2hub:num-restart', 
+                    ($context/@docx2hub:num-restart, $context/@docx2hub:num-continue), 
+                    root($context)
+                  )[. &lt;&lt; $context]
+                )[last()]"/>
+    
+    <xsl:variable name="context-relevant" as="element(w:p)+" 
+      select="$start-of-relevant | $context/preceding-sibling::w:p[. &gt;&gt; $start-of-relevant] | $context"/>
+    
+    <xsl:variable name="level-counter" as="xs:integer" 
+      select="xs:integer($start-of-relevant/@docx2hub:num-restart-val) 
+              + count($context/preceding-sibling::w:p[. &gt;&gt; $start-of-relevant]
+                                                     [@docx2hub:num-continue = $start-of-relevant/@docx2hub:num-restart])
+              + count($context[not(. is $start-of-relevant)])"/>
+    
     <xsl:variable name="resolve-symbol-encoding">
       <element>
         <xsl:apply-templates select="$lvl-to-use/w:lvlText/@w:val" mode="wml-to-dbk"/>
@@ -327,15 +301,6 @@
         <xsl:when test="$resolve-symbol-encoding//@w:val">
           <xsl:analyze-string select="$lvl-to-use/w:lvlText/@w:val" regex="%([0-9])">
             <xsl:matching-substring>
-              <xsl:variable name="level-counter" select="letex:get-level-counter(
-                                                           $context-relevant,
-                                                           $lvl-to-use,
-                                                           xs:double(regex-group(1))-1,
-                                                           if (exists(letex:get-lvl-override($context)/w:startOverride)) 
-                                                           then letex:get-lvl-override($context)/w:startOverride/@w:val 
-                                                           else if ($lvl-to-use/w:start/@w:val) 
-                                                                then $lvl-to-use/w:start/@w:val 
-                                                                else 1)"/>
               <xsl:number value="if (xs:double(regex-group(1)) gt $ilvl) 
                                  then $level-counter 
                                  else $level-counter - 1"
@@ -354,28 +319,6 @@
     <xsl:value-of select="string-join($string,'')"/>
   </xsl:function>
   
-  <xsl:function name="letex:get-level-counter" as="xs:double">
-    <xsl:param name="context-relevant" as="element(w:p)*"/>
-    <xsl:param name="lvl" as="element(w:lvl)"/>
-    <xsl:param name="ilvl" as="xs:double"/>
-    <xsl:param name="start" as="xs:double"/>
-    
-    <xsl:variable name="restart-point" select="if (exists($context-relevant[letex:get-lvl-of-numbering(.)/@w:ilvl &lt; $ilvl][last()])) 
-                                               then $context-relevant[letex:get-lvl-of-numbering(.)/@w:ilvl &lt; $ilvl][last()] 
-                                               else ()"/>
-    <xsl:variable name="restart" select="if (exists($lvl/w:lvlRestart)) 
-                                         then if ($lvl/w:lvlRestart = '0') 
-                                              then false() 
-                                              else true() 
-                                         else true()"/>
-    <xsl:variable name="count-precedings" select="(if (exists($restart-point) and $restart) 
-                                                   then count($context-relevant[. &gt;&gt; $restart-point][letex:get-lvl-of-numbering(.)/@w:ilvl = $ilvl]) 
-                                                   else count($context-relevant[letex:get-lvl-of-numbering(.)/@w:ilvl = $ilvl])) 
-                                                  + $start"/>
-    
-    <xsl:value-of select="$count-precedings"/>
-  </xsl:function>
-
   <xsl:function name="letex:get-numbering-format" as="xs:string">
     <xsl:param name="format" as="xs:string"/>
     <xsl:param name="default" as="xs:string?"/>

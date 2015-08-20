@@ -248,10 +248,10 @@
     <xsl:variable name="props" as="item()*">
       <xsl:apply-templates select="$lvl/w:pPr" mode="#current"/>
     </xsl:variable>
-    <xsl:sequence select="$props/docx2hub:attribute"/>
+    <xsl:sequence select="$props//docx2hub:attribute"/>
     <xsl:next-match/>
   </xsl:template>
-
+  
   <xsl:template match="w:lvl/w:rPr | w:lvl/w:pPr" mode="docx2hub:add-props" priority="3">
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="*" mode="#current" />
@@ -1056,7 +1056,15 @@
                           /@*[matches(name(), '^(css:|xml:lang)')]" mode="docx2hub:remove-redundant-run-atts" 
                 priority="10"/>
   
-
+  <!-- collateral: denote numbering resets -->
+  <xsl:template match="w:p" mode="docx2hub:remove-redundant-run-atts">
+    <xsl:copy copy-namespaces="no">
+      <xsl:apply-templates select="@*" mode="#current"/>
+      <xsl:apply-templates select="(key('docx2hub:style-by-role', @role), .)/w:numPr" mode="docx2hub:abstractNum"/>  
+      <xsl:apply-templates mode="#current"/>
+    </xsl:copy>
+  </xsl:template>
+  
 
   <xsl:template match="*[w:p[w:pgSz]]" mode="docx2hub:remove-redundant-run-atts">
     <xsl:copy>
