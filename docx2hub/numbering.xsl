@@ -270,7 +270,7 @@
                                             else $lvl"/>
     <xsl:variable name="ilvl" select="xs:double($lvl-to-use/@w:ilvl)"/>
 
-    <xsl:variable name="start-of-relevant" as="element(w:p)"
+    <xsl:variable name="start-of-relevant" as="element(w:p)?"
       select="if ($context/@docx2hub:num-restart)
               then $context
               else
@@ -282,11 +282,8 @@
                   )[. &lt;&lt; $context]
                 )[last()]"/>
     
-    <xsl:variable name="context-relevant" as="element(w:p)+" 
-      select="$start-of-relevant | $context/preceding-sibling::w:p[. &gt;&gt; $start-of-relevant] | $context"/>
-    
     <xsl:variable name="level-counter" as="xs:integer" 
-      select="xs:integer($start-of-relevant/@docx2hub:num-restart-val) 
+      select="(for $s in $start-of-relevant/@docx2hub:num-restart-val return xs:integer($s), 1)[1] 
               + count($context/preceding-sibling::w:p[. &gt;&gt; $start-of-relevant]
                                                      [@docx2hub:num-continue = $start-of-relevant/@docx2hub:num-restart])
               + count($context[not(. is $start-of-relevant)])"/>
@@ -344,5 +341,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:function>
+  
+  <xsl:template match="@docx2hub:num-restart | @docx2hub:num-continue | @docx2hub:num-restart-val" mode="docx2hub:join-runs"/>
   
 </xsl:stylesheet>
