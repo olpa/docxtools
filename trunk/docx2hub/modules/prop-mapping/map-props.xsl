@@ -180,7 +180,11 @@
         <xsl:apply-templates select="* except w:basedOn" mode="#current" />
       </xsl:variable>
       <xsl:for-each-group select="$mergeable-atts[self::docx2hub:attribute]" group-by="@name">
-        <docx2hub:attribute name="{current-grouping-key()}"><xsl:value-of select="current-group()[last()]" /></docx2hub:attribute>
+        <docx2hub:attribute name="{current-grouping-key()}">
+          <xsl:value-of select="if (matches(current-grouping-key(), '^css:(margin|text-indent)'))
+                                then current-group()[last()]
+                                else current-group()"/>
+        </docx2hub:attribute>
       </xsl:for-each-group>
       <xsl:sequence select="$mergeable-atts[self::*][not(self::docx2hub:attribute)]"/>
     </xsl:variable>
