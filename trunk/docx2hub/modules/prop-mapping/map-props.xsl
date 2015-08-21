@@ -265,7 +265,7 @@
   
   <xsl:template match="w:style/w:pPr[w:numPr]" mode="docx2hub:add-props" priority="3">
     <xsl:variable name="based-on-chain" as="document-node()" select="docx2hub:based-on-chain(..)"/>
-    <xsl:variable name="numId" as="element(w:numId)" select="$based-on-chain/*[w:pPr/w:numPr/w:numId][1]/w:pPr/w:numPr/w:numId"/>
+    <xsl:variable name="numId" as="element(w:numId)?" select="$based-on-chain/*[w:pPr/w:numPr/w:numId][1]/w:pPr/w:numPr/w:numId"/>
     <xsl:variable name="ilvl" as="xs:integer" 
       select="(
                 for $i in $based-on-chain/*[w:pPr/w:numPr/w:ilvl][1]/w:pPr/w:numPr/w:ilvl/@w:val return xs:integer($i),

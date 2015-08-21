@@ -74,25 +74,39 @@
   </xsl:template>
 
   <xsl:template match="@docx2hub:num-signature" mode="docx2hub:join-instrText-runs">
+    <xsl:variable name="context" as="element(w:p)" select=".."/>
     <xsl:variable name="last-same-signature" as="element(w:p)?" 
-      select="(key('docx2hub:num-signature', current())[. &lt;&lt; current()/..])[last()]"/>
+      select="(key('docx2hub:num-signature', current())[. &lt;&lt; $context])[last()]"/>
     <xsl:variable name="in-between" as="element(w:p)*"
-      select="//w:p[. &gt;&gt; $last-same-signature][. &lt;&lt; current()/..]"/>
+      select="//w:p[if ($last-same-signature) 
+                    then (. &gt;&gt; $last-same-signature)
+                    else true()]
+                   [. &lt;&lt; current()/..]"/>
+    <xsl:variable name="same-abstract-in-between" as="element(w:p)*" 
+      select="$in-between[@docx2hub:num-abstract = $context/@docx2hub:num-abstract]"/>
+    <xsl:variable name="super-level-before" as="xs:boolean"
+      select="some $p in $same-abstract-in-between satisfies 
+              $p/@docx2hub:num-ilvl &lt; $context/@docx2hub:num-ilvl"/>
     <xsl:choose>
       <xsl:when test="empty ($last-same-signature)
                       or 
-                      (
-                        some $p in $in-between satisfies 
-                        $p/@docx2hub:ilvl &lt; current()/../@docx2hub:ilvl
-                      )">
+                      $super-level-before">
         <xsl:copy/>
+        <xsl:attribute name="docx2hub:num-restart-level" select="0"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:attribute name="docx2hub:num-continue" select="."/>
       </xsl:otherwise>
     </xsl:choose>
+    <xsl:if test="empty($last-same-signature)">
+      <!-- special case: sub levels of the same abstract def are before context; implicitly increase starting value by 1 
+      So that it’s 1.1.1 instead of 0.0.1 if heading 3 is the first heading -->
+      <xsl:if test="some $p in $same-abstract-in-between satisfies 
+                    $p/@docx2hub:num-ilvl &gt; $context/@docx2hub:num-ilvl">
+        <xsl:attribute name="docx2hub:num-initial-skip-increment" select="'1'"/>
+      </xsl:if>
+    </xsl:if>  
   </xsl:template>
-
 
   <xsl:function name="letex:insert-numbering" as="item()*">
     <xsl:param name="context" as="element(w:p)"/>
@@ -140,6 +154,8 @@
 
   <xsl:function name="letex:get-lvl-of-numbering" as="element(w:lvl)?">
     <xsl:param name="context" as="node()"/>
+    <!-- This function has not been migrated to make use of @docx2hub:num-… atts. Don’t know whether
+      they may be exploited to make the function less verbose -->
     <!-- for-each: just to avoid an XTDE1270 which shouldn't happen when the 3-arg form of key() is invoked: -->
     <xsl:variable name="lvls" as="element(w:lvl)*">
       <xsl:for-each select="$context">
@@ -275,12 +291,9 @@
         <xsl:sequence select="()"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:variable name="numPr" select="if ($context/w:numPr) 
-                                           then $context/w:numPr 
-                                           else ()"/>
-        <xsl:variable name="style" select="if ($context/w:pPr/w:pStyle) 
-                                           then key('style-by-id', $context/w:pPr/w:pStyle/@w:val, root($context))/w:numPr 
-                                           else ()"/>
+        <xsl:variable name="numPr" select="$context/w:numPr" as="element(w:numPr)?"/>
+        <xsl:variable name="style" as="element(w:numPr)?" 
+          select="key('docx2hub:style-by-role', $context/@role, root($context))/w:numPr"/>
         <xsl:sequence select="if ($numPr)
                               then key('numbering-by-id', $numPr/w:numId/@w:val, root($context))/w:lvlOverride[@w:ilvl = $numPr/w:ilvl/@w:val]
                               else if ($style)
@@ -291,6 +304,8 @@
   </xsl:function>
 
   <xsl:key name="docx2hub:num-signature" match="*[@docx2hub:num-signature]" use="@docx2hub:num-signature"/>
+  <xsl:key name="docx2hub:num-signature-or-continue" match="*[@docx2hub:num-signature | @docx2hub:num-continue]" 
+    use="@docx2hub:num-signature | @docx2hub:num-continue"/>
 
   <xsl:function name="letex:get-identifier" as="xs:string">
     <xsl:param name="context" as="element(w:p)"/>
@@ -301,24 +316,6 @@
                                             then letex:get-lvl-override($context)/w:lvl 
                                             else $lvl"/>
     <xsl:variable name="ilvl" select="xs:double($lvl-to-use/@w:ilvl)"/>
-
-    <xsl:variable name="start-of-relevant" as="element(w:p)?"
-      select="if ($context/@docx2hub:num-signature)
-              then $context
-              else
-                (
-                  key(
-                    'docx2hub:num-signature', 
-                    ($context/@docx2hub:num-signature, $context/@docx2hub:num-continue), 
-                    root($context)
-                  )[. &lt;&lt; $context]
-                )[last()]"/>
-    
-    <xsl:variable name="level-counter" as="xs:integer" 
-      select="(for $s in $start-of-relevant/@docx2hub:num-restart-val return xs:integer($s), 1)[1] 
-              + count(root($context)//w:p[. &gt;&gt; $start-of-relevant][. &lt;&lt; $context]
-                                         [@docx2hub:num-continue = $start-of-relevant/@docx2hub:num-signature])
-              + count($context[not(. is $start-of-relevant)])"/>
     
     <xsl:variable name="resolve-symbol-encoding">
       <element>
@@ -328,12 +325,34 @@
     <xsl:variable name="string" as="xs:string*">
       <xsl:choose>
         <xsl:when test="$resolve-symbol-encoding//@w:val">
-          <xsl:analyze-string select="$lvl-to-use/w:lvlText/@w:val" regex="%([0-9])">
+          <xsl:analyze-string select="$lvl-to-use/w:lvlText/@w:val" regex="%(\d)">
             <xsl:matching-substring>
-              <xsl:number value="if (xs:double(regex-group(1)) gt $ilvl) 
-                                 then $level-counter 
-                                 else $level-counter - 1"
-                          format="{letex:get-numbering-format($lvl/ancestor::w:abstractNum/w:lvl[@w:ilvl=xs:double(regex-group(1))-1]/w:numFmt/@w:val, $lvl-to-use/w:lvlText/@w:val)}"/>
+              <xsl:variable name="pattern-ilvl" as="xs:integer" select="xs:integer(regex-group(1)) - 1"/>
+              <xsl:variable name="pattern-lvl" as="element(w:lvl)?" 
+                select="$lvl/ancestor::w:abstractNum/w:lvl[@w:ilvl = $pattern-ilvl]"/>
+              <xsl:variable name="context-for-counter" as="element(w:p)?">
+                <xsl:choose>
+                  <xsl:when test="$pattern-ilvl = $ilvl">
+                    <xsl:sequence select="$context"/>
+                  </xsl:when>
+                  <xsl:when test="$pattern-ilvl gt $ilvl"/>
+                  <xsl:otherwise>
+                    <xsl:sequence select="(
+                                            key(
+                                              'docx2hub:num-signature-or-continue',
+                                              string-join(($context/@docx2hub:num-abstract, string($pattern-ilvl)), '_'), 
+                                              root($context)
+                                            )[. &lt;&lt; $context]
+                                          )[last()]"/>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </xsl:variable>
+              <xsl:variable name="level-counter" as="xs:integer"
+                select="if ($context-for-counter)
+                        then letex:get-level-counter($context-for-counter, $pattern-lvl)
+                        else $pattern-lvl/w:start/@w:val"/>
+              <xsl:number value="$level-counter"
+                          format="{letex:get-numbering-format($pattern-lvl/w:numFmt/@w:val, $lvl-to-use/w:lvlText/@w:val)}"/>
             </xsl:matching-substring>
             <xsl:non-matching-substring>
               <xsl:value-of select="."/>
@@ -347,7 +366,31 @@
     </xsl:variable>
     <xsl:sequence select="string-join($string,'')"/>
   </xsl:function>
-  
+
+  <xsl:function name="letex:get-level-counter" as="xs:integer">
+    <xsl:param name="context" as="element(w:p)"/>
+    <xsl:param name="lvl" as="element(w:lvl)"/>
+    <xsl:variable name="start-of-relevant" as="element(w:p)?"
+      select="if ($context/@docx2hub:num-signature)
+              then $context
+              else
+                (
+                  key(
+                    'docx2hub:num-signature', 
+                    ($context/@docx2hub:num-signature, $context/@docx2hub:num-continue), 
+                    root($context)
+                  )[. &lt;&lt; $context]
+                )[last()]"/>
+    <xsl:variable name="level-counter" as="xs:integer" 
+      select="(for $s in $start-of-relevant/@docx2hub:num-restart-val return xs:integer($s), 1)[1] 
+              + count(root($context)//w:p[. &gt;&gt; $start-of-relevant][. &lt;&lt; $context]
+                                         [@docx2hub:num-continue = $start-of-relevant/@docx2hub:num-signature])
+              + count($context[not(. is $start-of-relevant)])
+              + count($start-of-relevant/@docx2hub:num-initial-skip-increment)"/>
+    
+    <xsl:sequence select="$level-counter"/>
+  </xsl:function>
+
   <xsl:function name="letex:get-numbering-format" as="xs:string">
     <xsl:param name="format" as="xs:string"/>
     <xsl:param name="default" as="xs:string?"/>
