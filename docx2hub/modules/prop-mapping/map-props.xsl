@@ -180,7 +180,7 @@
         <xsl:apply-templates select="* except w:basedOn" mode="#current" />
       </xsl:variable>
       <xsl:for-each-group select="$mergeable-atts[self::docx2hub:attribute]" group-by="@name">
-        <docx2hub:attribute name="{current-grouping-key()}"><xsl:value-of select="current-group()" /></docx2hub:attribute>
+        <docx2hub:attribute name="{current-grouping-key()}"><xsl:value-of select="current-group()[last()]" /></docx2hub:attribute>
       </xsl:for-each-group>
       <xsl:sequence select="$mergeable-atts[self::*][not(self::docx2hub:attribute)]"/>
     </xsl:variable>
@@ -236,15 +236,44 @@
     <xsl:apply-templates select="*" mode="#current" />
   </xsl:template>
   
-  <xsl:template match="w:style/w:pPr[w:numPr[w:ilvl]]" mode="docx2hub:add-props" priority="3">
-    <xsl:variable name="numPr" as="element(w:numPr)" select="w:numPr"/>
-    <xsl:variable name="lvl" as="element(w:lvl)" select="key(
+  <!-- The most specific style comes first, the one that it is based on comes next, etc.
+    I put it in a document node in order to avoid getting them ordered in document order 
+    when I output a sequence of w:style elements. -->
+  <xsl:function name="docx2hub:based-on-chain" as="document-node()">
+    <xsl:param name="initial" as="element(w:style)*"/>
+    <xsl:variable name="next" as="element(w:style)?" 
+      select="if (exists($initial)) 
+              then key('docx2hub:style', $initial[last()]/w:basedOn/@w:val, root($initial[last()]))
+              else ()"/>
+    <xsl:choose>
+      <xsl:when test="exists($next)">
+        <xsl:document>
+          <xsl:sequence select="docx2hub:based-on-chain(($initial, $next))/*"/>  
+        </xsl:document>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:document>
+          <xsl:sequence select="$initial"/>  
+        </xsl:document>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:function>
+  
+  <xsl:template match="w:style/w:pPr[w:numPr]" mode="docx2hub:add-props" priority="3">
+    <xsl:variable name="based-on-chain" as="document-node()" select="docx2hub:based-on-chain(..)"/>
+    <xsl:variable name="numId" as="element(w:numId)" select="$based-on-chain/*[w:pPr/w:numPr/w:numId][1]/w:pPr/w:numPr/w:numId"/>
+    <xsl:variable name="ilvl" as="xs:integer" 
+      select="(
+                for $i in $based-on-chain/*[w:pPr/w:numPr/w:ilvl][1]/w:pPr/w:numPr/w:ilvl/@w:val return xs:integer($i),
+                0
+              )[1]"/>
+    <xsl:variable name="lvl" as="element(w:lvl)?" select="key(
                                                            'abstract-numbering-by-id', 
                                                            key(
                                                              'numbering-by-id', 
-                                                             $numPr/w:numId/@w:val 
+                                                             $numId/@w:val 
                                                            )/w:abstractNumId/@w:val
-                                                         )/w:lvl[@w:ilvl = $numPr/w:ilvl/@w:val]"/>
+                                                         )/w:lvl[@w:ilvl = $ilvl]"/>
     <xsl:variable name="props" as="item()*">
       <xsl:apply-templates select="$lvl/w:pPr" mode="#current"/>
     </xsl:variable>
@@ -1024,10 +1053,11 @@
   <xsl:template match="w:tblPr[following-sibling::w:tblPr]" mode="docx2hub:props2atts" />
   <xsl:template match="w:tcPr[following-sibling::w:tcPr]" mode="docx2hub:props2atts" />
 
-  <xsl:template match="w:numPr[not(following-sibling::w:numPr)][not(w:numId)]" mode="docx2hub:props2atts">
+  <xsl:template match="w:numPr[not(following-sibling::w:numPr)]" mode="docx2hub:props2atts">
     <w:numPr>
-      <xsl:apply-templates select="(preceding-sibling::w:numPr/w:numId)[1]" mode="#current"/>
-      <xsl:apply-templates select="node()" mode="#current"/>
+      <xsl:apply-templates select="(w:numId, preceding-sibling::w:numPr/w:numId)[1]" mode="#current"/>
+      <xsl:apply-templates select="(w:ilvl, preceding-sibling::w:numPr/w:ilvl)[1]" mode="#current"/>
+      <xsl:apply-templates select="node() except w:numId, w:ilvl" mode="#current"/>
     </w:numPr>
   </xsl:template>
    
@@ -1059,8 +1089,21 @@
   <!-- collateral: denote numbering resets -->
   <xsl:template match="w:p" mode="docx2hub:remove-redundant-run-atts">
     <xsl:copy copy-namespaces="no">
+      <xsl:variable name="style" select="key('docx2hub:style-by-role', @role)" as="element(css:rule)?"/>
+      <xsl:variable name="numId" as="element(w:numId)?" 
+        select="(w:numPr/w:numId, $style/w:numPr/w:numId)[1]"/>
+      <xsl:variable name="ilvl" as="xs:integer" 
+        select="(
+                  for $i in 
+                    (w:numPr/w:ilvl/@w:val,
+                     $style/w:numPr/w:ilvl/@w:val)[1] 
+                  return xs:integer($i),
+                  0
+                )[1]"/>
       <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:apply-templates select="(key('docx2hub:style-by-role', @role), .)/w:numPr" mode="docx2hub:abstractNum"/>  
+      <xsl:apply-templates select="$numId" mode="docx2hub:abstractNum">
+        <xsl:with-param name="ilvl" select="$ilvl"/>
+      </xsl:apply-templates>
       <xsl:apply-templates mode="#current"/>
     </xsl:copy>
   </xsl:template>
