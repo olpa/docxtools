@@ -56,3 +56,5 @@ de:
       W2D_601: "Zeichen aus Font '{{info-text}}' kann nicht richtig dargestellt werden."
 
       W2D_602: "Symbol in Feldfunktion kann nicht interpretiert werden: '{{info-text}}'"
+      
+      W2D_093: "In sich geschachtelte Feldfunktion: '{{info-text}}'"
