@@ -374,7 +374,7 @@
     </xsl:choose>
   </xsl:function>
   
-  <xsl:template match="@docx2hub:num-signature | @docx2hub:num-continue | @docx2hub:num-abstract 
+  <xsl:template match="@docx2hub:num-signature | @docx2hub:num-continue | @docx2hub:num-abstract | @docx2hub:num-id 
                        | @docx2hub:num-restart-val | @docx2hub:num-ilvl | @docx2hub:num-restart-level" mode="docx2hub:join-runs"/>
   
 </xsl:stylesheet>

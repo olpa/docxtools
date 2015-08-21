@@ -281,7 +281,7 @@
     <xsl:variable name="props" as="item()*">
       <xsl:apply-templates select="$lvl/w:pPr" mode="#current"/>
     </xsl:variable>
-    <xsl:sequence select="$props//docx2hub:attribute"/>
+    <xsl:sequence select="$props//docx2hub:attribute[starts-with(@name, 'css:')]"/>
     <xsl:next-match/>
   </xsl:template>
   
