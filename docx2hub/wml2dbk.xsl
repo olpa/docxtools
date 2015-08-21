@@ -925,7 +925,7 @@
                     <value key="xpath"><xsl:value-of select="@srcpath"/></value>
                     <value key="level">WRN</value>
                     <value key="info-text"><xsl:value-of select="$instrText"/></value>
-                    <value key="pi">fieldfunction_nested: In sich geschachtelte Feldfunktion <xsl:value-of select="$instrText"/>. Bitte prüfen.</value>
+                    <!--<value key="pi">fieldfunction_nested: In sich geschachtelte Feldfunktion <xsl:value-of select="$instrText"/>. Bitte prüfen.</value>-->
                   </xsl:with-param>
                 </xsl:call-template>
               </xsl:when>
