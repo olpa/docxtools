@@ -917,7 +917,11 @@
                 <xsl:apply-templates select="$text" mode="#current"/>    
               </xsl:when>
               <xsl:when test="exists($text[self::dbk:*]) and (every $e in ($text) satisfies $e[self::dbk:*[descendant-or-self::dbk:mediaobject or descendant-or-self::dbk:inlinemediaobject]])">
-                <xsl:copy-of select="$text"/>
+                <xsl:call-template name="handle-figures">
+                  <xsl:with-param name="instr" select="$instrText"/>
+                  <xsl:with-param name="text" select="$text"/>
+                  <xsl:with-param name="nodes" select="$nodes"/>
+                </xsl:call-template>
                 <xsl:call-template name="signal-error" xmlns="">
                   <xsl:with-param name="error-code" select="'W2D_093'"/>
                   <xsl:with-param name="fail-on-error" select="'no'"/>
