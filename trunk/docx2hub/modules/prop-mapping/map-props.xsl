@@ -547,8 +547,10 @@
       </xsl:when>
 
       <xsl:when test=". eq 'docx-font-family'">
-        <xsl:if test="$val/@w:ascii or $val/@w:cs">
-          <xsl:variable name="font-name" select="($val/@w:ascii, $val/@w:cs)[1]" as="xs:string"/>
+        <xsl:if test="$val/@w:ascii or $val/@w:hAnsi">
+          <!-- We should implement the complex font selection rules as defined in 
+            https://onedrive.live.com/view.aspx/Public%20Documents/2009/DR-09-0040.docx?cid=c8ba0861dc5e4adc&sc=documents -->
+          <xsl:variable name="font-name" select="($val/@w:ascii, $val/@w:hAnsi)[1]" as="xs:string"/>
           <docx2hub:attribute name="{../@target-name}"><xsl:value-of select="$font-name"/></docx2hub:attribute>
           <xsl:variable name="charset" as="xs:string*" 
             select="distinct-values(key('docx2hub:font-by-name', $font-name, root($val))/w:charset/@w:val)"/>
