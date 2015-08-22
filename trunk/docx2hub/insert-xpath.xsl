@@ -215,7 +215,7 @@
     <xsl:copy copy-namespaces="no">
       <xsl:attribute name="xml:base" select="base-uri()" />
       <!-- Font des Standardtextes -->
-      <xsl:variable name="normal" select="key('docx2hub:style', 'Normal')" as="element(w:style)?" />
+      <xsl:variable name="normal" select="w:style[@w:type = 'paragraph'][@w:default = '1']" as="element(w:style)?" />
       <xsl:variable name="default-font" as="xs:string"
         select="if ($normal/w:rPr/w:rFonts/@w:ascii)
                 then $normal/w:rPr/w:rFonts/@w:ascii
@@ -229,25 +229,56 @@
         select="if ($normal/w:rPr/w:sz/@w:val)
                 then ($normal/w:rPr/w:sz/@w:val)[1]
                 else '20'" />
+      <xsl:variable name="default-lang" as="xs:string"
+        select="if ($normal/w:rPr/w:lang/@w:val)
+                then $normal/w:rPr/w:lang/@w:val
+                else (
+                        w:docDefaults/w:rPrDefault/w:rPr/w:lang/@w:val,
+                        w:docDefaults/w:rPrDefault/w:lang/@w:val
+                      )[1]" />
       <xsl:apply-templates select="@*, * except w:latentStyles" mode="#current" >
         <xsl:with-param name="default-font" select="$default-font" tunnel="yes"/>
         <xsl:with-param name="default-font-size" select="$default-font-size" tunnel="yes"/>
+        <xsl:with-param name="default-lang" select="$default-lang" tunnel="yes"/>
       </xsl:apply-templates>
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="key('docx2hub:style', 'Normal')/w:rPr" mode="insert-xpath">
+  <xsl:template match="w:style[@w:type = 'paragraph']/w:rPr" mode="insert-xpath">
     <xsl:param name="default-font" as="xs:string?" tunnel="yes"/>
     <xsl:param name="default-font-size" as="xs:string" tunnel="yes"/>
+    <xsl:param name="default-lang" as="xs:string?" tunnel="yes"/>
     <xsl:copy copy-namespaces="no">
       <xsl:apply-templates select="@*, *" mode="#current"/>
-      <xsl:if test="not(w:sz)">
+      <xsl:if test="not(w:sz) and $default-font-size">
         <w:sz w:val="{$default-font-size}"/>
       </xsl:if>
       <xsl:if test="not(w:rFonts) and $default-font">
         <w:rFonts w:ascii="{$default-font}"/>
       </xsl:if>
+      <xsl:if test="not(w:lang) and $default-lang">
+        <w:lang w:val="{$default-lang}"/>
+      </xsl:if>
     </xsl:copy>
   </xsl:template>
-  
+
+  <xsl:template match="w:style[@w:type = 'paragraph'][empty(w:rPr)]" mode="insert-xpath">
+    <xsl:param name="default-font" as="xs:string?" tunnel="yes"/>
+    <xsl:param name="default-font-size" as="xs:string" tunnel="yes"/>
+    <xsl:param name="default-lang" as="xs:string?" tunnel="yes"/>
+    <xsl:copy copy-namespaces="no">
+      <xsl:apply-templates select="@*, node()" mode="#current"/>
+      <w:rPr>
+        <xsl:if test="$default-font-size">
+          <w:sz w:val="{$default-font-size}"/>
+        </xsl:if>
+        <xsl:if test="$default-font">
+          <w:rFonts w:ascii="{$default-font}"/>
+        </xsl:if>
+        <xsl:if test="$default-lang">
+          <w:lang w:val="{$default-lang}"/>
+        </xsl:if>
+      </w:rPr>
+    </xsl:copy>
+  </xsl:template>
 </xsl:stylesheet>
