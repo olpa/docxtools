@@ -553,7 +553,13 @@
           <xsl:variable name="charset" as="xs:string*" 
             select="distinct-values(key('docx2hub:font-by-name', $font-name, root($val))/w:charset/@w:val)"/>
           <!-- xs:string* instead of xs:string? because there are docx files with multiple w:font entries for a given @w:name -->
-          <xsl:if test="exists($charset) and not($charset = ('00', '80'))"><!-- 80: Arial Unicode MS, MS Mincho, … -->
+          <xsl:if test="exists($charset) 
+                        and not($charset = ('00', '80')) (: 80: Arial Unicode MS, MS Mincho, … :)
+                        and not($val/ancestor::w:style)">
+            <!-- I saw 'C8' for SMinionPlus. Don’t know whether this may be treated as Unicode. Probably not,
+            since it may contain variants of the Springer logo at various positions. We should supply a mapping 
+            for this. Also need to establish a mechanism for the situation when mosts characters of a font map to Unicode except 
+            for a few exceptions. -->
             <docx2hub:attribute name="docx2hub:map-from"><xsl:value-of select="$font-name"/></docx2hub:attribute>
           </xsl:if>
         </xsl:if>
