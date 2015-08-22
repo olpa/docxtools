@@ -110,6 +110,7 @@
 
   <xsl:function name="letex:insert-numbering" as="item()*">
     <xsl:param name="context" as="element(w:p)"/>
+    <!-- Do we process lvlOverrides? -->
     
     <xsl:variable name="lvl" select="letex:get-lvl-of-numbering($context)" as="element(w:lvl)?"/>
     <xsl:choose>
@@ -126,7 +127,8 @@
             </xsl:with-param>
           </xsl:call-template>
         </xsl:if>
-        <xsl:variable name="context-atts" select="key('style-by-name', $context/@role, $context/root())/@* | $context/@*" as="attribute(*)*"/>
+        <xsl:variable name="style-atts" select="key('style-by-name', $context/@role, $context/root())/@*" as="attribute(*)*"/>
+        <xsl:variable name="ad-hoc-atts" select="$context/@*" as="attribute(*)*"/>
         <xsl:variable name="pPr" as="attribute(*)*">
           <xsl:apply-templates mode="numbering" select="$lvl/w:pPr/@*">
             <xsl:with-param name="context" select="$context" tunnel="yes"/>
@@ -137,10 +139,10 @@
             <xsl:with-param name="context" select="$context" tunnel="yes"/>
           </xsl:apply-templates>
         </xsl:variable>
-        <xsl:sequence select="$pPr, $context-atts[name() = $pPr/name()]"/>
+        <xsl:sequence select="$pPr, $style-atts[name() = $pPr/name()], $ad-hoc-atts[name() = $pPr/name()]"/>
         <xsl:apply-templates select="$context/dbk:tabs" mode="wml-to-dbk"/>
         <phrase role="hub:identifier">
-          <xsl:sequence select="$rPr, $context-atts[name() = $rPr/name()]"/>
+          <xsl:sequence select="$rPr, $style-atts[name() = $rPr/name()], $ad-hoc-atts[name() = $rPr/name()]"/>
           <xsl:value-of select="letex:get-identifier($context,$lvl)"/>
         </phrase>
         <tab/>
