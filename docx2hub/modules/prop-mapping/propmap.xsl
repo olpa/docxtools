@@ -106,6 +106,7 @@
         <prop name="w:pgSz/@w:orient" target-name="css:orientation" type="linear"/>
         <prop name="w:position" target-name="css:top" type="docx-length-attr-negated"/>
         <prop name="w:position" target-name="css:position" target-value="relative"/>
+        <prop name="w:pPrChange"/>
         <prop name="w:pStyle" type="docx-parastyle" />
         <prop name="w:qFormat" />
         <prop name="w:rFonts" type="docx-font-family" target-name="css:font-family" />
