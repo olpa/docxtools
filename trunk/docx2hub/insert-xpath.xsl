@@ -244,7 +244,8 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="w:style[@w:type = 'paragraph']/w:rPr" mode="insert-xpath">
+  <xsl:template match="w:style[@w:type = 'paragraph']
+                              [not(w:basedOn)]/w:rPr" mode="insert-xpath">
     <xsl:param name="default-font" as="xs:string?" tunnel="yes"/>
     <xsl:param name="default-font-size" as="xs:string" tunnel="yes"/>
     <xsl:param name="default-lang" as="xs:string?" tunnel="yes"/>
@@ -262,7 +263,9 @@
     </xsl:copy>
   </xsl:template>
 
-  <xsl:template match="w:style[@w:type = 'paragraph'][empty(w:rPr)]" mode="insert-xpath">
+  <xsl:template match="w:style[@w:type = 'paragraph']
+                              [not(w:basedOn)]
+                              [empty(w:rPr)]" mode="insert-xpath">
     <xsl:param name="default-font" as="xs:string?" tunnel="yes"/>
     <xsl:param name="default-font-size" as="xs:string" tunnel="yes"/>
     <xsl:param name="default-lang" as="xs:string?" tunnel="yes"/>
