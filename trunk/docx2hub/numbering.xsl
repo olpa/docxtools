@@ -143,6 +143,13 @@
         <xsl:apply-templates select="$context/dbk:tabs" mode="wml-to-dbk"/>
         <phrase role="hub:identifier">
           <xsl:sequence select="$rPr, $style-atts[name() = $rPr/name()], $ad-hoc-atts[name() = $rPr/name()]"/>
+          <xsl:if test="$rPr/self::attribute(docx2hub:map-from)">
+            <!-- If the list marker character was in a mapped font, the replacement font should appear here. 
+              Another unresolved issue might be: If the $style-atts @css:font-family is inherited from a
+              w:basedOn style, and if the numPr are attached to the current style, then we will see the
+              inherited font here instead of the numPr font. Not sure how Word behaves in that case. -->
+            <xsl:sequence select="$rPr/self::attribute(docx2hub:map-from), $rPr/self::attribute(css:font-family)"/>
+          </xsl:if>
           <xsl:value-of select="letex:get-identifier($context,$lvl)"/>
         </phrase>
         <tab/>

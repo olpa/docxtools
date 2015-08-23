@@ -218,6 +218,7 @@
       <xsl:sequence select="for $a in ($elt/@* except ($elt/@letex:processed, $elt/@srcpath, $elt/@docx2hub:map-from)) 
                             return letex:attr-hash($a)" />
     </xsl:perform-sort>
+    <!-- unmappable chars should stay in their own span: --> 
     <xsl:sequence select="$elt[@docx2hub:map-from[. = $elt/@css:font-family]]/generate-id()"/>
   </xsl:function>
 
