@@ -467,16 +467,21 @@
       </xsl:when>
 
       <xsl:when test=". eq 'lang'">
-        <docx2hub:attribute name="{../@target-name}">
-          <xsl:variable name="stringval" select="if ($val/self::w:lang) then ($val/@w:val, $val/@w:bidi)[1] else $val"/>
-          <xsl:value-of select="if (matches($stringval, 'German') or matches($stringval, '\Wde\W'))
-                                then 'de'
-                                else 
-                                  if (matches($stringval, 'English'))
-                                  then 'en'
-                                  else replace($stringval, '^(\p{Ll}+).*$', '$1')" />
-          <!-- stripping the country by default. If someone needs it, we need to introduce an option -->
-        </docx2hub:attribute>
+        <xsl:variable name="stringval" as="xs:string?" 
+          select="if ($val/self::w:lang) then ($val/@w:val, $val/@w:bidi)[1] else $val"/>
+        <!-- stripping the country by default. If someone needs it, we need to introduce an option -->
+        <xsl:variable name="repl" as="xs:string" 
+          select="if (matches($stringval, 'German') or matches($stringval, '\Wde\W'))
+                  then 'de'
+                  else 
+                    if (matches($stringval, 'English'))
+                    then 'en'
+                    else replace($stringval, '^(\p{Ll}+).*$', '$1')" />
+        <xsl:if test="normalize-space($repl)">
+          <docx2hub:attribute name="{../@target-name}">
+            <xsl:value-of select="$repl"/>  
+          </docx2hub:attribute>
+        </xsl:if>
       </xsl:when>
 
       <xsl:when test=". eq 'docx-boolean-prop'">
