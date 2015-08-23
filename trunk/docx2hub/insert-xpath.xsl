@@ -264,6 +264,15 @@
   </xsl:template>
 
   <xsl:template match="w:style[@w:type = 'paragraph']
+                              [not(w:basedOn)]/w:rPr/w:lang[not(@w:val)]" mode="insert-xpath">
+    <xsl:param name="default-lang" as="xs:string?" tunnel="yes"/>
+    <xsl:copy copy-namespaces="no">
+      <xsl:attribute name="w:val" select="$default-lang"/>
+      <xsl:copy-of select="@*"/>
+    </xsl:copy>
+  </xsl:template>
+  
+  <xsl:template match="w:style[@w:type = 'paragraph']
                               [not(w:basedOn)]
                               [empty(w:rPr)]" mode="insert-xpath">
     <xsl:param name="default-font" as="xs:string?" tunnel="yes"/>
