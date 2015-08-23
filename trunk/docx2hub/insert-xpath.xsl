@@ -215,7 +215,11 @@
     <xsl:copy copy-namespaces="no">
       <xsl:attribute name="xml:base" select="base-uri()" />
       <!-- Font des Standardtextes -->
-      <xsl:variable name="normal" select="w:style[@w:type = 'paragraph'][@w:default = '1']" as="element(w:style)?" />
+      <xsl:variable name="normal" as="element(w:style)?"
+        select="(
+                  w:style[@w:type = 'paragraph'][@w:default = '1'],
+                  w:style[w:name[@w:val = 'Normal']]
+                )[1]"  />
       <xsl:variable name="default-font" as="xs:string"
         select="if ($normal/w:rPr/w:rFonts/@w:ascii)
                 then $normal/w:rPr/w:rFonts/@w:ascii
@@ -229,7 +233,7 @@
         select="if ($normal/w:rPr/w:sz/@w:val)
                 then ($normal/w:rPr/w:sz/@w:val)[1]
                 else '20'" />
-      <xsl:variable name="default-lang" as="xs:string"
+      <xsl:variable name="default-lang" as="xs:string?"
         select="if ($normal/w:rPr/w:lang/@w:val)
                 then $normal/w:rPr/w:lang/@w:val
                 else (
