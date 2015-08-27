@@ -951,6 +951,9 @@
           <xsl:when test="matches($instrText,'^[\s&#160;]*$')">
             <xsl:apply-templates select="$text" mode="#current"/>
           </xsl:when>
+          <xsl:when test="$tokens[1] = 'PRINT'">
+            <xsl:processing-instruction name="PRINT" select="string-join($tokens[position() gt 1], ' ')"/>
+          </xsl:when>
           <xsl:when test="$tokens[1] = 'AUTOTEXT'">
             <xsl:call-template name="signal-error" xmlns="">
               <xsl:with-param name="error-code" select="'W2D_045'"/>
@@ -1002,7 +1005,6 @@
     <letex:field-function name="NOTEREF" element="link" attrib="linkend" value="2"/>
     <letex:field-function name="PAGE"/>
     <letex:field-function name="PAGEREF" element="link" attrib="linkend" value="2"/>
-    <letex:field-function name="PRINT" destroy="yes"/>
     <letex:field-function name="RD"/>
     <letex:field-function name="REF"/>
     <letex:field-function name="ADVANCE"/>
