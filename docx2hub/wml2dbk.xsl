@@ -272,7 +272,7 @@
                       <xsl:apply-templates select="(current-group()[w:instrText])[1]" mode="wml-to-dbk">
                         <xsl:with-param name="instrText" select="string-join(current-group()//text()[parent::w:instrText], '')" tunnel="yes" as="xs:string?"/>
                         <xsl:with-param name="nodes" select="current-group()[descendant::w:instrText]" tunnel="yes" as="element(*)*"/>
-                        <xsl:with-param name="text" select="current-group()[.//text()[parent::w:t] or .//w:tab or .//w:br or .//w:pict or .//dbk:*]" tunnel="yes" as="element(*)*"/>
+                        <xsl:with-param name="text" select="current-group()[.//text()[parent::w:t] or .//w:tab or .//w:br or .//w:pict or descendant-or-self::dbk:*]" tunnel="yes" as="element(*)*"/>
                       </xsl:apply-templates>
                     </xsl:variable>
                     <xsl:for-each select="$prelim">
