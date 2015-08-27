@@ -1039,7 +1039,7 @@
     <xsl:element name="mediaobject">
       <xsl:apply-templates select="($nodes//@srcpath)[1]" mode="#current"/>
       <imageobject>
-        <imagedata fileref="{replace(tokenize($instr, ' ')[matches(.,'^&#x22;.*&#x22;$')][1],'&#x22;','')}"/>
+        <imagedata fileref="{if (tokenize($instr, ' ')[matches(.,'^&#x22;.*&#x22;$')]) then replace(tokenize($instr, ' ')[matches(.,'^&#x22;.*&#x22;$')][1],'&#x22;','') else if (matches($instr,'&#x22;.*&#x22;')) then tokenize($instr,'&#x22;')[2] else tokenize($instr, ' ')[2]}"/>
       </imageobject>
     </xsl:element>
   </xsl:template>
