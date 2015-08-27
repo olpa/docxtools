@@ -916,23 +916,6 @@
               <xsl:when test="$nodes/ancestor::w:p//w:pict">
                 <xsl:apply-templates select="$text" mode="#current"/>    
               </xsl:when>
-              <xsl:when test="exists($text[self::dbk:*]) and (every $e in ($text) satisfies $e[self::dbk:*[descendant-or-self::dbk:mediaobject or descendant-or-self::dbk:inlinemediaobject]])">
-                <xsl:call-template name="handle-figures">
-                  <xsl:with-param name="instr" select="$instrText"/>
-                  <xsl:with-param name="text" select="$text"/>
-                  <xsl:with-param name="nodes" select="$nodes"/>
-                </xsl:call-template>
-                <xsl:call-template name="signal-error" xmlns="">
-                  <xsl:with-param name="error-code" select="'W2D_093'"/>
-                  <xsl:with-param name="fail-on-error" select="'no'"/>
-                  <xsl:with-param name="hash">
-                    <value key="xpath"><xsl:value-of select="@srcpath"/></value>
-                    <value key="level">WRN</value>
-                    <value key="info-text"><xsl:value-of select="$instrText"/></value>
-                    <!--<value key="pi">fieldfunction_nested: In sich geschachtelte Feldfunktion <xsl:value-of select="$instrText"/>. Bitte prüfen.</value>-->
-                  </xsl:with-param>
-                </xsl:call-template>
-              </xsl:when>
               <xsl:otherwise>
                 <xsl:call-template name="handle-figures">
                   <xsl:with-param name="instr" select="$instrText"/>
