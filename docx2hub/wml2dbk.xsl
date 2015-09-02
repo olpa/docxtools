@@ -1141,6 +1141,10 @@
     <!-- Attribute von smartTag vorerst ignoriert. -->
   </xsl:template>
   
+  <xsl:template match="w:sdt" mode="wml-to-dbk">
+    <xsl:apply-templates select="w:sdtContent/*" mode="#current"/>
+  </xsl:template>
+  
   <!-- The following template removes indentation if the document.xml was processed 
     earlier with libxml without indent flag.  If you miss breaks, it's dead certain 
     that this template is the cause. -->
