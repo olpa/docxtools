@@ -17,7 +17,7 @@
   <symbol number="F08E" entity="&#xF08E;" char="&#x2778;"/><!-- DINGBAT NEGATIVE CIRCLED DIGIT THREE -->
   <symbol number="F08F" entity="&#xF08F;" char="&#x2779;"/><!-- DINGBAT NEGATIVE CIRCLED DIGIT FOUR -->
   <symbol number="F090" entity="&#xF090;" char="&#x277a;"/><!-- DINGBAT NEGATIVE CIRCLED DIGIT FIVE -->
-  <symbol number="F09E" entity="" char="&#x2022;"/><!-- BULLET -->
+  <symbol number="F09E" entity="" char="&#xb7;"/><!-- MIDDLE DOT -->
   <symbol number="F09F" entity="" char="&#x2022;"/><!-- BIG BULLET -->
   <symbol number="F0A6" entity="&#xF0A6;" char="&#x274D;" font="Segoe UI Symbol"/><!-- SHADOWED WHITE CIRCLE -->
   <symbol number="F0A7" entity="&#xF0A7;" char="&#x25aa;" font="Segoe UI Symbol"/><!-- BLACK SMALL SQUARE -->
