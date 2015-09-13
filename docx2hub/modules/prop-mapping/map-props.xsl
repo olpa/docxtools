@@ -493,6 +493,7 @@
           <docx2hub:attribute name="{../@target-name}">
             <xsl:value-of select="$repl"/>  
           </docx2hub:attribute>
+        <!-- stripping the country by default. If someone needs it, we need to introduce an option -->
         </xsl:if>
       </xsl:when>
 
@@ -916,7 +917,7 @@
 
   <xsl:template match="val/@match" mode="docx2hub:add-props" as="element(*)?">
     <xsl:param name="val" as="item()" tunnel="yes" />
-    <xsl:if test="matches($val/@w:val, .)">
+    <xsl:if test="matches($val/@*:val, .)">
       <xsl:call-template name="docx2hub:XML-Hubformat-atts" />
     </xsl:if>
   </xsl:template>
