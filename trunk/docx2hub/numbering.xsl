@@ -152,7 +152,7 @@
         </xsl:if>
         <xsl:variable name="style-atts" select="key('style-by-name', $context/@role, $context/root())/@*" as="attribute(*)*"/>
         <xsl:variable name="ad-hoc-atts" select="$context/@*" as="attribute(*)*"/>
-        <xsl:variable name="pPr" as="attribute(*)*">
+        <xsl:variable name="pPr-from-numPr" as="attribute(*)*">
           <xsl:apply-templates mode="numbering" select="$lvl/w:pPr/@*">
             <xsl:with-param name="context" select="$context" tunnel="yes"/>
           </xsl:apply-templates>
@@ -162,7 +162,19 @@
             <xsl:with-param name="context" select="$context" tunnel="yes"/>
           </xsl:apply-templates>
         </xsl:variable>
-        <xsl:sequence select="$style-atts[name() = $pPr/name()], $pPr, $ad-hoc-atts[name() = $pPr/name()]"/>
+        <xsl:variable name="immediate-first" as="attribute(*)*">
+          <xsl:choose>
+            <xsl:when test="$context/w:numPr">
+              <xsl:sequence select="$style-atts[name() = $pPr-from-numPr/name()], $pPr-from-numPr"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <!-- the declaration priorities within $pPr (taking into account style inheritance) should have
+                been sorted out when calculating $pPr during prop mapping -->
+              <xsl:sequence select="$pPr-from-numPr, $style-atts[name() = $pPr-from-numPr/name()]"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:sequence select="$immediate-first, $ad-hoc-atts[name() = $pPr-from-numPr/name()]"/>
         <xsl:apply-templates select="$context/dbk:tabs" mode="wml-to-dbk"/>
         <phrase role="hub:identifier">
           <xsl:sequence select="$rPr, $style-atts[name() = $rPr/name()], $ad-hoc-atts[name() = $rPr/name()]"/>
