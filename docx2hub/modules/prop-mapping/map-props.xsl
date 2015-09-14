@@ -265,7 +265,10 @@
   
   <xsl:template match="w:style/w:pPr[w:numPr]" mode="docx2hub:add-props" priority="3">
     <xsl:variable name="based-on-chain" as="document-node()" select="docx2hub:based-on-chain(..)"/>
-    <xsl:variable name="numId" as="element(w:numId)?" select="$based-on-chain/*[w:pPr/w:numPr/w:numId][1]/w:pPr/w:numPr/w:numId"/>
+    <xsl:variable name="numId-chain-item" as="element(w:style)" select="$based-on-chain/*[w:pPr/w:numPr/w:numId][1]"/>
+    <xsl:variable name="numId-chain-item-pos" as="xs:integer" 
+      select="index-of(for $item in $based-on-chain/* return generate-id($item), generate-id($numId-chain-item))"/>
+    <xsl:variable name="numId" as="element(w:numId)?" select="$numId-chain-item/w:pPr/w:numPr/w:numId"/>
     <xsl:variable name="ilvl" as="xs:integer" 
       select="(
                 for $i in $based-on-chain/*[w:pPr/w:numPr/w:ilvl][1]/w:pPr/w:numPr/w:ilvl/@w:val return xs:integer($i),
@@ -280,6 +283,8 @@
                                                          )/w:lvl[@w:ilvl = $ilvl]"/>
     <xsl:variable name="props" as="item()*">
       <xsl:apply-templates select="$lvl/w:pPr" mode="#current"/>
+      <xsl:apply-templates select="for $style in reverse($based-on-chain/*[position() le $numId-chain-item-pos])
+                                   return $style/w:pPr/*[not(self::w:numPr)]" mode="#current"/>
     </xsl:variable>
     <xsl:sequence select="$props//docx2hub:attribute[starts-with(@name, 'css:')]"/>
     <xsl:next-match>
