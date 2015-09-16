@@ -53,28 +53,27 @@
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:for-each-group select="*" 
             group-adjacent="if (
-                              (
-                                w:footnoteRef and
-                                docx2hub:element-is-footnoteref(.) and
-                                not(preceding-sibling::*[docx2hub:element-is-footnoteref(.)])
-                              )
-                              or 
-                              (
-                                matches(.,'^[\s&#160;]*$') and 
-                                following-sibling::*[1][docx2hub:element-is-footnoteref(.)][w:footnoteRef]) and
-                                not(preceding-sibling::*[docx2hub:element-is-footnoteref(.)])
-                              ) 
+                                   docx2hub:element-is-footnoteref(.) or 
+                                   ( matches(.,'^[\s&#160;]*$') and 
+                                     following-sibling::*[1][docx2hub:element-is-footnoteref(.)]
+                                   ) or
+                                   ( preceding-sibling::*[1][docx2hub:element-is-footnoteref(.)] and 
+                                     matches(.,'^\)[\s&#160;]*')
+                                   )
+                               )
                             then true() else false()">
             <xsl:choose>
               <xsl:when test="current-grouping-key()">
                 <phrase role="hub:identifier">
-                  <xsl:apply-templates select="current-group()/node() except (current-group()/tab, 
+                  <xsl:apply-templates select="current-group()[not(self::*[preceding-sibling::*[1][docx2hub:element-is-footnoteref(.)] and 
+                    matches(.,'^\)[\s&#160;]*')])]/node() except (current-group()/w:tab, 
                                                                               current-group()[matches(.,'^[\s&#160;]*$')][not(w:footnoteRef)]
                                                                                              [not(exists(following-sibling::w:r[matches(@role,$footnote-reference-style-regex)]
                                                                                                                                [not(matches(.,'^[\s&#160;]*$'))])
                                                                                                   or 
                                                                                                   exists(following-sibling::w:r[w:footnoteRef]))
-                                                                                             ]/node())" mode="#current">
+                                                                                                  ]/node()) | current-group()[self::*[preceding-sibling::*[1][docx2hub:element-is-footnoteref(.)] and 
+                                                                                                  matches(.,'^\)[\s&#160;]*')]]/node()/node()[matches(.,'^\)[\s&#160;]*$')][1]" mode="#current">
                     <xsl:with-param name="identifier" select="true()"/>
                   </xsl:apply-templates>
                 </phrase>    
@@ -82,10 +81,10 @@
               <xsl:otherwise/>
             </xsl:choose>
           </xsl:for-each-group>
-      <xsl:apply-templates select="node() except *[
-                                     docx2hub:element-is-footnoteref(.) and 
-                                     not(preceding-sibling::*[docx2hub:element-is-footnoteref(.)])
-                                   ]" mode="#current"/>
+      <xsl:apply-templates select="node() 
+                                   except *[docx2hub:element-is-footnoteref(.) or ( preceding-sibling::*[1][docx2hub:element-is-footnoteref(.)] and matches(.,'^\)[\s&#160;]*'))] | 
+                                   node()[preceding-sibling::*[1][docx2hub:element-is-footnoteref(.)] and matches(.,'^\)[\s&#160;]*')]/node() 
+                                   except (node()[preceding-sibling::*[1][docx2hub:element-is-footnoteref(.)] and matches(.,'^\)[\s&#160;]*')]/node()[matches(.,'^\)[\s&#160;]*$')][1], node()[preceding-sibling::*[1][docx2hub:element-is-footnoteref(.)] and matches(.,'^\)[\s&#160;]*')]/node()[matches(.,'^\)[\s&#160;]*$')][1]/following-sibling::node()[1][self::w:tab])" mode="#current"/>
     </para>
   </xsl:template>
 
@@ -150,5 +149,5 @@
                 mode="wml-to-dbk" priority="3">
     <xsl:apply-templates mode="#current"/>
   </xsl:template>
-
+  
 </xsl:stylesheet>
