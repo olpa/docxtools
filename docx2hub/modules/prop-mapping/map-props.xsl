@@ -265,11 +265,11 @@
   
   <xsl:template match="w:style/w:pPr[w:numPr]" mode="docx2hub:add-props" priority="3">
     <xsl:variable name="based-on-chain" as="document-node()" select="docx2hub:based-on-chain(..)"/>
-    <xsl:variable name="numId-chain-item" as="element(w:style)" select="$based-on-chain/*[w:pPr/w:numPr/w:numId][1]"/>
-    <xsl:variable name="numId-chain-item-pos" as="xs:integer" 
+    <xsl:variable name="numId-chain-item" as="element(w:style)?" select="$based-on-chain/*[w:pPr/w:numPr/w:numId][1]"/>
+    <xsl:variable name="numId-chain-item-pos" as="xs:integer?" 
       select="index-of(for $item in $based-on-chain/* return generate-id($item), generate-id($numId-chain-item))"/>
     <xsl:variable name="numId" as="element(w:numId)?" select="$numId-chain-item/w:pPr/w:numPr/w:numId"/>
-    <xsl:variable name="ilvl" as="xs:integer" 
+    <xsl:variable name="ilvl" as="xs:integer?" 
       select="(
                 for $i in $based-on-chain/*[w:pPr/w:numPr/w:ilvl][1]/w:pPr/w:numPr/w:ilvl/@w:val return xs:integer($i),
                 0
