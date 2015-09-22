@@ -770,7 +770,7 @@
       </xsl:choose>
     </link>
   </xsl:template>
-
+  
   <xsl:template match="w:hyperlink[@w:tooltip][$unwrap-tooltip-links = ('yes', 'true')]" mode="wml-to-dbk">
     <xsl:apply-templates select="*" mode="#current"/>
   </xsl:template>
@@ -818,7 +818,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="w:hyperlink/@w:history" mode="wml-to-dbk" priority="1.5"/>
+  <xsl:template match="w:hyperlink/@w:history | w:hyperlink/@w:tgtFrame" mode="wml-to-dbk" priority="1.5"/>
  
   <xsl:template match="w:smartTagPr" mode="wml-to-dbk"/>
 
