@@ -85,7 +85,7 @@
     <xsl:attribute name="docx2hub:num-continue" select="."/>
   </xsl:template>
 
-  <xsl:template match="@docx2hub:num-signature[exists(../@docx2hub:num-restart-level)] (: should check whether 0 or a higher number :)
+  <xsl:template match="@docx2hub:num-signature[../@docx2hub:num-restart-level &gt; 0]
                                               [
                                                 .. is (
                                                        key('docx2hub:num-signature', current())
