@@ -39,7 +39,11 @@
               <!-- element name (15-09-14):
                      in case of a para merged with a table (para deleted, table alive) we need w:tbl as element name 
                      otherwise w:p will be set, usually -->
-              <xsl:element name="{name(current-group()[not(docx2hub:is-merged-changemarkup-para(.))][1])}">
+              <xsl:element name="{(
+                                    current-group()[not(docx2hub:is-merged-changemarkup-para(.))]
+                                                   [not(name() = ('w:moveToRangeStart', 'w:moveToRangeEnd'))][1]/name()
+                                  )[1]
+                                 }">
                 <xsl:copy-of select="current-group()[1]/@*"/>
                 <xsl:attribute name="srcpath" select="string-join(current-group()/@srcpath, '&#x20;')"/>
                 <xsl:copy-of select="current-group()[1]/node()"/>
@@ -105,8 +109,7 @@
       select="exists(
                 $para/self::w:p[w:del or w:moveFrom]
                      [every $e in * 
-                      satisfies $e[name() = ('w:del', 'w:pPr', 'w:moveFromRangeStart', 'w:moveFromRangeEnd') or 
-                      self::w:moveFrom[every $m in * satisfies $m/self::w:del]]
+                      satisfies $e[name() = ('w:del', 'w:pPr', 'w:moveFromRangeStart', 'w:moveFromRangeEnd', 'w:moveFrom')]
                      ]
               )"/>
   </xsl:function>
