@@ -1136,7 +1136,6 @@
                   return xs:integer($i),
                   0
                 )[1]"/>
-      <xsl:if test="@role='berschrift4'"><xsl:message select="'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB ', @role, $numId"></xsl:message></xsl:if>
       <xsl:if test="$css:orientation">
         <xsl:attribute name="css:orientation" select="$css:orientation"/>
       </xsl:if>
