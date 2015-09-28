@@ -1123,6 +1123,7 @@
   
   <!-- collateral: denote numbering resets -->
   <xsl:template match="w:p" mode="docx2hub:remove-redundant-run-atts">
+    <xsl:param name="css:orientation" as="xs:string?" tunnel="yes"/>
     <xsl:copy copy-namespaces="no">
       <xsl:variable name="style" select="key('docx2hub:style-by-role', @role)" as="element(css:rule)?"/>
       <xsl:variable name="numId" as="element(w:numId)?" 
@@ -1135,6 +1136,10 @@
                   return xs:integer($i),
                   0
                 )[1]"/>
+      <xsl:if test="@role='berschrift4'"><xsl:message select="'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB ', @role, $numId"></xsl:message></xsl:if>
+      <xsl:if test="$css:orientation">
+        <xsl:attribute name="css:orientation" select="$css:orientation"/>
+      </xsl:if>
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:apply-templates select="$numId" mode="docx2hub:abstractNum">
         <xsl:with-param name="ilvl" select="$ilvl"/>
@@ -1154,7 +1159,9 @@
               <xsl:choose>
                 <xsl:when test="current-group()[last()][self::w:p[w:pgSz[@css:orientation='landscape']]]">
                   <xsl:apply-templates select="current-group()[1]" mode="#current"/>
-                  <xsl:apply-templates select="current-group()[position() gt 1]" mode="add-attribute"/>
+                  <xsl:apply-templates select="current-group()[position() gt 1]" mode="docx2hub:remove-redundant-run-atts">
+                    <xsl:with-param name="css:orientation" select="'landscape'" tunnel="yes"/>
+                  </xsl:apply-templates>
                 </xsl:when>
                 <xsl:otherwise>
                   <xsl:apply-templates select="current-group()" mode="#current"/>
@@ -1170,19 +1177,4 @@
     </xsl:copy>
   </xsl:template>
   
-  <xsl:template match="*" mode="add-attribute">
-    <xsl:copy>
-      <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:apply-templates mode="docx2hub:remove-redundant-run-atts"/>
-    </xsl:copy>
-  </xsl:template>
-  
-  <xsl:template match="w:tbl | w:p[descendant::v:imagedata]" mode="add-attribute">
-    <xsl:copy>
-      <xsl:attribute name="css:orientation" select="'landscape'"/>
-      <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:apply-templates mode="docx2hub:remove-redundant-run-atts"/>
-    </xsl:copy>
-  </xsl:template>
-
 </xsl:stylesheet>
