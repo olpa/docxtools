@@ -38,18 +38,19 @@
                         preceding-sibling::*[1][docx2hub:is-merged-changemarkup-para(.)]">
         <xsl:choose>
           <xsl:when test="current-grouping-key()">
+            <xsl:variable name="first-non-merged-blockelement" as="element()?"
+              select="current-group()[not(docx2hub:is-merged-changemarkup-para(.))]
+                                     [not(name() = ('w:moveToRangeStart', 'w:moveToRangeEnd'))][1]"/>
             <xsl:variable name="merged-para" as="element(*)">
               <!-- element name (15-09-14):
                      in case of a para merged with a table (para deleted, table alive) we need w:tbl as element name 
                      otherwise w:p will be set, usually -->
-              <xsl:element name="{(
-                                    current-group()[not(docx2hub:is-merged-changemarkup-para(.))]
-                                                   [not(name() = ('w:moveToRangeStart', 'w:moveToRangeEnd'))][1]/name()
-                                  )[1]
-                                 }">
-                <xsl:apply-templates select="current-group()[not(docx2hub:is-changemarkup-removed-para(.))][1]/@*" mode="#current"/>
+              <xsl:element name="{$first-non-merged-blockelement[1]/name()}">
+                <xsl:apply-templates select="current-group()[not(docx2hub:is-merged-changemarkup-para(.))][1]/@*" mode="#current"/>
                 <xsl:attribute name="srcpath" select="string-join(current-group()/@srcpath, '&#x20;')"/>
-                <xsl:apply-templates select="current-group()[not(docx2hub:is-changemarkup-removed-para(.))]/node()" mode="#current"/>
+                <xsl:apply-templates mode="#current"
+                  select="$first-non-merged-blockelement/w:pPr,
+                          current-group()[not(docx2hub:is-changemarkup-removed-para(.))]/node()[not(self::w:pPr)]"/>
               </xsl:element>
             </xsl:variable>
             <xsl:sequence select="$merged-para"/>
