@@ -17,12 +17,15 @@
   xmlns:saxon		= "http://saxon.sf.net/"
   xmlns:letex		= "http://www.le-tex.de/namespace"
   xmlns:mml             = "http://www.w3.org/Math/DTD/mathml2/mathml2.dtd"
+  xmlns:m = "http://schemas.openxmlformats.org/officeDocument/2006/math"
   xmlns:css="http://www.w3.org/1996/css"
   xmlns:docx2hub = "http://www.le-tex.de/namespace/docx2hub"
   xmlns="http://docbook.org/ns/docbook"
 
   exclude-result-prefixes = "w o v wx xs dbk pkg r rel word200x exsl saxon fn letex mml"
   >
+  
+  <!-- mode docx2hub:changemarkupis for applying user`s tracked changes -->
 
   <!-- merge changemarkup paragraphs:
        an element w:p[w:pPr[w:rPr[w:del]]] has to be merged with the following w:p
@@ -44,13 +47,12 @@
                                                    [not(name() = ('w:moveToRangeStart', 'w:moveToRangeEnd'))][1]/name()
                                   )[1]
                                  }">
-                <xsl:copy-of select="current-group()[1]/@*"/>
+                <xsl:apply-templates select="current-group()[not(docx2hub:is-changemarkup-removed-para(.))][1]/@*" mode="#current"/>
                 <xsl:attribute name="srcpath" select="string-join(current-group()/@srcpath, '&#x20;')"/>
-                <xsl:copy-of select="current-group()[1]/node()"/>
-                <xsl:copy-of select="current-group()[position() != 1][not(docx2hub:is-changemarkup-removed-para(.))]/node() except w:pPr"/>
+                <xsl:apply-templates select="current-group()[not(docx2hub:is-changemarkup-removed-para(.))]/node()" mode="#current"/>
               </xsl:element>
             </xsl:variable>
-            <xsl:apply-templates select="$merged-para" mode="#current"/>
+            <xsl:sequence select="$merged-para"/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:apply-templates select="current-group()" mode="#current"/>
@@ -108,8 +110,10 @@
     <xsl:sequence 
       select="exists(
                 $para/self::w:p[w:del or w:moveFrom]
-                     [every $e in * 
-                      satisfies $e[name() = ('w:del', 'w:pPr', 'w:moveFromRangeStart', 'w:moveFromRangeEnd', 'w:moveFrom')]
+                     [
+                       every $e in * satisfies $e[
+                         name() = ('m:oMath', 'w:del', 'w:pPr', 'w:moveFromRangeStart', 'w:moveFromRangeEnd', 'w:moveFrom')
+                       ]
                      ]
               )"/>
   </xsl:function>
