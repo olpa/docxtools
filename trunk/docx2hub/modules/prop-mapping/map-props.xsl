@@ -485,7 +485,7 @@
 
       <xsl:when test=". eq 'lang'">
         <xsl:variable name="stringval" as="xs:string?" 
-          select="if ($val/self::w:lang) then ($val/@w:val, $val/@w:bidi)[1] else $val"/>
+          select="if ($val/self::w:lang) then $val/@w:val[1] else $val"/>
         <!-- stripping the country by default. If someone needs it, we need to introduce an option -->
         <xsl:variable name="repl" as="xs:string" 
           select="if (matches($stringval, 'German') or matches($stringval, '\Wde\W'))
@@ -499,6 +499,11 @@
             <xsl:value-of select="$repl"/>  
           </docx2hub:attribute>
         <!-- stripping the country by default. If someone needs it, we need to introduce an option -->
+        </xsl:if>
+        <xsl:if test="$val/self::w:lang[not(@w:val)]/@w:bidi">
+          <docx2hub:attribute name="docx2hub:rtl-lang">
+            <xsl:value-of select="replace($val/@w:bidi, '^(\p{Ll}+).*$', '$1')"/>  
+          </docx2hub:attribute>
         </xsl:if>
       </xsl:when>
 
@@ -1133,7 +1138,7 @@
                           [every $c in * satisfies ($c/(self::w:instrText | self::w:fldChar))]
                           /@*[matches(name(), '^(css:|xml:lang)')]" mode="docx2hub:remove-redundant-run-atts" 
                 priority="10"/>
-  
+
   <!-- collateral: denote numbering resets -->
   <xsl:template match="w:p" mode="docx2hub:remove-redundant-run-atts">
     <xsl:param name="css:orientation" as="xs:string?" tunnel="yes"/>
