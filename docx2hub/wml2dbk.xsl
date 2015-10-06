@@ -851,14 +851,38 @@
     <xsl:variable name="ancestors-with-langs" as="element(*)+">
       <xsl:for-each select="ancestor::*">
         <xsl:copy>
-          <xsl:copy-of select="key('style-by-name', @role)/@xml:lang"/>
-          <xsl:copy-of select="@xml:lang except $context"/>
+          <xsl:copy-of select="key('style-by-name', @role)/(@xml:lang, @css:direction, @docx2hub:rtl-lang)"/>
+          <xsl:copy-of select="@xml:lang except $context, ../@css:direction, ../@docx2hub:rtl-lang"/>
         </xsl:copy>
       </xsl:for-each>
     </xsl:variable>
+    <xsl:variable name="dir" as="xs:string?" select="$ancestors-with-langs[@css:direction][last()]/@css:direction"/>
+    <xsl:variable name="last-lang" select="if ($dir = 'rtl')
+                                           then $ancestors-with-langs[@docx2hub:rtl-lang][last()]/@docx2hub:rtl-lang
+                                           else $ancestors-with-langs[@xml:lang][last()]/@xml:lang"/>
     <!-- Only output the next specific xml:lang if its string value differs from the current one’s: -->
-    <xsl:if test="not($ancestors-with-langs[@xml:lang][last()]/@xml:lang = $context)">
-      <xsl:next-match/>
+    <xsl:if test="not($last-lang = $context)">
+      <xsl:attribute name="xml:lang" select="$context"/>
+    </xsl:if>
+  </xsl:template>
+  
+  <xsl:template match="@docx2hub:rtl-lang" mode="wml-to-dbk" priority="5">
+    <xsl:variable name="context" select="." as="attribute(*)"/>
+    <xsl:variable name="ancestors-with-langs" as="element(*)+">
+      <xsl:for-each select="ancestor::*">
+        <xsl:copy>
+          <xsl:copy-of select="key('style-by-name', @role)/(@xml:lang, @css:direction, @docx2hub:rtl-lang)"/>
+          <xsl:copy-of select="@xml:lang except $context, ../@css:direction, ../@xml:lang"/>
+        </xsl:copy>
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:variable name="dir" as="xs:string?" select="$ancestors-with-langs[@css:direction][last()]/@css:direction"/>
+    <xsl:variable name="last-lang" select="if ($dir = 'rtl')
+                                           then $ancestors-with-langs[@docx2hub:rtl-lang][last()]/@docx2hub:rtl-lang
+                                           else $ancestors-with-langs[@xml:lang][last()]/@xml:lang"/>
+    <!-- Only output the next specific xml:lang if its string value differs from the current one’s: -->
+    <xsl:if test="not($last-lang = $context)">
+      <xsl:attribute name="xml:lang" select="$context"/>
     </xsl:if>
   </xsl:template>
 
