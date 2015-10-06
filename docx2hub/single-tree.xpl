@@ -36,6 +36,11 @@
     <p:documentation>Directory (OS path, not file: URL) to which the file will be unzipped. If option is empty string, will be
       '.tmp' appended to OS file path.</p:documentation>
   </p:option>
+  <p:option name="no-srcpaths-for-text-runs-threshold" select="'40000'">
+    <p:documentation>In order to speed up conversion for long documents, if more w:r elements are found, they won’t receive 
+      a srcpath of their own. In principle, srcpath generation may be sped up by computing them more efficiently,
+      building on a tunnelled parameter that contains the parent element’s already-computed srcpath.</p:documentation>
+  </p:option>
   <p:serialization port="result" omit-xml-declaration="false"/>
 
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl"/>
@@ -177,6 +182,11 @@
     <p:with-option name="debug-dir-uri" select="$debug-dir-uri"/>
     <p:with-param name="srcpaths" select="$srcpaths"/>
     <p:with-param name="fail-on-error" select="$fail-on-error"/>
+    <p:with-param name="srcpaths-on-runs" 
+      select="if (count(//w:r) &gt; $no-srcpaths-for-text-runs-threshold)
+              then 'no' else 'yes'">
+      <p:pipe step="document" port="result"/>
+    </p:with-param>
   </letex:xslt-mode>
 
   <p:choose name="apply-changemarkup">
