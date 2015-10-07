@@ -881,7 +881,7 @@
                                            then $ancestors-with-langs[@docx2hub:rtl-lang][last()]/@docx2hub:rtl-lang
                                            else $ancestors-with-langs[@xml:lang][last()]/@xml:lang"/>
     <!-- Only output the next specific xml:lang if its string value differs from the current one’s: -->
-    <xsl:if test="not($last-lang = $context)">
+    <xsl:if test="$last-lang = $context">
       <xsl:attribute name="xml:lang" select="$context"/>
     </xsl:if>
   </xsl:template>
