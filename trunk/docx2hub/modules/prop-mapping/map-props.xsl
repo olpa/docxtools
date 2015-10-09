@@ -61,12 +61,26 @@
             <!-- /w:root/@xml:base example: file:/data/docx/M_001.docx.tmp/ -->
             <xsl:value-of select="replace(/w:root/@xml:base, '^.*/(.+)\.doc[xm](\.tmp/?)?$', '$1')"/>
           </keyword>
-          <xsl:if test="/w:root/w:containerProps/*:Properties/*:Application">
+          <xsl:if test="/w:root/w:containerProps/extendedProps:Properties/extendedProps:Application">
             <keyword role="source-application">
-              <xsl:value-of select="/w:root/w:containerProps/*:Properties/*:Application"/>
+              <xsl:value-of select="/w:root/w:containerProps/extendedProps:Properties/extendedProps:Application"/>
             </keyword>
           </xsl:if>
         </keywordset>
+        <xsl:if test="exists(../../w:containerProps/(extendedProps:Properties|cp:coreProperties))">
+          <keywordset role="docProps">
+            <xsl:for-each select="../../w:containerProps/cp:*/*[not(*)]">
+              <keyword role="{name()}">
+                <xsl:value-of select="."/>
+              </keyword>
+            </xsl:for-each>
+            <xsl:for-each select="../../w:containerProps/extendedProps:Properties/extendedProps:*[not(*)]">
+              <keyword role="extendedProps:{local-name()}">
+                <xsl:value-of select="."/>
+              </keyword>
+            </xsl:for-each>
+          </keywordset>
+        </xsl:if>
         <xsl:if test="exists(../../w:settings/w:docVars/w:docVar)">
           <keywordset role="docVars">
             <xsl:for-each select="../../w:settings/w:docVars/w:docVar">
