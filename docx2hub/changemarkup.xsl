@@ -33,14 +33,18 @@
   <xsl:template match="*[w:p]" mode="docx2hub:apply-changemarkup">
     <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
-      <xsl:for-each-group select="*" 
+      <xsl:for-each-group select="*[not(name() = ('w:moveToRangeStart', 'w:moveToRangeEnd'))]" 
         group-adjacent="docx2hub:is-merged-changemarkup-para(.) or 
                         preceding-sibling::*[1][docx2hub:is-merged-changemarkup-para(.)]">
         <xsl:choose>
+          <!-- deleted para without following mergable paragraphs, i.e. single para in footnote -->
+          <xsl:when test="current-grouping-key() and (
+                            every $el in current-group() satisfies docx2hub:is-changemarkup-removed-para($el)
+                          )"/>
+          <!-- default behaviour: more than one paragraph, merge them -->
           <xsl:when test="current-grouping-key()">
             <xsl:variable name="first-non-merged-blockelement" as="element()?"
-              select="current-group()[not(docx2hub:is-merged-changemarkup-para(.))]
-                                     [not(name() = ('w:moveToRangeStart', 'w:moveToRangeEnd'))][1]"/>
+              select="current-group()[not(docx2hub:is-merged-changemarkup-para(.))][1]"/>
             <xsl:variable name="merged-para" as="element(*)">
               <!-- element name (15-09-14):
                      in case of a para merged with a table (para deleted, table alive) we need w:tbl as element name 
@@ -103,7 +107,7 @@
   
   <xsl:function name="docx2hub:is-changemarkup-removed-para-break" as="xs:boolean">
     <xsl:param name="el" as="element(*)"/>
-    <xsl:sequence select="exists($el/self::w:p[w:pPr[w:rPr[w:del]]])"/>
+    <xsl:sequence select="exists($el/self::w:p[not(w:moveTo)][w:pPr[w:rPr[w:del]]])"/>
   </xsl:function>
 
   <xsl:function name="docx2hub:is-changemarkup-removed-para" as="xs:boolean">
