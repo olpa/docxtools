@@ -32,12 +32,18 @@
     <p:document href="schematron/field-functions.sch.xml"/>
     <p:documentation>Schematron that will validate the intermediate format after merging/splitting Word field functions.</p:documentation>
   </p:input>
+  <p:input port="result-schematron">
+    <p:document href="schematron/result.sch.xml"/>
+    <p:documentation>Schematron that will validate the flat Hub. It will chiefly report error messages that were 
+      embedded during conversion.</p:documentation>
+  </p:input>
   <p:output port="result" primary="true"/>
   <p:output port="insert-xpath">
     <p:pipe step="single-tree" port="result"/>
   </p:output>
   <p:output port="report" sequence="true">
     <p:pipe port="result" step="check-field-functions"/>
+    <p:pipe port="result" step="check-result"/>
   </p:output>
   <p:output port="schema" sequence="true">
     <p:pipe port="result" step="decorate-field-functions-schematron"/>
@@ -281,6 +287,41 @@
   <letex:prepend-hub-xml-model name="pi">
     <p:with-option name="hub-version" select="$hub-version"/>
   </letex:prepend-hub-xml-model>
+  
+  
+  <p:validate-with-schematron assert-valid="false" name="check-result0">
+    <p:input port="schema">
+      <p:pipe port="result-schematron" step="docx2hub"/>
+    </p:input>
+    <p:input port="parameters"><p:empty/></p:input>
+    <p:with-param name="allow-foreign" select="'true'"/>
+  </p:validate-with-schematron>
+
+  <p:sink/>
+
+  <p:add-attribute name="check-result" match="/*" 
+    attribute-name="transpect:rule-family" attribute-value="docx2hub">
+    <p:input port="source">
+      <p:pipe port="report" step="check-result0"/>
+    </p:input>
+  </p:add-attribute>
+  
+  <p:sink/>
+  
+  <p:add-attribute name="decorate-result-schematron" match="/*" 
+    attribute-name="transpect:rule-family" attribute-value="docx2hub">
+    <p:input port="source">
+      <p:pipe port="result-schematron" step="docx2hub"/>
+    </p:input>
+  </p:add-attribute>
+  
+  <p:sink/>
+  
+  <p:identity>
+    <p:input port="source">
+      <p:pipe port="result" step="pi"/>
+    </p:input>
+  </p:identity>
   
   <p:group use-when="doc-available('http://transpect.le-tex.de/book-conversion/converter/xpl/simple-progress-msg.xpl')">
     <letex:simple-progress-msg name="success-msg" file="docx2hub-success.txt">
