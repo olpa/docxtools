@@ -22,20 +22,6 @@
       </assert>
     </rule>
   </pattern>
-  
-  <pattern id="indexterm-syntax">
-    <rule context="w:instrText[matches(., '^\s*XE\s+', 'i')]">
-      <let name="bookmark-name" value="replace(., '^.+\\r\s+&quot;([^&quot;]*)&quot;.*$', '$1')"/>
-      <assert test="exists(//w:bookmarkStart[@w:name = $bookmark-name])" id="range-not-found"  role="warning"><!-- diagnostics="range-not-found_de" -->
-        <span class="srcpath"><xsl:value-of select="concat(
-                                                      $base-dir, 
-                                                      ancestor::w:p[1]/@srcpath
-                                                    )"/></span>
-           The index term instruction text '<value-of select="."/>' requested a bookmark range '<value-of select="$bookmark-name"/>' 
-        that could not be located in the document. Reverting to a plain (non-range) index term.
-      </assert>
-    </rule>
-  </pattern>
 
   <pattern id="fnmarks">
     <rule context="w:p[w:r/w:footnoteRef]">
