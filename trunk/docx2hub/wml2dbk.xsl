@@ -529,7 +529,7 @@
     <xsl:copy/>
   </xsl:template>
 
-  <xsl:template match="@*" mode="wml-to-dbk">
+  <xsl:template match="@*[not(starts-with(name(), 'docx2hub:generated'))]" mode="wml-to-dbk" priority="-0.5">
     <xsl:call-template name="signal-error" xmlns="">
       <xsl:with-param name="error-code" select="'W2D_021'"/>
       <xsl:with-param name="fail-on-error" select="$fail-on-error"/>
