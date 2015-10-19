@@ -49,7 +49,7 @@
               <!-- element name (15-09-14):
                      in case of a para merged with a table (para deleted, table alive) we need w:tbl as element name 
                      otherwise w:p will be set, usually -->
-              <xsl:element name="{$first-non-merged-blockelement[1]/name()}">
+              <xsl:element name="{($first-non-merged-blockelement[1]/name(), 'w:p')[1]}">
                 <xsl:apply-templates select="current-group()[not(docx2hub:is-merged-changemarkup-para(.))][1]/@*" mode="#current"/>
                 <xsl:attribute name="srcpath" select="string-join(current-group()/@srcpath, '&#x20;')"/>
                 <xsl:apply-templates mode="#current"
