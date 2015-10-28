@@ -31,12 +31,15 @@
                        ]" mode="docx2hub:join-runs" priority="5">
     <xsl:variable name="context" select="." as="element(dbk:para)"/>
     <xsl:variable name="splitted" as="element(dbk:para)+">
-      <xsl:for-each-group select="node()" group-adjacent="not(self::dbk:br[@role eq 'column'])">
-        <xsl:if test="current-grouping-key()">
-          <para>
-            <xsl:sequence select="$context/@*, current-group()"/>
-          </para>
-        </xsl:if>
+      <xsl:for-each-group select="node()" group-starting-with="dbk:br[@role eq 'column']">
+        <para>
+          <xsl:sequence select="$context/@*"/>
+          <xsl:if test="$context/@srcpath and position() != 1">
+            <xsl:attribute name="srcpath" select="concat($context/@srcpath, ';n=', position())"/>
+            <xsl:message select="current-group()[not(self::dbk:br[@role eq 'column'])]"/>
+          </xsl:if>
+          <xsl:sequence select="current-group()[not(self::dbk:br[@role eq 'column'])]"/>
+        </para>
       </xsl:for-each-group>
     </xsl:variable>
     <xsl:apply-templates select="$splitted" mode="#current"/>
