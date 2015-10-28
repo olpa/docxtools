@@ -17,7 +17,7 @@
   xmlns:saxon		= "http://saxon.sf.net/"
   xmlns:letex		= "http://www.le-tex.de/namespace"
   xmlns:docx2hub = "http://www.le-tex.de/namespace/docx2hub"
-  xmlns:mml             = "http://www.w3.org/Math/DTD/mathml2/mathml2.dtd"
+  xmlns:mml = "http://www.w3.org/1998/Math/MathML"
   xmlns:css="http://www.w3.org/1996/css"
   xmlns="http://docbook.org/ns/docbook"
 
@@ -392,6 +392,24 @@
           </xsl:when>
           <xsl:otherwise>
             <xsl:copy-of select="current-group()"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each-group>
+    </xsl:copy>
+  </xsl:template>
+  
+  <!-- group more than one mml:mi[@mathvariant='normal'] element to mtext -->
+  <xsl:template match="mml:*[mml:mi]" mode="docx2hub:join-runs">
+    <xsl:copy copy-namespaces="no">
+      <xsl:for-each-group select="node()" group-adjacent="exists(self::mml:mi[@mathvariant eq 'normal'])">
+        <xsl:choose>
+          <xsl:when test="current-grouping-key() and string-length(string-join(current-group(), '')) gt 1">
+            <mml:mtext>
+              <xsl:apply-templates select="current-group()/node()" mode="#current"/>
+            </mml:mtext>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates select="current-group()" mode="#current"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:for-each-group>
