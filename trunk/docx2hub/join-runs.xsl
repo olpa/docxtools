@@ -36,7 +36,6 @@
           <xsl:sequence select="$context/@*"/>
           <xsl:if test="$context/@srcpath and position() != 1">
             <xsl:attribute name="srcpath" select="concat($context/@srcpath, ';n=', position())"/>
-            <xsl:message select="current-group()[not(self::dbk:br[@role eq 'column'])]"/>
           </xsl:if>
           <xsl:sequence select="current-group()[not(self::dbk:br[@role eq 'column'])]"/>
         </para>
