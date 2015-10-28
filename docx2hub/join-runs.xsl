@@ -26,6 +26,22 @@
 
   <!--<xsl:import href="http://transpect.le-tex.de/xslt-util/hex/hex.xsl"/>-->
 
+  <xsl:template match="dbk:para[
+                         dbk:br[@role eq 'column'][preceding-sibling::node() and following-sibling::node()]
+                       ]" mode="docx2hub:join-runs" priority="5">
+    <xsl:variable name="context" select="." as="element(dbk:para)"/>
+    <xsl:variable name="splitted" as="element(dbk:para)+">
+      <xsl:for-each-group select="node()" group-adjacent="not(self::dbk:br[@role eq 'column'])">
+        <xsl:if test="current-grouping-key()">
+          <para>
+            <xsl:sequence select="$context/@*, current-group()"/>
+          </para>
+        </xsl:if>
+      </xsl:for-each-group>
+    </xsl:variable>
+    <xsl:apply-templates select="$splitted" mode="#current"/>
+  </xsl:template>
+
   <!-- w:r is here for historic reasons. We used to group the text runs
        prematurely until we found out that it is better to group when
        there's docbook markup. So we implemented the special case of
