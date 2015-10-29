@@ -419,6 +419,7 @@
   <!-- group more than one mml:mi[@mathvariant='normal'] element to mtext -->
   <xsl:template match="mml:*[mml:mi]" mode="docx2hub:join-runs">
     <xsl:copy copy-namespaces="no">
+      <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:for-each-group select="node()" group-adjacent="exists(self::mml:mi[@mathvariant eq 'normal'])">
         <xsl:choose>
           <xsl:when test="current-grouping-key() and string-length(string-join(current-group(), '')) gt 1">
