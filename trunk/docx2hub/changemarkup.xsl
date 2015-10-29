@@ -133,6 +133,17 @@
   <xsl:template match="w:del" mode="docx2hub:apply-changemarkup"/>
   <xsl:template match="w:pPrChange" mode="docx2hub:apply-changemarkup"/>
 
+  <!-- some magic: let some deleted end-fldChar elements stay, if begin and end were not equal -->
+  <xsl:template match="w:del[*][every $r in * satisfies $r[self::w:r[*][every $e in * satisfies $e[self::w:rPr or self::w:fldChar[@w:fldCharType eq 'end']]]]]" mode="docx2hub:apply-changemarkup" priority="1">
+    <xsl:variable name="start-elements" select="preceding-sibling::w:r/w:fldChar[@w:fldCharType eq 'begin']"/>
+    <xsl:variable name="end-elements" select="preceding-sibling::w:r/w:fldChar[@w:fldCharType eq 'end'] 
+                                                union
+                                                preceding-sibling::w:del/w:r/w:fldChar[@w:fldCharType eq 'end']"/>
+    <xsl:if test="count($start-elements) &gt; count($end-elements)">
+      <xsl:apply-templates select="w:r" mode="#current"/>
+    </xsl:if>
+  </xsl:template>
+
   <xsl:template match="w:ins | w:moveTo | w:moveFrom" mode="docx2hub:apply-changemarkup">
     <xsl:apply-templates select="*" mode="#current"/>
   </xsl:template>
