@@ -376,6 +376,11 @@
   <xsl:template match="w:tcW" mode="docx2hub:add-props" priority="2">
     <xsl:apply-templates select="@w:w" mode="#current" />
   </xsl:template>
+  
+  <!-- ISO/IEC 29500-1 (2008-11-15):
+       „If this run has any background shading specified using the shd element (§17.3.2.32), 
+       then the background shading shall be superseded by the highlighting color“ -->
+  <xsl:template match="w:shd[../w:highlight]" mode="docx2hub:add-props" priority="2"/>
 
   <xsl:template match="w:sectPr[parent::w:pPr]" mode="docx2hub:add-props" priority="+2">
     <xsl:apply-templates select="w:pgSz" mode="#current"/>
