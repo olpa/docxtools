@@ -85,8 +85,8 @@
     <xsl:variable name="field-code" select="normalize-space(string-join($nodes/w:instrText, ''))" as="xs:string"/>
     <xsl:choose>
       <!-- construct link element -->
-      <xsl:when test="matches($field-code, '^REF\s_([a-z]+\d+)\s?.+\\h(\s|$)')">
-        <xsl:variable name="linkend" select="replace($field-code, '^REF\s_([a-z]+\d+)\s?.+$', '$1', 'i')" as="xs:string"/>
+      <xsl:when test="matches($field-code, '^REF\s(_[a-z]+\d+)\s?.+\\h(\s|$)')">
+        <xsl:variable name="linkend" select="replace($field-code, '^REF\s(_[a-z]+\d+)\s?.+$', '$1', 'i')" as="xs:string"/>
         <link linkend="{$linkend}">
           <xsl:apply-templates select="$nodes" mode="#current"/>
         </link>    
@@ -1166,7 +1166,6 @@
   </xsl:template>
 
  <xsl:template match="w:sym" mode="omml2mml" priority="120">
-    <xsl:message select="'hurz'"/>
     <xsl:apply-templates select="." mode="wml-to-dbk"/>
   </xsl:template>
 
