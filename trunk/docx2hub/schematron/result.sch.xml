@@ -20,6 +20,8 @@
         <span class="srcpath"><xsl:value-of 
           select="for $s in tokenize(ancestor-or-self::*[@srcpath][1]/@srcpath, '\s+')
                   return concat($base-dir, $s)"/></span>
+        <span class="category">docx</span>
+        <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Unbalanced field functions</span>
         There was an error (infinite loop) in finding matching start/end markers for field functions.
         This is typically caused by inadvertent removal of one of the markers while “track changes” is active.
         Word has some autocorrection capability for these things that this converter lacks. 
@@ -36,6 +38,8 @@
 
   <diagnostics>
     <diagnostic id="docx_unbalanced_field_functions_de" xml:lang="de">
+      <span class="category">docx</span>
+      <span class="issue" xmlns="http://www.w3.org/1999/xhtml">Feldfunktionen: Schachtelung falsch</span>
       Es gab einen Fehler (unendliche Rekursion) beim Zuordnen von Start-/Endemarkierungen für Feldfunktionen.
       Dies wird typischerweise dadurch verursacht, dass solche Markierungen bei eingeschalteter Änderungsverfolgung 
       unbeabsichtigt mit entfernt werden. Word kann derlei wohl korrigieren, dieser Konverter jedoch nicht.
