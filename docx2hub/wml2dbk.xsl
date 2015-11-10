@@ -1035,7 +1035,11 @@
               </xsl:if>
             </xsl:element>
           </xsl:when>
-          <xsl:when test="$func/@destroy = 'yes'"/>
+          <xsl:when test="$func/@destroy = 'yes'">
+            <xsl:if test="$text[descendant::w:fldChar]">
+              <xsl:apply-templates select="$text" mode="#current"/>
+            </xsl:if> 
+          </xsl:when>
           <xsl:otherwise>
             <xsl:apply-templates select="$text" mode="#current"/>
           </xsl:otherwise>
