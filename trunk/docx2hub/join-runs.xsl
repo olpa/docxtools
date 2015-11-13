@@ -34,7 +34,7 @@
       <xsl:for-each-group select="node()" group-starting-with="dbk:br[@role eq 'column']">
         <para>
           <xsl:sequence select="$context/@*"/>
-          <xsl:if test="$context/@srcpath and position() != 1">
+          <xsl:if test="$context/@srcpath and position() != 1 and $context/@srcpath">
             <xsl:attribute name="srcpath" select="concat($context/@srcpath, ';n=', position())"/>
           </xsl:if>
           <xsl:sequence select="current-group()[not(self::dbk:br[@role eq 'column'])]"/>
@@ -66,7 +66,7 @@
           <xsl:otherwise>
             <xsl:copy copy-namespaces="no">
               <xsl:apply-templates select="@role, @* except (@srcpath, @role)" mode="#current"/>
-              <xsl:if test="$srcpaths = 'yes'">
+              <xsl:if test="$srcpaths = 'yes' and current-group()/@srcpath">
                 <xsl:attribute name="srcpath" select="current-group()/@srcpath" separator=" "/>
               </xsl:if>
               <xsl:apply-templates select="current-group()[not(self::dbk:anchor)]/node() 
@@ -400,7 +400,7 @@
           <xsl:when test="current-grouping-key()">
             <xsl:copy copy-namespaces="no">
               <xsl:apply-templates select="@* except @srcpath" mode="#current"/>
-              <xsl:if test="$srcpaths = 'yes'">
+              <xsl:if test="$srcpaths = 'yes' and current-group()/@srcpath">
                 <xsl:attribute name="srcpath" select="current-group()/@srcpath" separator=" "/>
               </xsl:if>
               <w:instrText xsl:exclude-result-prefixes="#all">
