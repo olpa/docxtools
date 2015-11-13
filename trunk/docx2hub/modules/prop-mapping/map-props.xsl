@@ -1061,6 +1061,12 @@
           <xsl:sequence select="docx2hub:wrap((@srcpath, $content), (docx2hub:wrap[not(@element = ('superscript', 'subscript'))]))" />
         </xsl:copy>
       </xsl:when>
+      <!-- do not wrap field function elements in subscript or superscript-->
+      <xsl:when test="docx2hub:wrap/@element = ('superscript', 'subscript') and (every $i in * satisfies $i[self::w:fldChar or self::w:instrText or self::docx2hub:*])">
+        <xsl:copy>
+          <xsl:sequence select="docx2hub:wrap((@srcpath, $content), (docx2hub:wrap[not(@element = ('superscript', 'subscript'))]))" />
+        </xsl:copy>
+      </xsl:when>
       <xsl:when test="exists(docx2hub:wrap) and exists(self::css:rule | self::dbk:style)">
         <xsl:copy>
           <xsl:attribute name="remap" select="docx2hub:wrap/@element" />
