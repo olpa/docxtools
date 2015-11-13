@@ -47,9 +47,9 @@
                           )"/>
   </xsl:function>
 
-  <xsl:template match="w:footnote/w:p[*[docx2hub:element-is-footnoteref(.)]]" mode="wml-to-dbk" priority="+1">
+  <xsl:template match="w:footnote/w:p[*[docx2hub:element-is-footnoteref(.)]]" mode="docx2hub:separate-field-functions" priority="+1">
     <xsl:param name="identifier" select="false()"/>
-    <para>
+    <xsl:copy>
       <xsl:apply-templates select="@*" mode="#current"/>
       <xsl:for-each-group select="*" 
             group-adjacent="if (
@@ -89,7 +89,7 @@
                                    except (node()[preceding-sibling::*[1][docx2hub:element-is-footnoteref(.)] and matches(.,'^\)[\s&#160;]*')]/node()[matches(.,'^\)[\s&#160;]*$')][1], 
                                    node()[preceding-sibling::*[1][docx2hub:element-is-footnoteref(.)] and matches(.,'^\)[\s&#160;]*')]/node()[matches(.,'^\)[\s&#160;]*$')][1]/following-sibling::node()[1][self::w:tab])" 
                            mode="#current"/>
-    </para>
+    </xsl:copy>
   </xsl:template>
 
   <!--KW 2014-08-14: 
@@ -98,7 +98,7 @@
   <!-- setzt die Nummer der Fußnote. Prüfen!! -->
   <!-- GI 2013-05-23: Apparently both Word 2013 and LibreOffice 4.0.3 generate a number even if the 
       footnote doesn’t contain a footnoteRef. See for example DIN EN 419251-1, Sect. 6.1 -->
-  <xsl:template match="w:footnoteRef" mode="wml-to-dbk">
+  <xsl:template match="w:footnoteRef" mode="docx2hub:separate-field-functions">
     <xsl:param name="identifier" select="false()"/>
     <xsl:choose>
       <xsl:when test="$identifier">
