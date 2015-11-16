@@ -1062,7 +1062,11 @@
         </xsl:copy>
       </xsl:when>
       <!-- do not wrap field function elements in subscript or superscript-->
-      <xsl:when test="docx2hub:wrap/@element = ('superscript', 'subscript') and (every $i in * satisfies $i[self::w:fldChar or self::w:instrText or self::docx2hub:*])">
+      <xsl:when test="docx2hub:wrap/@element = ('superscript', 'subscript') 
+                      and
+                      (exists(self::w:fldChar | self::w:instrText | self::docx2hub:*))
+                      and
+                      (every $i in * satisfies $i[self::w:fldChar or self::w:instrText or self::docx2hub:*])">
         <xsl:copy>
           <xsl:sequence select="docx2hub:wrap((@srcpath, $content), (docx2hub:wrap[not(@element = ('superscript', 'subscript'))]))" />
         </xsl:copy>
