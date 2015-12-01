@@ -362,7 +362,7 @@
         <xsl:when test="key('natives', .)[matches(@native-name, '(Einfaches Absatzformat|^p$)', 'i')]">
           <xsl:sequence select="'para'"/>
         </xsl:when>
-        <xsl:when test="matches(., 'hub:identifier')">
+        <xsl:when test="matches(., 'hub:')">
           <xsl:sequence select="."/>
         </xsl:when>
         <xsl:otherwise>
@@ -409,7 +409,7 @@
             </xsl:copy>
           </xsl:when>
           <xsl:otherwise>
-            <xsl:copy-of select="current-group()"/>
+            <xsl:apply-templates select="current-group()" mode="#current"/>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:for-each-group>

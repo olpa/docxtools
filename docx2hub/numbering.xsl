@@ -72,6 +72,7 @@
     <xsl:attribute name="docx2hub:num-abstract" select="../@w:abstractNumId"/>
     <xsl:attribute name="docx2hub:num-ilvl" select="@w:ilvl"/>
     <xsl:attribute name="docx2hub:num-id" select="$numId"/>
+    <xsl:attribute name="docx2hub:num-lvlRestart" select="w:lvlRestart/@w:val"/>
     <xsl:if test="exists($restart)">
       <xsl:attribute name="docx2hub:num-restart-level" select="$restart"/>
     </xsl:if>
@@ -110,6 +111,8 @@
     <xsl:variable name="super-level-before" as="xs:boolean"
       select="some $p in $same-abstract-in-between satisfies 
               $p/@docx2hub:num-ilvl &lt; $context/@docx2hub:num-ilvl"/>
+    <xsl:attribute name="docx2hub:num-super-level-before" select="$super-level-before"/>
+    <xsl:attribute name="docx2hub:num-last-same-signature" select="exists($last-same-signature)"/>
     <xsl:choose>
       <xsl:when test="empty ($last-same-signature)
                       or 
@@ -409,7 +412,8 @@
   </xsl:function>
   
   <xsl:template match="@docx2hub:num-signature | @docx2hub:num-continue | @docx2hub:num-abstract | @docx2hub:num-id 
-                       | @docx2hub:num-restart-val | @docx2hub:num-ilvl | @docx2hub:num-restart-level
+                       | @docx2hub:num-restart-val | @docx2hub:num-ilvl | @docx2hub:num-restart-level | @docx2hub:num-lvlRestart
+                       | @docx2hub:num-super-level-before | @docx2hub:num-last-same-signature
                        | @docx2hub:num-initial-skip-increment" mode="docx2hub:join-runs"/>
   
 </xsl:stylesheet>
