@@ -1097,14 +1097,11 @@
 
   <!-- whitespace elements, etc. -->
   <xsl:template match="w:tab" mode="wml-to-dbk">
-    <xsl:choose>
-      <xsl:when test="$srcpaths eq 'yes'">
-        <tab xml:space="preserve" srcpath="{@srcpath}">&#9;</tab>
-      </xsl:when>
-      <xsl:otherwise>
-        <tab xml:space="preserve">&#9;</tab>
-      </xsl:otherwise>
-    </xsl:choose>
+    <tab>
+      <xsl:attribute name="xml:space" select="'preserve'"/>
+      <xsl:apply-templates select="@*"/>
+      <xsl:text>&#9;</xsl:text>   
+    </tab>
   </xsl:template>
 
   <xsl:template match="w:br" mode="wml-to-dbk">
