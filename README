@@ -1,0 +1,15 @@
+DocBook to .docx
+================
+
+Le-tex transpect is an "open source framework for converting and checking documents".
+
+http://www.le-tex.de/en/transpect.html
+http://www.le-tex.de/de/transpect.html
+
+The framework is solved many technical issues already, so I overcame the "not invented here syndrome" and decided to rely on this tool.
+
+DocBook to .docx conversion is far from complete. For my documents, I need to extend the stylesheet and fix bugs. To do it, I made a clone of the le-tex repository.
+
+If you want to try the code, start with "doc/hello-world".
+
+olpa / Oleg Parashchenko / olpa uucode com
