@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<book xmlns="http://docbook.org/ns/docbook"
+      xmlns:css="http://www.w3.org/1996/css"
+      xmlns:cx="http://xmlcalabash.com/ns/extensions"
+      version="5.1-variant le-tex_Hub-1.1"
+      css:version="3.0-variant le-tex_Hub-1.1">
+   <info xmlns:dbk2hub="http://www.le-tex.de/namespace/dbk2hub">
+      <keywordset role="hub">
+         <keyword role="source-basename">hello</keyword>
+         <keyword role="source-paths">false</keyword>
+         <keyword role="formatting-deviations-only">true</keyword>
+         <keyword role="source-type">DBK-XML</keyword>
+      </keywordset>
+      <css:rules>
+         <css:rule layout-type="inline" name="bold" css:font-weight="bold"/>
+         <css:rule layout-type="inline" name="italic" css:font-style="italic"/>
+      </css:rules>
+   </info>
+   <title>Hello, World!</title>
+   <para>Foobar.</para>
+</book>

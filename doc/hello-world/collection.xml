@@ -1,0 +1,5 @@
+<collection stable="true">
+  <doc href="intermediate_matched.xml"/>
+  <doc href="intermediate_not_matched.xml"/>
+  </collection>
+</collection>
