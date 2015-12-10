@@ -65,9 +65,13 @@ Saxon will need these files also as a collection. The definition in "collection.
   </collection>
 </collection>
 
-Put the file "resolver.jar" into "dbk2docx/frontend/calabash/resolver". I found one in other le-tex svn modules. A copy is in the directory "support".
+3) Collect the runtime support
 
-Make directory "dbk2docx/frontend/xslt-util/xmlcatalog", put the file "support/catalog.xml" into this directory.
+Copy the directories "calabash" and "xslt-util" from "dbk2docx/frontend" to the root of this repository. A better way would be a git submodule instead of copy, but this approach needs setup and I prefer the quick way.
+
+Put the file "resolver.jar" into "calabash/resolver" in this repository. I found "resolver.jar" in other le-tex svn modules. A copy is in the directory "support".
+
+In this repository, make a directory "xslt-util/xmlcatalog", put the file "support/catalog.xml" into this directory.
 
 run saxon
 ---------
@@ -78,7 +82,7 @@ INFILE=intermediate_not_matched.xml
 OUTFILE=document.xml
 MODE=default # Second pass: clean, third: merge
 
-CODEDIR=.../dbk2docx/frontend
+CODEDIR=../..
 java -cp $CODEDIR/calabash/resolver/resolver.jar:$CODEDIR/calabash/lib/saxon9he.jar \
   net.sf.saxon.Transform -s:$INFILE \
   --defaultCollection:collection.xml -o:$OUTFILE \
@@ -89,4 +93,7 @@ java -cp $CODEDIR/calabash/resolver/resolver.jar:$CODEDIR/calabash/lib/saxon9he.
 
 The conversion is done in three passes. Each pass is defined by the mode. The first: "default", the second: "clean", the third: "merge".
 
+This xslt in the framework
+--------------------------
 
+Delete the directory ".../dbk2docx/frontend/hub2docx". Instead of the directory, create a symlink to "hub2docx/lib" in this directory. Now "make conversion" will use the XSLT code from this repository.
