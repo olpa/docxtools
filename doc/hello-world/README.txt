@@ -33,6 +33,7 @@ Before the step "transformed-hub", add:
     <p:with-option name="active" select="$debug" />
     <p:with-option name="pipeline-step" select="'hub2docx/5_matched'" />
     <p:with-option name="base-uri" select="$debug-dir-uri" />
+    <p:with-option name="indent" select="'false'"/>
   </letex:store-debug>
   <letex:store-debug name="store-not-matched">
     <p:input port="source">
@@ -41,6 +42,7 @@ Before the step "transformed-hub", add:
     <p:with-option name="active" select="$debug" />
     <p:with-option name="pipeline-step" select="'hub2docx/5_not_matched'" />
     <p:with-option name="base-uri" select="$debug-dir-uri" />
+    <p:with-option name="indent" select="'false'"/>
   </letex:store-debug>
   <p:sink/>
 

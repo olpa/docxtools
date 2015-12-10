@@ -38,12 +38,33 @@
   </p:input>
   <p:input port="parameters" kind="parameter" primary="true"/>
   <p:output port="result" primary="true" />
-  
+
   <p:import href="http://xmlcalabash.com/extension/steps/library-1.0.xpl" />
   <p:import href="http://transpect.le-tex.de/xproc-util/xslt-mode/xslt-mode.xpl"/>
+  <p:import href="http://transpect.le-tex.de/xproc-util/store-debug/store-debug.xpl" />
 
   <p:split-sequence name="split" test="position() = 1" initial-only="true"/>
 
+  <p:sink/>
+
+  <letex:store-debug name="store-matched">
+    <p:input port="source">
+      <p:pipe step="split" port="matched"/>
+    </p:input>
+    <p:with-option name="active" select="$debug" />
+    <p:with-option name="pipeline-step" select="'hub2docx/5_matched'" />
+    <p:with-option name="base-uri" select="$debug-dir-uri" />
+    <p:with-option name="indent" select="'false'"/>
+  </letex:store-debug>
+  <letex:store-debug name="store-not-matched">
+    <p:input port="source">
+      <p:pipe step="split" port="not-matched"/>
+    </p:input>
+    <p:with-option name="active" select="$debug" />
+    <p:with-option name="pipeline-step" select="'hub2docx/5_not_matched'" />
+    <p:with-option name="base-uri" select="$debug-dir-uri" />
+    <p:with-option name="indent" select="'false'"/>
+  </letex:store-debug>
   <p:sink/>
 
   <letex:xslt-mode name="transformed-hub" msg="yes" mode="hub:default" prefix="hub2docx/10">
