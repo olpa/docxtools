@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<section>
+<title>Bar</title>
+<informaltable frame="none" colsep="1" rowsep="1">
+<tgroup cols="1" colsep="1" rowsep="1">
+<colspec colnum="1" colname="1" colwidth="300pt"/>
+<tbody>
+<row rowsep="1">
+<entry colname="1">
+<para>Fail: Mixed content. Whitespace, "para", whitespace.</para>
+</entry>
+</row>
+<row rowsep="1">
+<entry colname="1">Ok: Cell with PCDATA.</entry>
+</row>
+<row rowsep="1">
+<entry colname="1">Ok: Don't fail on <emphasis>mixed</emphasis> content, please.</entry>
+</row>
+</tbody>
+</tgroup>
+</informaltable>
+</section>
