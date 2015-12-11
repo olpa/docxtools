@@ -91,6 +91,7 @@
           <xsl:with-param name="rPrContent" select="$rPrContent" as="element(*)*" tunnel="yes"/>
         </xsl:apply-templates>
       </xsl:when>
+      <xsl:when test="parent::entry and ('' = normalize-space())"/>
       <xsl:otherwise>
         <w:r>
           <xsl:if  test="$rPrContent">
