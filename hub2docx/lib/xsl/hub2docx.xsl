@@ -44,6 +44,7 @@
   <xsl:import href="module/header.xsl"/>
   <xsl:import href="module/footer.xsl"/>
   <xsl:import href="module/merge-with-template.xsl"/>
+  <xsl:import href="module/project-specific.xsl"/>
 
 
   <xsl:param  name="a3paper" select="'no'"/>					<!-- DIN A3 paper -->
