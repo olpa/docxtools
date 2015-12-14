@@ -12,4 +12,10 @@ DocBook to .docx conversion is far from complete. For my documents, I need to ex
 
 If you want to try the code, start with "doc/hello-world".
 
+Further changes
+---------------
+
+The Word template belongs to another le-tex module "dbk2docx". The following styles are to be added there: "Literal" (formatting: monospace font).
+
+-- 
 olpa / Oleg Parashchenko / olpa uucode com
