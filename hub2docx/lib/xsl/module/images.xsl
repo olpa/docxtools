@@ -149,27 +149,7 @@
       </w:r>
     </w:p>
   </xsl:template>
-  
-  <xsl:template match="symbol" mode="hub:default">
-    <xsl:variable name="sidebar-style" as="xs:string*">
-      <xsl:for-each select="@css:position|@css:z-index|@css:margin-left|@css:margin-top|@css:width|@css:height">
-        <xsl:value-of select="concat(local-name(.),':',.)"/>
-      </xsl:for-each>
-    </xsl:variable>
-    <w:r>
-      <w:pict>
-        <xsl:element name="{.}">
-          <xsl:attribute name="coordsize" select="'21600,21600'"/>
-          <xsl:attribute name="o:spt" select="'100'"/>
-          <xsl:attribute name="style" select="string-join($sidebar-style,';')"/>
-          <xsl:if test="@css:background-color ne ''">
-            <xsl:attribute name="fillcolor" select="letex:convert-css-color(@css:background-color, 'hex')"/>
-          </xsl:if>
-        </xsl:element>
-      </w:pict>
-    </w:r>
-  </xsl:template>
-  
+
   <xsl:template match="figure/title" mode="hub:default">
     <xsl:variable name="pPr" as="element(*)*">
       <xsl:apply-templates  select="@css:page-break-after, @css:page-break-inside, @css:page-break-before, @css:text-indent, (@css:widows, @css:orphans)[1], @css:margin-bottom, @css:margin-top, @css:line-height, @css:text-align"  mode="props" />

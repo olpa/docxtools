@@ -179,7 +179,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template  match="emphasis | phrase"  mode="hub:default">
+  <xsl:template  match="emphasis | phrase | symbol"  mode="hub:default">
     <xsl:param  name="rPrContent"  as="element(*)*"  tunnel="yes"/><!-- w:… property elements -->
     <xsl:apply-templates mode="#current" >
       <xsl:with-param  name="rPrContent"  tunnel="yes" as="element(*)*"><!-- w:… property elements -->
@@ -188,10 +188,15 @@
           <xsl:with-param name="new_rPrContent" as="element(*)*">
             <xsl:apply-templates select="@role, @css:*, @xml:lang" mode="props"/>
             <xsl:sequence select="letex:borders(.)"/>
-            <xsl:if test="not(@role) and self::emphasis">
-              <!-- idEmphasisWithoutRoleAttribute -->
-              <w:i/>
-            </xsl:if>
+            <xsl:choose>
+              <xsl:when test="not(@role) and self::emphasis">
+                <!-- idEmphasisWithoutRoleAttribute -->
+                <w:i/>
+              </xsl:when>
+              <xsl:when test="not(@role) and self::symbol">
+                <w:rStyle w:val="Literal"/>
+              </xsl:when>
+            </xsl:choose>
           </xsl:with-param>
         </xsl:call-template>
       </xsl:with-param>
