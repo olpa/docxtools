@@ -529,7 +529,7 @@
   
   <xsl:template match="w:pPr/w:pStyle/@w:val[matches(., '^berschrift\d+$')]" mode="hub:merge">
     <xsl:choose>
-      <xsl:when test="not(collection()/w:root/w:styles/w:style[@type eq 'paragraph']/@w:styleId = .)">
+      <xsl:when test="not(collection()/w:root/w:styles/w:style[@w:type eq 'paragraph']/@w:styleId = .)">
         <xsl:attribute name="w:val" select="replace(., '^berschrift(\d+)$', 'Heading$1')"/>
       </xsl:when>
       <xsl:otherwise>
